@@ -148,7 +148,7 @@ Assume standard WPILib Java project layout:
 
 - `src/main/java/frc/robot/subsystems/*`
   - Each subsystem owns its hardware objects + periodic logic.
-  - Subsystems expose methods that represent “robot actions” (e.g., `setIntakeVoltage()`, `setPivotAngleRadians()`, `stop()`). 
+  - Subsystems expose methods that represent “robot actions” (e.g., `setIntakeVoltage()`, `setPivotAngleRadians()`, `stop()`).
 
 - `src/main/java/frc/robot/commands/*`
   - Commands orchestrate subsystem actions and define end conditions.
