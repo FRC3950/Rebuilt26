@@ -8,6 +8,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.AllianceFlipUtil.*;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always
@@ -89,12 +92,13 @@ public final class Constants {
       public static final double[] flywheelSpeeds = { 50.0, 55.0, 60.0, 65.0, 70.0 };
     }
   }
-
+// Note: Sasha Isn't the person you ask
   public static final class FieldConstants {
-    // 2025 Reefscape Reef Center (approximate, update for 2026/Current game)
-    // Using a generic 0,0,0 translation for now as "Hub"
-    public static final edu.wpi.first.math.geometry.Translation2d hubTranslation = new edu.wpi.first.math.geometry.Translation2d(
-        0.0, 0.0);
+    //position of Hub
+    public static final Translation2d hubTranslation = AllianceFlipUtil.apply(new Translation2d(4.6256194, 4.0346376));
+    //both in inches
+    public static final double fieldWidth = 317.69;
+    public static final double fieldLength = 651.2275;
   }
 
 }
