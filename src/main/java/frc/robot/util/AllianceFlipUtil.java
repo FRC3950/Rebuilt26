@@ -7,9 +7,10 @@
 
 package frc.robot.util;
 
+import static frc.robot.Constants.FieldConstants.*;
+
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
-import static frc.robot.Constants.FieldConstants.*;
 
 public class AllianceFlipUtil {
   public static double applyX(double x) {

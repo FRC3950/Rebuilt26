@@ -323,6 +323,16 @@ public class Drive extends SubsystemBase {
     return getPose().getRotation();
   }
 
+  /** Returns the measured chassis speeds of the robot (robot-relative). */
+  public ChassisSpeeds getRobotRelativeSpeeds() {
+    return getChassisSpeeds();
+  }
+
+  /** Returns the measured chassis speeds of the robot (field-relative). */
+  public ChassisSpeeds getFieldRelativeSpeeds() {
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getRobotRelativeSpeeds(), getRotation());
+  }
+
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
