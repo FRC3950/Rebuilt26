@@ -1,11 +1,17 @@
 package frc.robot;
 
+<<<<<<< HEAD
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.SubsystemConstants.*;
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+=======
+import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+>>>>>>> main
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -18,16 +24,28 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+<<<<<<< HEAD
 import frc.robot.subsystems.turret.FerryMode;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
+=======
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+>>>>>>> main
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+<<<<<<< HEAD
   private final Turret turret1;
   private final Turret turret2;
+=======
+  private final Vision vision;
+>>>>>>> main
 
   // Controller
   private final CommandXboxController driver = new CommandXboxController(0);
@@ -48,6 +66,11 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
         break;
 
       case SIM:
@@ -59,6 +82,12 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    camera0Name, VisionConstants.robotToCamera0, drive::getPose));
         break;
 
       default:
@@ -70,6 +99,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         break;
     }
 
@@ -119,11 +150,16 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
+<<<<<<< HEAD
     // Primary Driver Layout: https://tinyurl.com/2uptvdyh
+=======
+    // Primary Driver Layout: https://tinyurl.com/3z8baru9
+>>>>>>> main
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
+<<<<<<< HEAD
             drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
 
     // Auto Ferry Mode
@@ -154,6 +190,12 @@ public class RobotContainer {
         .whileTrue(
             new FerryMode(turret1, drive, robotToTurret1, rightFerryTarget)
                 .alongWith(new FerryMode(turret2, drive, robotToTurret2, rightFerryTarget)));
+=======
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> -controller.getRightX()));
+>>>>>>> main
   }
 
   public Command getAutonomousCommand() {
