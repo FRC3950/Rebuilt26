@@ -137,7 +137,7 @@ public final class Constants {
         AllianceFlipUtil.apply(
             new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
 
-    public static final double neutralZoneMinY = 5.1816;
-    public static final double neutralZoneMaxY = 11.303;
+    public static final double neutralZoneMinX = 5.1816;
+    public static final double neutralZoneMaxX = 11.303;
   }
 }

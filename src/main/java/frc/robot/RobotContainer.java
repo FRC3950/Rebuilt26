@@ -1,17 +1,12 @@
 package frc.robot;
 
-<<<<<<< HEAD
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.SubsystemConstants.*;
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-=======
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 
 import com.pathplanner.lib.auto.AutoBuilder;
->>>>>>> main
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -24,28 +19,22 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-<<<<<<< HEAD
 import frc.robot.subsystems.turret.FerryMode;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
-=======
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
->>>>>>> main
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-<<<<<<< HEAD
   private final Turret turret1;
   private final Turret turret2;
-=======
   private final Vision vision;
->>>>>>> main
 
   // Controller
   private final CommandXboxController driver = new CommandXboxController(0);
@@ -150,35 +139,30 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-<<<<<<< HEAD
     // Primary Driver Layout: https://tinyurl.com/2uptvdyh
-=======
-    // Primary Driver Layout: https://tinyurl.com/3z8baru9
->>>>>>> main
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
-<<<<<<< HEAD
             drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
 
     // Auto Ferry Mode
     new Trigger(
             () ->
-                drive.getPose().getY() > Constants.FieldConstants.neutralZoneMinY
-                    && drive.getPose().getY() < Constants.FieldConstants.neutralZoneMaxY)
+                drive.getPose().getX() > neutralZoneMinX
+                    && drive.getPose().getX() < neutralZoneMaxX)
         .whileTrue(new FerryMode(turret1, drive, robotToTurret1));
 
     new Trigger(
             () ->
-                drive.getPose().getY() > Constants.FieldConstants.neutralZoneMinY
-                    && drive.getPose().getY() < Constants.FieldConstants.neutralZoneMaxY)
+                drive.getPose().getX() > neutralZoneMinX
+                    && drive.getPose().getX() < neutralZoneMaxX)
         .whileTrue(new FerryMode(turret2, drive, robotToTurret2));
 
     // Manual Ferry Mode - Left
     driver
         .povLeft()
-        .and(() -> drive.getPose().getY() > Constants.FieldConstants.neutralZoneMinY)
+        .and(() -> drive.getPose().getX() > neutralZoneMinX)
         .whileTrue(
             new FerryMode(turret1, drive, robotToTurret1, leftFerryTarget)
                 .alongWith(new FerryMode(turret2, drive, robotToTurret2, leftFerryTarget)));
@@ -186,16 +170,10 @@ public class RobotContainer {
     // Manual Ferry Mode - Right
     driver
         .povRight()
-        .and(() -> drive.getPose().getY() > neutralZoneMinY)
+        .and(() -> drive.getPose().getY() > neutralZoneMinX)
         .whileTrue(
             new FerryMode(turret1, drive, robotToTurret1, rightFerryTarget)
                 .alongWith(new FerryMode(turret2, drive, robotToTurret2, rightFerryTarget)));
-=======
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
->>>>>>> main
   }
 
   public Command getAutonomousCommand() {
