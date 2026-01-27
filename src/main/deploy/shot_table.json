@@ -1,0 +1,34 @@
+{
+  "units": {
+    "distance": "m",
+    "hood": "deg",
+    "flywheel": "rps",
+    "tof": "s"
+  },
+  "points": [
+    {
+      "d": 1.50,
+      "hoodDeg": 18.0,
+      "rps": 86.7,
+      "tof": 0.70
+    },
+    {
+      "d": 2.50,
+      "hoodDeg": 22.5,
+      "rps": 86.7,
+      "tof": 0.82
+    },
+    {
+      "d": 3.50,
+      "hoodDeg": 27.0,
+      "rps": 88.3,
+      "tof": 0.95
+    },
+    {
+      "d": 4.50,
+      "hoodDeg": 31.5,
+      "rps": 90.0,
+      "tof": 1.08
+    }
+  ]
+}

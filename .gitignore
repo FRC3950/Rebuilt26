@@ -1,0 +1,31 @@
+# Gradle
+.gradle/
+build/
+bin/
+
+# DS Store
+.DS_Store
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ Idea
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code
+.vscode/

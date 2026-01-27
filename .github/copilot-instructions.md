@@ -16,6 +16,7 @@ These instructions apply to all FRC3950 robot repositories, including (but not l
 - Avoid blocking loops (`while(true)`, long `Thread.sleep`, busy waits). Use Command-based scheduling and timers.
 - Always ensure actuators are set to a known safe state when disabled and when commands end/interrupted.
 - Prefer conservative defaults (brake/coast, current limits, ramp rates, soft limits) and make them constants.
+-Never modify files in the following directories: .gradle .wpilib .vscode .github gradle
 
 ### 1.2 Don’t guess vendor APIs
 - If you are writing or editing code that calls WPILib / CTRE / REV APIs, verify method/class names and expected units by consulting the “Authoritative Docs” section below.

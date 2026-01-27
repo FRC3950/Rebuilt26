@@ -1,17 +1,15 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
 package frc.robot;
 
+import static frc.robot.Constants.FieldConstants.*;
+import static frc.robot.Constants.SubsystemConstants.*;
+import static frc.robot.Constants.SubsystemConstants.Turret.*;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
@@ -21,6 +19,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.turret.FerryMode;
+import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.turret.TurretTargeting;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -28,24 +29,19 @@ import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and button mappings) should be declared here.
- */
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Turret turret1;
+  private final Turret turret2;
   private final Vision vision;
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController driver = new CommandXboxController(0);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL:
@@ -97,10 +93,33 @@ public class RobotContainer {
         break;
     }
 
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    turret1 =
+        new Turret(
+            azimuthID,
+            azimuthConfig,
+            hoodID,
+            hoodConfig,
+            flywheelID,
+            flywheelConfig,
+            flywheelFollowerID,
+            CANivore);
+    turret2 =
+        new Turret(
+            azimuthID2,
+            azimuthConfig,
+            hoodID2,
+            hoodConfig,
+            flywheelID2,
+            flywheelConfig,
+            flywheelFollowerID2,
+            CANivore);
 
-    // Set up SysId routines
+    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
+    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
+    SmartDashboard.putData("Turret Subsystem", turret1);
+
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
+
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
     autoChooser.addOption(
@@ -116,26 +135,47 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    // Configure the button bindings
     configureButtonBindings();
   }
 
   private void configureButtonBindings() {
-    // Primary Driver Layout: https://tinyurl.com/3z8baru9
+    // Primary Driver Layout: https://tinyurl.com/2uptvdyh
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
+
+    // Auto Ferry Mode
+    new Trigger(
+            () ->
+                drive.getPose().getX() > neutralZoneMinX
+                    && drive.getPose().getX() < neutralZoneMaxX)
+        .whileTrue(new FerryMode(turret1, drive, robotToTurret1));
+
+    new Trigger(
+            () ->
+                drive.getPose().getX() > neutralZoneMinX
+                    && drive.getPose().getX() < neutralZoneMaxX)
+        .whileTrue(new FerryMode(turret2, drive, robotToTurret2));
+
+    // Manual Ferry Mode - Left
+    driver
+        .povLeft()
+        .and(() -> drive.getPose().getX() > neutralZoneMinX)
+        .whileTrue(
+            new FerryMode(turret1, drive, robotToTurret1, leftFerryTarget)
+                .alongWith(new FerryMode(turret2, drive, robotToTurret2, leftFerryTarget)));
+
+    // Manual Ferry Mode - Right
+    driver
+        .povRight()
+        .and(() -> drive.getPose().getY() > neutralZoneMinX)
+        .whileTrue(
+            new FerryMode(turret1, drive, robotToTurret1, rightFerryTarget)
+                .alongWith(new FerryMode(turret2, drive, robotToTurret2, rightFerryTarget)));
   }
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
+
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
