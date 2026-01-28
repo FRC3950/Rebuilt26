@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
@@ -35,6 +36,7 @@ public class RobotContainer {
   private final Turret turret1;
   private final Turret turret2;
   private final Vision vision;
+  private final Intake intake;
 
   // Controller
   private final CommandXboxController driver = new CommandXboxController(0);
@@ -114,6 +116,8 @@ public class RobotContainer {
             flywheelFollowerID2,
             CANivore);
 
+    intake = new Intake();
+
     turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
     turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
     SmartDashboard.putData("Turret Subsystem", turret1);
@@ -139,7 +143,7 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    // Primary Driver Layout: https://tinyurl.com/2uptvdyh
+    // Primary Driver Layout: https://tinyurl.com/5n7kv2up
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -174,6 +178,11 @@ public class RobotContainer {
         .whileTrue(
             new FerryMode(turret1, drive, robotToTurret1, rightFerryTarget)
                 .alongWith(new FerryMode(turret2, drive, robotToTurret2, rightFerryTarget)));
+
+    // Intake
+    driver.leftTrigger().whileTrue(intake.intakeCommand());
+    
+    driver.rightBumper().onTrue(intake.retractCommand());
   }
 
   public Command getAutonomousCommand() {
