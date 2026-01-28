@@ -7,9 +7,9 @@ package frc.robot.subsystems.indexer;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Indexer.*;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.Command;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Indexer extends SubsystemBase {
 
@@ -47,13 +47,13 @@ public class Indexer extends SubsystemBase {
 
   public Command feedCommand() {
     return this.runEnd(
-      () -> {
-        startIndexer();
-        startHotdog();
-      },
-      () -> {
-        stopIndexer();
-        stopHotdog();
-      });
+        () -> {
+          startIndexer();
+          startHotdog();
+        },
+        () -> {
+          stopIndexer();
+          stopHotdog();
+        });
   }
 }
