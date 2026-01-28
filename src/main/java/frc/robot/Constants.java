@@ -142,6 +142,14 @@ public final class Constants {
 
       // for the pivot: motion magic with kv and kp, for intake: duty cycle.
     }
+
+    public static final class Indexer{
+      public static final int hotdogMotorID = 20;
+      public static final int indexerMotorID = 21;
+
+      public static final int indexerSpeed = 85; // Duty Cycle: 1-100
+      public static final int hotdogSpeed = 70; // Duty Cycle: 1-100
+    }
   }
   // Josh wrote this part of the code, easter egg of 2026
 
