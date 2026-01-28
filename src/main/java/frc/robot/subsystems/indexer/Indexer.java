@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 public class Indexer extends SubsystemBase {
-  
+
   TalonFX hotdogMotor;
   TalonFX indexerMotor;
 
@@ -43,5 +43,17 @@ public class Indexer extends SubsystemBase {
 
   public void stopHotdog() {
     setHotdogSpeed(0);
+  }
+
+  public Command feedCommand() {
+    return this.runEnd(
+      () -> {
+        startIndexer();
+        startHotdog();
+      },
+      () -> {
+        stopIndexer();
+        stopHotdog();
+      });
   }
 }

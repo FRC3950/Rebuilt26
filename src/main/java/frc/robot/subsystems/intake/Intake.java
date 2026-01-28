@@ -48,15 +48,6 @@ public class Intake extends SubsystemBase {
     pivotMotor.setControl(mmRequest.withPosition(upPos));
   }
 
-  public Command intakeCommand() {
-    return this.runEnd(
-        () -> {
-          extend();
-          startIntake();
-        },
-        () -> stopIntake());
-  }
-
   public Command retractCommand() {
     return this.runOnce(this::retract);
   }
