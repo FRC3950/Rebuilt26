@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
@@ -12,11 +13,13 @@ import frc.robot.subsystems.intake.Intake;
 public class IntakeCommand extends Command {
   private final Intake intake;
   private final Indexer indexer;
+  private final BooleanSupplier isShooting;
 
   /** Creates a new IntakeCommand. */
-  public IntakeCommand(Intake intake, Indexer indexer) {
+  public IntakeCommand(Intake intake, Indexer indexer, BooleanSupplier isShooting) {
     this.intake = intake;
     this.indexer = indexer;
+    this.isShooting = isShooting;
     addRequirements(intake);
   }
 
@@ -25,18 +28,19 @@ public class IntakeCommand extends Command {
   public void initialize() {
     intake.extend();
     intake.startIntake();
-    indexer.setHotdogSpeed(0.5);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    if (!isShooting.getAsBoolean())
+      indexer.runEndHotdog(0.5);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     intake.stopIntake();
-    indexer.stopHotdog();
   }
 
   // Returns true when the command should end.

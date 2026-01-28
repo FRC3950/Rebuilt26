@@ -56,4 +56,10 @@ public class Indexer extends SubsystemBase {
           stopHotdog();
         });
   }
+
+  public Command runEndHotdog(double speed) {
+    return this.runEnd(
+        () -> setHotdogSpeed(speed),
+        () -> stopHotdog());
+  }
 }
