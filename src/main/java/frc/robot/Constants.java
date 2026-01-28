@@ -127,7 +127,7 @@ public final class Constants {
       public static final double downPos = -2.5;
       public static final double upPos = 2.5;
 
-      public static final int intakeSpeed = 80; // Duty Cycle: 1-100
+      public static final double intakeSpeed = 0.80; // Duty Cycle: -1 to 1
 
       public static final TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
       public static final double pivotKP = 0.2;
@@ -149,8 +149,8 @@ public final class Constants {
       public static final int hotdogMotorID = 20;
       public static final int indexerMotorID = 21;
 
-      public static final int indexerSpeed = 85; // Duty Cycle: 1-100
-      public static final int hotdogSpeed = 70; // Duty Cycle: 1-100
+      public static final double indexerSpeed = .85; // Duty Cycle: -1 to 1
+      public static final double hotdogSpeed = .70; // Duty Cycle: -1 to 1
     }
   }
   // Josh wrote this part of the code, easter egg of 2026
