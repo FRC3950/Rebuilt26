@@ -7,10 +7,10 @@ package frc.robot.subsystems.intake;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Intake.*;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.Command;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
   private final TalonFX intakeMotor;
@@ -46,15 +46,6 @@ public class Intake extends SubsystemBase {
 
   public void retract() {
     pivotMotor.setControl(mmRequest.withPosition(upPos));
-  }
-
-  public Command intakeCommand() {
-    return this.runEnd(
-        () -> {
-          extend();
-          startIntake();
-        },
-        () -> stopIntake());
   }
 
   public Command retractCommand() {
