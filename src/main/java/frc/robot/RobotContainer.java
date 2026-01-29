@@ -15,6 +15,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
@@ -37,6 +38,7 @@ public class RobotContainer {
   private final Turret turret2;
   private final Vision vision;
   private final Intake intake;
+  private final Climber climber;
 
   // Controller
   private final CommandXboxController driver = new CommandXboxController(0);
@@ -117,6 +119,7 @@ public class RobotContainer {
             CANivore);
 
     intake = new Intake();
+    climber = new Climber();
 
     turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
     turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
@@ -183,6 +186,9 @@ public class RobotContainer {
     driver.leftTrigger().whileTrue(intake.intakeCommand());
     
     driver.rightBumper().onTrue(intake.retractCommand());
+
+    // Climber
+    driver.povDown().onTrue(climber.togglePositionCommand());
   }
 
   public Command getAutonomousCommand() {
