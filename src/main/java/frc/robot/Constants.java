@@ -145,6 +145,30 @@ public final class Constants {
       // for the pivot: motion magic with kv and kp, for intake: duty cycle.
     }
 
+    public static final class Climber {
+      public static final int climberMotorID = 22;
+      public static final int limitSwitchPort = 0;
+
+      public static final double climberMaxHeight = 20;
+      public static final double climbUpHeight = 18;
+      public static final double climbFinalPos = 4;
+
+      public static final TalonFXConfiguration climberConfig = new TalonFXConfiguration();
+      public static final double climberKP = 0.2;
+      public static final double climberKV = 0.11;
+      public static final int climberMMVelocity = 25;
+      public static final int climberMMAcceleration = 10;
+
+      static {
+        climberConfig.Slot0.kP = climberKP;
+        climberConfig.Slot0.kV = climberKV;
+        climberConfig.MotionMagic.MotionMagicAcceleration = climberMMAcceleration;
+        climberConfig.MotionMagic.MotionMagicCruiseVelocity = climberMMVelocity;
+        climberConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        climberConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = climberMaxHeight;
+        climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+      }
     public static final class Indexer {
       public static final int hotdogMotorID = 20;
       public static final int indexerMotorID = 21;
