@@ -100,8 +100,10 @@ public final class Constants {
         azimuthConfig.Slot0.kP = azimuthKP;
         azimuthConfig.Slot0.kV = azimuthKV;
         azimuthConfig.Slot0.kS = azimuthKS;
-        azimuthConfig.MotionMagic.MotionMagicCruiseVelocity = azimuthMaxVelocity / 360.0 * azimuthGearRatio; // Rotations/s
-        azimuthConfig.MotionMagic.MotionMagicAcceleration = azimuthMaxAcceleration / 360.0 * azimuthGearRatio; // Rotations/s^2
+        azimuthConfig.MotionMagic.MotionMagicCruiseVelocity =
+            azimuthMaxVelocity / 360.0 * azimuthGearRatio; // Rotations/s
+        azimuthConfig.MotionMagic.MotionMagicAcceleration =
+            azimuthMaxAcceleration / 360.0 * azimuthGearRatio; // Rotations/s^2
         azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // Hood Motor Config
@@ -125,7 +127,7 @@ public final class Constants {
       public static final double downPos = -2.5;
       public static final double upPos = 2.5;
 
-      public static final int intakeSpeed = 80; // Duty Cycle: 1-100
+      public static final double intakeSpeed = 0.80; // Duty Cycle: -1 to 1
 
       public static final TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
       public static final double pivotKP = 0.2;
@@ -167,6 +169,12 @@ public final class Constants {
         climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
       }
+    public static final class Indexer {
+      public static final int hotdogMotorID = 20;
+      public static final int indexerMotorID = 21;
+
+      public static final double indexerSpeed = .85; // Duty Cycle: -1 to 1
+      public static final double hotdogSpeed = .70; // Duty Cycle: -1 to 1
     }
   }
   // Josh wrote this part of the code, easter egg of 2026
@@ -174,16 +182,19 @@ public final class Constants {
   // Note: Sasha Isn't the person you ask
   public static final class FieldConstants {
     // position of Hub
-    public static final Translation2d hubTranslation = AllianceFlipUtil.apply(new Translation2d(4.6256194, 4.0346376));
+    public static final Translation2d hubTranslation =
+        AllianceFlipUtil.apply(new Translation2d(4.6256194, 4.0346376));
     // both in inches
     public static final double fieldWidth = 317.69;
     public static final double fieldLength = 651.2275;
     // positions of ferry shot targets
     // 1 foot = 0.3048 meters
-    public static final Translation2d leftFerryTarget = AllianceFlipUtil.apply(
-        new Translation2d(hubTranslation.getX() - 1.34, hubTranslation.getY() - 0.59));
-    public static final Translation2d rightFerryTarget = AllianceFlipUtil.apply(
-        new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
+    public static final Translation2d leftFerryTarget =
+        AllianceFlipUtil.apply(
+            new Translation2d(hubTranslation.getX() - 1.34, hubTranslation.getY() - 0.59));
+    public static final Translation2d rightFerryTarget =
+        AllianceFlipUtil.apply(
+            new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
 
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;
