@@ -145,6 +145,14 @@ public final class Constants {
       // for the pivot: motion magic with kv and kp, for intake: duty cycle.
     }
 
+    public static final class Indexer {
+      public static final int hotdogMotorID = 20;
+      public static final int indexerMotorID = 21;
+
+      public static final double indexerSpeed = .85; // Duty Cycle: -1 to 1
+      public static final double hotdogSpeed = .70; // Duty Cycle: -1 to 1
+    }
+
     public static final class Climber {
       public static final int climberMotorID = 22;
       public static final int limitSwitchPort = 0;
@@ -169,17 +177,12 @@ public final class Constants {
         climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
       }
-    public static final class Indexer {
-      public static final int hotdogMotorID = 20;
-      public static final int indexerMotorID = 21;
-
-      public static final double indexerSpeed = .85; // Duty Cycle: -1 to 1
-      public static final double hotdogSpeed = .70; // Duty Cycle: -1 to 1
     }
-  }
-  // Josh wrote this part of the code, easter egg of 2026
+    // Josh wrote this part of the code, easter egg of 2026
 
-  // Note: Sasha Isn't the person you ask
+    // Note: Sasha Isn't the person you ask
+  }
+
   public static final class FieldConstants {
     // position of Hub
     public static final Translation2d hubTranslation =

@@ -55,8 +55,7 @@ public class Turret extends SubsystemBase {
     // Mechanism 2D
     mechanism = new Mechanism2d(3, 3);
     mechRoot = mechanism.getRoot("TurretRoot", 1.5, 1.5);
-    turretLigament =
-        mechRoot.append(new MechanismLigament2d("Turret", 0.5, 0, 6, new Color8Bit(Color.kBlue)));
+    turretLigament = mechRoot.append(new MechanismLigament2d("Turret", 0.5, 0, 6, new Color8Bit(Color.kBlue)));
     SmartDashboard.putData("Turret Mechanism", mechanism);
   }
 
@@ -99,9 +98,8 @@ public class Turret extends SubsystemBase {
     double azimuthRotations = azimuth.getPosition().getValueAsDouble();
     double currentAzimuthDegrees = Units.rotationsToDegrees(azimuthRotations / azimuthGearRatio);
 
-    double deltaDegrees =
-        MathUtil.inputModulus(
-            targetAzimuthDegrees - currentAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
+    double deltaDegrees = MathUtil.inputModulus(
+        targetAzimuthDegrees - currentAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
     double setpointDegrees = currentAzimuthDegrees + deltaDegrees;
 
     azimuth.setControl(
