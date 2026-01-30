@@ -34,60 +34,60 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
-    // Subsystems
-    private final Drive drive;
-    private final Turret turret1;
-    private final Turret turret2;
-    private final Vision vision;
-    private final Intake intake;
-    private final Indexer indexer;
-    private final Climber climber;
+  // Subsystems
+  private final Drive drive;
+  private final Turret turret1;
+  private final Turret turret2;
+  private final Vision vision;
+  private final Intake intake;
+  private final Indexer indexer;
+  private final Climber climber;
 
-    // Controller
-    private final CommandXboxController driver = new CommandXboxController(0);
+  // Controller
+  private final CommandXboxController driver = new CommandXboxController(0);
 
-    // Dashboard inputs
-    private final LoggedDashboardChooser<Command> autoChooser;
+  // Dashboard inputs
+  private final LoggedDashboardChooser<Command> autoChooser;
 
-    public RobotContainer() {
-        switch (Constants.currentMode) {
-            case REAL:
-                // Real robot, instantiate hardware IO implementations
-                // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
-                // a CANcoder
+  public RobotContainer() {
+    switch (Constants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
+        // a CANcoder
         drive =
             new Drive(
-                        new GyroIOPigeon2(),
-                        new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                        new ModuleIOTalonFX(TunerConstants.FrontRight),
-                        new ModuleIOTalonFX(TunerConstants.BackLeft),
-                        new ModuleIOTalonFX(TunerConstants.BackRight));
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                new ModuleIOTalonFX(TunerConstants.BackRight));
 
         vision =
             new Vision(
-                        drive::addVisionMeasurement,
-                        new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
-                break;
+                drive::addVisionMeasurement,
+                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
+        break;
 
-            case SIM:
-                // Sim robot, instantiate physics sim IO implementations
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
                 new GyroIO() {},
-                        new ModuleIOSim(TunerConstants.FrontLeft),
-                        new ModuleIOSim(TunerConstants.FrontRight),
-                        new ModuleIOSim(TunerConstants.BackLeft),
-                        new ModuleIOSim(TunerConstants.BackRight));
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight));
 
         vision =
             new Vision(
-                        drive::addVisionMeasurement,
-                        new VisionIOPhotonVisionSim(
-                                camera0Name, VisionConstants.robotToCamera0, drive::getPose));
-                break;
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    camera0Name, VisionConstants.robotToCamera0, drive::getPose));
+        break;
 
-            default:
-                // Replayed robot, disable IO implementations
+      default:
+        // Replayed robot, disable IO implementations
         drive =
             new Drive(
                 new GyroIO() {},
@@ -97,108 +97,110 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-                break;
-        }
+        break;
+    }
 
     turret1 =
         new Turret(
-                azimuthID,
-                azimuthConfig,
-                hoodID,
-                hoodConfig,
-                flywheelID,
-                flywheelConfig,
-                flywheelFollowerID,
-                CANivore);
+            azimuthID,
+            azimuthConfig,
+            hoodID,
+            hoodConfig,
+            flywheelID,
+            flywheelConfig,
+            flywheelFollowerID,
+            CANivore);
     turret2 =
         new Turret(
-                azimuthID2,
-                azimuthConfig,
-                hoodID2,
-                hoodConfig,
-                flywheelID2,
-                flywheelConfig,
-                flywheelFollowerID2,
-                CANivore);
+            azimuthID2,
+            azimuthConfig,
+            hoodID2,
+            hoodConfig,
+            flywheelID2,
+            flywheelConfig,
+            flywheelFollowerID2,
+            CANivore);
 
-        intake = new Intake();
-        indexer = new Indexer();
-        climber = new Climber();
+    intake = new Intake();
+    indexer = new Indexer();
+    climber = new Climber();
 
-        turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
-        turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
-        SmartDashboard.putData("Turret Subsystem", turret1);
+    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
+    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
+    SmartDashboard.putData("Turret Subsystem", turret1);
 
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
 
-        autoChooser.addOption(
-                "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-        autoChooser.addOption(
-                "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Forward)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Reverse)",
-                drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-        configureButtonBindings();
-    }
+    configureButtonBindings();
+  }
 
-    private void configureButtonBindings() {
-        // Primary Driver Layout: https://tinyurl.com/5n7kv2up
+  private void configureButtonBindings() {
+    // Primary Driver Layout: https://tinyurl.com/5n7kv2up
 
-        // Default command, normal field-relative drive
-        drive.setDefaultCommand(
-                DriveCommands.joystickDrive(
-                        drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
+    // Default command, normal field-relative drive
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
 
-        // Auto Ferry Mode
-        new Trigger(
+    // Auto Ferry Mode
+    new Trigger(
             () ->
                 drive.getPose().getX() > neutralZoneMinX
-                        && drive.getPose().getX() < neutralZoneMaxX)
-                .whileTrue(new FerryMode(turret1, drive, robotToTurret1));
+                    && drive.getPose().getX() < neutralZoneMaxX)
+        .whileTrue(new FerryMode(turret1, drive, robotToTurret1));
 
-        new Trigger(
+    new Trigger(
             () ->
                 drive.getPose().getX() > neutralZoneMinX
-                        && drive.getPose().getX() < neutralZoneMaxX)
-                .whileTrue(new FerryMode(turret2, drive, robotToTurret2));
+                    && drive.getPose().getX() < neutralZoneMaxX)
+        .whileTrue(new FerryMode(turret2, drive, robotToTurret2));
 
-        // Manual Ferry Mode - Left
-        driver
-                .povLeft()
-                .and(() -> drive.getPose().getX() > neutralZoneMinX)
-                .whileTrue(
-                        new FerryMode(turret1, drive, robotToTurret1, leftFerryTarget)
-                                .alongWith(new FerryMode(turret2, drive, robotToTurret2, leftFerryTarget)));
+    // Manual Ferry Mode - Left
+    driver
+        .povLeft()
+        .and(() -> drive.getPose().getX() > neutralZoneMinX)
+        .whileTrue(
+            new FerryMode(turret1, drive, robotToTurret1, leftFerryTarget)
+                .alongWith(new FerryMode(turret2, drive, robotToTurret2, leftFerryTarget)));
 
-        // Manual Ferry Mode - Right
-        driver
-                .povRight()
-                .and(() -> drive.getPose().getY() > neutralZoneMinX)
-                .whileTrue(
-                        new FerryMode(turret1, drive, robotToTurret1, rightFerryTarget)
-                                .alongWith(new FerryMode(turret2, drive, robotToTurret2, rightFerryTarget)));
+    // Manual Ferry Mode - Right
+    driver
+        .povRight()
+        .and(() -> drive.getPose().getY() > neutralZoneMinX)
+        .whileTrue(
+            new FerryMode(turret1, drive, robotToTurret1, rightFerryTarget)
+                .alongWith(new FerryMode(turret2, drive, robotToTurret2, rightFerryTarget)));
 
-        // Intake
-        driver.leftTrigger().whileTrue(new IntakeCommand(intake, indexer, driver.rightTrigger()::getAsBoolean));
+    // Intake
+    driver
+        .leftTrigger()
+        .whileTrue(new IntakeCommand(intake, indexer, driver.rightTrigger()::getAsBoolean));
 
-        driver.rightBumper().onTrue(intake.retractCommand());
+    driver.rightBumper().onTrue(intake.retractCommand());
 
-        //Shoot/Feed Fuel
-        driver.rightTrigger().whileTrue(indexer.feedCommand());
+    // Shoot/Feed Fuel
+    driver.rightTrigger().whileTrue(indexer.feedCommand());
 
-        // Climber
-        driver.povDown().onTrue(climber.togglePositionCommand());
-    }
+    // Climber
+    driver.povDown().debounce(0.75).onTrue(climber.togglePositionCommand());
+  }
 
-    public Command getAutonomousCommand() {
-        return autoChooser.get();
-    }
+  public Command getAutonomousCommand() {
+    return autoChooser.get();
+  }
 }
