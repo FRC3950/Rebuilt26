@@ -37,24 +37,28 @@ public final class Constants {
     public static final class Drive {
       public static final int fLeftDriveID = 1;
       public static final int fLeftSteerID = 2;
-      public static final int fRightDriveID = 3;
-      public static final int fRightSteerID = 4;
-      public static final int bLeftDriveID = 5;
-      public static final int bLeftSteerID = 6;
-      public static final int bRightDriveID = 7;
-      public static final int bRightSteerID = 8;
+      public static final int fLeftEncoderID = 3;
+      public static final int fRightDriveID = 4;
+      public static final int fRightSteerID = 5;
+      public static final int fRightEncoderID = 6;
+      public static final int bLeftDriveID = 7;
+      public static final int bLeftSteerID = 8;
+      public static final int bLeftEncoderID = 9;
+      public static final int bRightDriveID = 10;
+      public static final int bRightSteerID = 11;
+      public static final int bRightEncoderID = 12;
     }
 
     public static final class Turret {
-      public static final int azimuthID = 10;
-      public static final int hoodID = 11;
-      public static final int flywheelID = 12;
-      public static final int flywheelFollowerID = 13;
+      public static final int azimuthID = 14;
+      public static final int hoodID = 15;
+      public static final int flywheelID = 16;
+      public static final int flywheelFollowerID = 17;
 
-      public static final int azimuthID2 = 14;
-      public static final int hoodID2 = 15;
-      public static final int flywheelID2 = 16;
-      public static final int flywheelFollowerID2 = 17;
+      public static final int azimuthID2 = 18;
+      public static final int hoodID2 = 19;
+      public static final int flywheelID2 = 20;
+      public static final int flywheelFollowerID2 = 21;
 
       public static final TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration hoodConfig = new TalonFXConfiguration();
@@ -84,6 +88,7 @@ public final class Constants {
       public static final double flywheelKP = 0.2;
       public static final double flywheelKS = 0.0;
       public static final double flywheelKV = 0.11;
+      public static final int speedTolerance = 25;
 
       // Turret position relative to the robot pose origin (meters).
       public static final Translation2d robotToTurret1 = new Translation2d(0.0, 0.0);
@@ -120,14 +125,17 @@ public final class Constants {
     }
 
     public static final class Intake {
-      public static final int intakeMotorID = 18;
-      public static final int pivotMotorID = 19;
+      public static final int intakeMotorID = 22;
+      public static final int pivotMotorID = 23;
 
       // Intake Positions - UPDATE ME!!!
       public static final double downPos = -2.5;
       public static final double upPos = 2.5;
 
-      public static final double intakeSpeed = 0.80; // Duty Cycle: -1 to 1
+      public static final double intakeSpeed = 40.0; // RPS
+      public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
+      public static final double intakeKP = 0.1;
+      public static final double intakeKV = 0.12;
 
       public static final TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
       public static final double pivotKP = 0.2;
@@ -140,21 +148,42 @@ public final class Constants {
         pivotConfig.Slot0.kV = pivotKV;
         pivotConfig.MotionMagic.MotionMagicAcceleration = pivotMMAcceleration;
         pivotConfig.MotionMagic.MotionMagicCruiseVelocity = pivotMMVelocity;
+
+        // Intake Motor Config
+        intakeConfig.Slot0.kP = intakeKP;
+        intakeConfig.Slot0.kV = intakeKV;
       }
 
       // for the pivot: motion magic with kv and kp, for intake: duty cycle.
     }
 
     public static final class Indexer {
-      public static final int hotdogMotorID = 20;
-      public static final int indexerMotorID = 21;
+      public static final int hotdogMotorID = 24;
+      public static final int indexerMotorID = 25;
 
-      public static final double indexerSpeed = .85; // Duty Cycle: -1 to 1
-      public static final double hotdogSpeed = .70; // Duty Cycle: -1 to 1
+      public static final double indexerSpeed = 20.0; // RPS
+      public static final double hotdogSpeed = 20.0; // RPS
+
+      public static final TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
+      public static final TalonFXConfiguration hotdogConfig = new TalonFXConfiguration();
+
+      public static final double indexerKP = 0.1;
+      public static final double indexerKV = 0.12;
+
+      public static final double hotdogKP = 0.1;
+      public static final double hotdogKV = 0.12;
+
+      static {
+        indexerConfig.Slot0.kP = indexerKP;
+        indexerConfig.Slot0.kV = indexerKV;
+
+        hotdogConfig.Slot0.kP = hotdogKP;
+        hotdogConfig.Slot0.kV = hotdogKV;
+      }
     }
 
     public static final class Climber {
-      public static final int climberMotorID = 22;
+      public static final int climberMotorID = 26;
       public static final int limitSwitchPort = 0;
 
       public static final double climberMaxHeight = 20;

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Climber extends SubsystemBase {
 
@@ -29,11 +30,21 @@ public class Climber extends SubsystemBase {
     climberMotor.setControl(mmRequest.withPosition(targetPosition));
   }
 
+  @AutoLogOutput(key = "Climber/Climber Zero'd?")
+  public boolean getClimberZeroed() {
+    return limitSwitch.get();
+  }
+
+  @AutoLogOutput(key = "Climber/Climber Position")
+  public double getClimberPosition() {
+    return climberMotor.getPosition().getValueAsDouble();
+  }
+
   public Command togglePositionCommand() {
     return runOnce(
         () -> {
-          double currentPos = climberMotor.getPosition().getValueAsDouble();
-          double target = (Math.abs(currentPos) < climbUpHeight / 2.0) ? climbUpHeight : 0.0;
+          double target =
+              (Math.abs(getClimberPosition()) < climbUpHeight / 2.0) ? climbUpHeight : 0.0;
           setPosition(target);
         });
   }
