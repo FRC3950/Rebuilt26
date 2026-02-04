@@ -19,6 +19,7 @@ public class Intake extends SubsystemBase {
   private final TalonFX pivotMotor;
   private final MotionMagicVoltage mmRequest = new MotionMagicVoltage(0);
   private final VelocityVoltage intakeControlRequest = new VelocityVoltage(0);
+  private boolean isIntaking = false;
 
   /** Creates a new intake. */
   public Intake() {
@@ -34,11 +35,19 @@ public class Intake extends SubsystemBase {
   }
 
   public void startIntake() {
+    isIntaking = true;
     setIntakeSpeed(intakeSpeed);
   }
 
+  
+
   public void stopIntake() {
+    isIntaking = false;
     setIntakeSpeed(0);
+  }
+
+  public boolean isIntaking() {
+    return isIntaking;
   }
 
   @AutoLogOutput(key = "Intake/Current Speed")
