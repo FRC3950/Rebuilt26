@@ -140,6 +140,10 @@ public class GetAdjustedShot {
     return params;
   }
 
+  public double getTimeOfFlight(double distance) {
+    return shotMap.get(distance).tofSec();
+  }
+
   public void clearShootingParameters() {
     latestParameters = null;
   }

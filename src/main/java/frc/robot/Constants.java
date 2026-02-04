@@ -230,5 +230,7 @@ public final class Constants {
 
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;
+
+    public static final double scoreTime = 0.5;
   }
 }

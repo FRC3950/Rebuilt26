@@ -39,8 +39,6 @@ public class Intake extends SubsystemBase {
     setIntakeSpeed(intakeSpeed);
   }
 
-  
-
   public void stopIntake() {
     isIntaking = false;
     setIntakeSpeed(0);

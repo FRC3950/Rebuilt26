@@ -35,7 +35,8 @@ public class Turret extends SubsystemBase {
   // Controls
   private final MotionMagicVoltage azimuthControl = new MotionMagicVoltage(0);
   private final PositionVoltage hoodControl = new PositionVoltage(0);
-  private final BangBangController flywheelControl = new BangBangController(speedTolerance); // Tolerance 50 RPS (placeholder)
+  private final BangBangController flywheelControl =
+      new BangBangController(speedTolerance); // Tolerance 50 RPS (placeholder)
 
   private double lastAzimuthSetpointDeg = 0.0;
   private double lastHoodSetpointDeg = 0.0;
@@ -60,7 +61,8 @@ public class Turret extends SubsystemBase {
     // Mechanism 2D
     mechanism = new Mechanism2d(3, 3);
     mechRoot = mechanism.getRoot("TurretRoot", 1.5, 1.5);
-    turretLigament = mechRoot.append(new MechanismLigament2d("Turret", 0.5, 0, 6, new Color8Bit(Color.kBlue)));
+    turretLigament =
+        mechRoot.append(new MechanismLigament2d("Turret", 0.5, 0, 6, new Color8Bit(Color.kBlue)));
     SmartDashboard.putData("Turret Mechanism", mechanism);
   }
 
@@ -103,8 +105,9 @@ public class Turret extends SubsystemBase {
     double azimuthRotations = azimuth.getPosition().getValueAsDouble();
     double currentAzimuthDegrees = Units.rotationsToDegrees(azimuthRotations / azimuthGearRatio);
 
-    double deltaDegrees = MathUtil.inputModulus(
-        targetAzimuthDegrees - currentAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
+    double deltaDegrees =
+        MathUtil.inputModulus(
+            targetAzimuthDegrees - currentAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
     double setpointDegrees = currentAzimuthDegrees + deltaDegrees;
     lastAzimuthSetpointDeg = setpointDegrees;
     lastHoodSetpointDeg = hoodAngleDeg;
@@ -120,7 +123,7 @@ public class Turret extends SubsystemBase {
 
     // BangBangController returns 1 if setpoint > measurement, 0 if setpoint <
     // measurement.
-    
+
     double speed = flywheelControl.calculate(currentVel, targetVel);
     flywheel.set(speed);
   }
