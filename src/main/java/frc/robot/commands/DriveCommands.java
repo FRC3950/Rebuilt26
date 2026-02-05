@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -89,9 +90,15 @@ public class DriveCommands {
               omega = Math.copySign(omega * omega, omega);
 
               // Snake Mode Logic
-              if (snakeModeSupplier.get()
-                  && isIntakingSupplier.get()
-                  && linearVelocity.getNorm() > 1e-3) {
+              boolean snakeModeEnabled = snakeModeSupplier.get();
+              boolean isIntaking = isIntakingSupplier.get();
+              boolean isMoving = linearVelocity.getNorm() > 1e-3;
+
+              Logger.recordOutput("Drive/SnakeMode/Enabled", snakeModeEnabled);
+              Logger.recordOutput(
+                  "Drive/SnakeMode/Active", snakeModeEnabled && isIntaking && isMoving);
+
+              if (snakeModeEnabled && isIntaking && isMoving) {
                 Rotation2d targetYaw =
                     AllianceFlipUtil.apply(
                         linearVelocity.getAngle().plus(Rotation2d.fromDegrees(180)));

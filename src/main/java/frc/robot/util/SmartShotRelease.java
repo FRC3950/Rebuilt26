@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.turret.GetAdjustedShot;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 public class SmartShotRelease {
   private static final String KEY_ENABLED = "Smart Shot/Enabled";
@@ -21,6 +22,7 @@ public class SmartShotRelease {
 
   public static boolean canShoot(double distance) {
     boolean enabled = SmartDashboard.getBoolean(KEY_ENABLED, true);
+    Logger.recordOutput(KEY_ENABLED, enabled);
     if (!enabled) return true;
 
     double timeOfFlight = GetAdjustedShot.getInstance().getTimeOfFlight(distance);
@@ -31,9 +33,10 @@ public class SmartShotRelease {
     double predictedImpactTime = matchTime - (timeOfFlight + scoreTime);
 
     SmartDashboard.putNumber(KEY_TOF, timeOfFlight);
+    Logger.recordOutput(KEY_TOF, timeOfFlight);
     boolean canShoot = isHubActiveAtTime(predictedImpactTime);
     SmartDashboard.putBoolean(KEY_CAN_SHOOT, canShoot);
-
+    Logger.recordOutput(KEY_CAN_SHOOT, canShoot);
     return canShoot;
   }
 
