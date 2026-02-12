@@ -21,15 +21,20 @@
       "Pos": "172,54",
       "Size": "259,54"
     },
+    "###/SmartDashboard/Turret Mechanism": {
+      "Collapsed": "0",
+      "Pos": "476,16",
+      "Size": "271,200"
+    },
     "###FMS": {
       "Collapsed": "0",
       "Pos": "9,525",
-      "Size": "283,140"
+      "Size": "169,184"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "250,465",
-      "Size": "796,73"
+      "Pos": "239,458",
+      "Size": "796,217"
     },
     "###NetworkTables": {
       "Collapsed": "0",
