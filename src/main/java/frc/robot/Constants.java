@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.util.AllianceFlipUtil;
@@ -51,22 +52,18 @@ public final class Constants {
 
     public static final class Turret {
       public static final int azimuthID = 14;
-      public static final int hoodID = 15;
       public static final int flywheelID = 16;
       public static final int flywheelFollowerID = 17;
 
       public static final int azimuthID2 = 18;
-      public static final int hoodID2 = 19;
       public static final int flywheelID2 = 20;
       public static final int flywheelFollowerID2 = 21;
 
       public static final TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
-      public static final TalonFXConfiguration hoodConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration flywheelConfig = new TalonFXConfiguration();
 
       // Gear Ratios (Placeholders - UPDATE ME)
       public static final double azimuthGearRatio = 12.8;
-      public static final double hoodGearRatio = 12.8;
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
@@ -74,6 +71,14 @@ public final class Constants {
       public static final double maxAzimuthAngle = 180.0;
       public static final double minHoodAngle = 10.0;
       public static final double maxHoodAngle = 50.0;
+      public static final int HOOD_SERVO_HUB_CAN_ID = 1;
+      public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 =
+          ServoChannel.ChannelId.kChannelId0;
+      public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_2 =
+          ServoChannel.ChannelId.kChannelId1;
+      public static final int HOOD_SERVO_MIN_PULSE_US = 1000;
+      public static final int HOOD_SERVO_CENTER_PULSE_US = 1500;
+      public static final int HOOD_SERVO_MAX_PULSE_US = 2000;
 
       // PID / Motion Magic Gains (Placeholders - UPDATE ME)
       public static final double azimuthKP = 2.0;
@@ -81,9 +86,6 @@ public final class Constants {
       public static final double azimuthKS = 0.25;
       public static final double azimuthMaxVelocity = 100.0; // deg/s
       public static final double azimuthMaxAcceleration = 200.0; // deg/s^2
-
-      public static final double hoodKP = 4.0;
-      public static final double hoodKD = 0.5;
 
       public static final double flywheelKP = 0.2;
       public static final double flywheelKS = 0.0;
@@ -110,11 +112,6 @@ public final class Constants {
         azimuthConfig.MotionMagic.MotionMagicAcceleration =
             azimuthMaxAcceleration / 360.0 * azimuthGearRatio; // Rotations/s^2
         azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-        // Hood Motor Config
-        hoodConfig.Slot0.kP = hoodKP;
-        hoodConfig.Slot0.kD = hoodKD;
-        hoodConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
