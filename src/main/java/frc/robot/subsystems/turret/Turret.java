@@ -6,9 +6,13 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.revrobotics.ResetMode;
+import com.revrobotics.servohub.ServoChannel;
+import com.revrobotics.servohub.ServoHub;
+import com.revrobotics.servohub.config.ServoChannelConfig;
+import com.revrobotics.servohub.config.ServoHubConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,10 +24,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Turret extends SubsystemBase {
-  private final TalonFX hood;
+  private static ServoHub hoodServoHub;
+
+  private final ServoChannel hoodServo;
   private final TalonFX flywheel;
   private final TalonFX flywheelFollower;
   private final TalonFX azimuth;
@@ -34,29 +41,30 @@ public class Turret extends SubsystemBase {
 
   // Controls
   private final MotionMagicVoltage azimuthControl = new MotionMagicVoltage(0);
-  private final PositionVoltage hoodControl = new PositionVoltage(0);
   private final BangBangController flywheelControl =
       new BangBangController(speedTolerance); // Tolerance 50 RPS (placeholder)
 
   private double lastAzimuthSetpointDeg = 0.0;
-  private double lastHoodSetpointDeg = 0.0;
+  private double lastHoodSetpointDeg = minHoodAngle;
   private double lastFlywheelSetpointRps = 0.0;
+  private double hoodPositionDeg = minHoodAngle;
+  private double hoodVelocityDegPerSec = 0.0;
 
   public Turret(
       int azimuthID,
       TalonFXConfiguration azimuthConfig,
-      int hoodID,
-      TalonFXConfiguration hoodConfig,
+      ServoChannel.ChannelId hoodChannelId,
       int flywheelID,
       TalonFXConfiguration flywheelConfig,
       int flywheelFollowerID,
       CANBus canbus) {
-    hood = new TalonFX(hoodID, canbus);
+    hoodServo = getConfiguredHoodServoHub().getServoChannel(hoodChannelId);
     flywheel = new TalonFX(flywheelID, canbus);
     flywheelFollower = new TalonFX(flywheelFollowerID, canbus);
     azimuth = new TalonFX(azimuthID, canbus);
 
-    configureMotors(azimuthConfig, hoodConfig, flywheelConfig, flywheelID);
+    configureMotors(azimuthConfig, flywheelConfig, flywheelID);
+    initializeHoodAtMinimum();
 
     // Mechanism 2D
     mechanism = new Mechanism2d(3, 3);
@@ -68,14 +76,10 @@ public class Turret extends SubsystemBase {
 
   private void configureMotors(
       TalonFXConfiguration azimuthConfig,
-      TalonFXConfiguration hoodConfig,
       TalonFXConfiguration flywheelConfig,
       int flywheelID) {
     // Azimuth Motor Config
     azimuth.getConfigurator().apply(azimuthConfig);
-
-    // Hood Motor Config
-    hood.getConfigurator().apply(hoodConfig);
 
     // Flywheel Motor Config
     flywheel.getConfigurator().apply(flywheelConfig);
@@ -88,7 +92,6 @@ public class Turret extends SubsystemBase {
 
   public void zeroEncoders() {
     azimuth.setPosition(0);
-    hood.setPosition(0);
     flywheel.setPosition(0);
   }
 
@@ -97,6 +100,7 @@ public class Turret extends SubsystemBase {
     double azimuthRotations = azimuth.getPosition().getValueAsDouble();
     double currentAzimuthDegrees = Units.rotationsToDegrees(azimuthRotations / azimuthGearRatio);
     turretLigament.setAngle(currentAzimuthDegrees);
+    updateHoodTelemetry();
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
@@ -109,14 +113,15 @@ public class Turret extends SubsystemBase {
         MathUtil.inputModulus(
             targetAzimuthDegrees - currentAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
     double setpointDegrees = currentAzimuthDegrees + deltaDegrees;
+    double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
+
     lastAzimuthSetpointDeg = setpointDegrees;
-    lastHoodSetpointDeg = hoodAngleDeg;
+    lastHoodSetpointDeg = clampedHoodAngleDeg;
     lastFlywheelSetpointRps = flywheelSpeed;
 
     azimuth.setControl(
         azimuthControl.withPosition(Units.degreesToRotations(setpointDegrees) * azimuthGearRatio));
-    hood.setControl(
-        hoodControl.withPosition(Units.degreesToRotations(hoodAngleDeg) * hoodGearRatio));
+    hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(clampedHoodAngleDeg));
 
     double currentVel = flywheel.getVelocity().getValueAsDouble();
     double targetVel = flywheelSpeed * flywheelGearRatio;
@@ -160,12 +165,12 @@ public class Turret extends SubsystemBase {
 
   @AutoLogOutput(key = "Turret/Hood/PositionDeg")
   public double getHoodPositionDeg() {
-    return Units.rotationsToDegrees(hood.getPosition().getValueAsDouble() / hoodGearRatio);
+    return hoodPositionDeg;
   }
 
   @AutoLogOutput(key = "Turret/Hood/VelocityDegPerSec")
   public double getHoodVelocityDegPerSec() {
-    return Units.rotationsToDegrees(hood.getVelocity().getValueAsDouble() / hoodGearRatio);
+    return hoodVelocityDegPerSec;
   }
 
   @AutoLogOutput(key = "Turret/Hood/SetpointDeg")
@@ -196,5 +201,74 @@ public class Turret extends SubsystemBase {
   @AutoLogOutput(key = "Turret/FlywheelFollower/VelocityRps")
   public double getFlywheelFollowerVelocityRps() {
     return flywheelFollower.getVelocity().getValueAsDouble();
+  }
+
+  private static synchronized ServoHub getConfiguredHoodServoHub() {
+    if (hoodServoHub == null) {
+      hoodServoHub = new ServoHub(HOOD_SERVO_HUB_CAN_ID);
+
+      ServoHubConfig hubConfig = new ServoHubConfig();
+      ServoChannelConfig turret1Config =
+          new ServoChannelConfig(HOOD_SERVO_CHANNEL_1)
+              .pulseRange(
+                  HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
+              .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
+      ServoChannelConfig turret2Config =
+          new ServoChannelConfig(HOOD_SERVO_CHANNEL_2)
+              .pulseRange(
+                  HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
+              .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
+
+      hubConfig.apply(HOOD_SERVO_CHANNEL_1, turret1Config);
+      hubConfig.apply(HOOD_SERVO_CHANNEL_2, turret2Config);
+      hoodServoHub.configure(hubConfig, ResetMode.kNoResetSafeParameters);
+    }
+    return hoodServoHub;
+  }
+
+  private void initializeHoodAtMinimum() {
+    lastHoodSetpointDeg = minHoodAngle;
+    hoodPositionDeg = minHoodAngle;
+    hoodVelocityDegPerSec = 0.0;
+
+    hoodServo.setEnabled(true);
+    hoodServo.setPowered(true);
+    hoodServo.setPulseWidth(HOOD_SERVO_MIN_PULSE_US);
+  }
+
+  private void updateHoodTelemetry() {
+    double measuredHoodAngleDeg = pulseWidthUsToHoodAngleDeg(hoodServo.getPulseWidth());
+    if (!Double.isFinite(measuredHoodAngleDeg)) {
+      measuredHoodAngleDeg = lastHoodSetpointDeg;
+    }
+
+    hoodVelocityDegPerSec = (measuredHoodAngleDeg - hoodPositionDeg) / Constants.loopPeriodSecs;
+    hoodPositionDeg = measuredHoodAngleDeg;
+  }
+
+  private static int hoodAngleToPulseWidthUs(double hoodAngleDeg) {
+    double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
+    double hoodAngleRangeDeg = maxHoodAngle - minHoodAngle;
+    int servoPulseRangeUs = HOOD_SERVO_MAX_PULSE_US - HOOD_SERVO_MIN_PULSE_US;
+    if (hoodAngleRangeDeg <= 0.0 || servoPulseRangeUs <= 0) {
+      return HOOD_SERVO_MIN_PULSE_US;
+    }
+
+    double t = (clampedHoodAngleDeg - minHoodAngle) / hoodAngleRangeDeg;
+    int pulseUs = (int) Math.round(HOOD_SERVO_MIN_PULSE_US + t * servoPulseRangeUs);
+    return Math.max(HOOD_SERVO_MIN_PULSE_US, Math.min(HOOD_SERVO_MAX_PULSE_US, pulseUs));
+  }
+
+  private static double pulseWidthUsToHoodAngleDeg(int pulseWidthUs) {
+    double hoodAngleRangeDeg = maxHoodAngle - minHoodAngle;
+    int servoPulseRangeUs = HOOD_SERVO_MAX_PULSE_US - HOOD_SERVO_MIN_PULSE_US;
+    if (hoodAngleRangeDeg <= 0.0 || servoPulseRangeUs <= 0) {
+      return minHoodAngle;
+    }
+
+    int clampedPulseUs =
+        Math.max(HOOD_SERVO_MIN_PULSE_US, Math.min(HOOD_SERVO_MAX_PULSE_US, pulseWidthUs));
+    double t = (double) (clampedPulseUs - HOOD_SERVO_MIN_PULSE_US) / servoPulseRangeUs;
+    return minHoodAngle + t * hoodAngleRangeDeg;
   }
 }
