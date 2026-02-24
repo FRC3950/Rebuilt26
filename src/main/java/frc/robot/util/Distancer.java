@@ -1,19 +1,18 @@
 package frc.robot.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public record Distancer(Rotation2d hoodAngle, double flywheelRps, double tofSec) {
+public record Distancer(double hoodAngleDeg, double flywheelRps, double tofSec) {
 
   public Distancer interpolate(Distancer endValue, double t) {
     t = clamp01(t);
 
-    Rotation2d hood = this.hoodAngle.interpolate(endValue.hoodAngle, t);
+    double hood = lerp(this.hoodAngleDeg, endValue.hoodAngleDeg, t);
     double rps = lerp(this.flywheelRps, endValue.flywheelRps, t);
     double tof = lerp(this.tofSec, endValue.tofSec, t);
 
@@ -45,7 +44,8 @@ public record Distancer(Rotation2d hoodAngle, double flywheelRps, double tofSec)
       ObjectMapper mapper = new ObjectMapper();
       DistancerFile data = mapper.readValue(file, DistancerFile.class);
 
-      if (data == null || data.points == null) return List.of();
+      if (data == null || data.points == null)
+        return List.of();
 
       ArrayList<Row> rows = new ArrayList<>(data.points);
       rows.sort(Comparator.comparingDouble(r -> r.d));
