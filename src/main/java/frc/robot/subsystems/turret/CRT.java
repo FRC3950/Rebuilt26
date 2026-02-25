@@ -27,7 +27,8 @@ public final class CRT {
     int residueA = toResidue(encoderAAbsRot, params.modulusA(), params.encoderAOffsetRot());
     int residueB = toResidue(encoderBAbsRot, params.modulusB(), params.encoderBOffsetRot());
 
-    long combinedResidue = chineseRemainder(residueA, params.modulusA(), residueB, params.modulusB());
+    long combinedResidue =
+        chineseRemainder(residueA, params.modulusA(), residueB, params.modulusB());
     if (combinedResidue < 0) {
       return OptionalDouble.empty();
     }
@@ -38,7 +39,8 @@ public final class CRT {
     }
 
     double angleDeg = combinedResidue * (360.0 / combinedModulus) + params.turretZeroOffsetDeg();
-    double wrappedAngle = MathUtil.inputModulus(angleDeg, params.minAngleDeg(), params.maxAngleDeg());
+    double wrappedAngle =
+        MathUtil.inputModulus(angleDeg, params.minAngleDeg(), params.maxAngleDeg());
     return Double.isFinite(wrappedAngle) ? OptionalDouble.of(wrappedAngle) : OptionalDouble.empty();
   }
 

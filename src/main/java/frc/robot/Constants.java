@@ -68,7 +68,7 @@ public final class Constants {
       public static final TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration flywheelConfig = new TalonFXConfiguration();
 
-      // Gear Ratios (Placeholders - UPDATE ME) 
+      // Gear Ratios (Placeholders - UPDATE ME)
       public static final double azimuthGearRatio = 0.1;
       public static final double flywheelGearRatio = 1.0;
 
@@ -81,38 +81,44 @@ public final class Constants {
       // CRT constants are placeholders. Fill with real turret gearing/offset values.
       public static final int azimuthCrtModulusA = 20;
       public static final int azimuthCrtModulusB = 20;
-      //In order to find the offset, you need to rotate the turret to the 0 degree position and then read the rav value from the encoders in Phoenix Tuner.
+      // In order to find the offset, you need to rotate the turret to the 0 degree position and
+      // then read the rav value from the encoders in Phoenix Tuner.
       public static final double azimuthCanCoderAOffsetRot = 0.0;
       public static final double azimuthCanCoderBOffsetRot = 0.0;
       public static final double azimuthCrtZeroOffsetDeg = 0.0;
 
       public static final int azimuthCrtModulusA2 = 20;
       public static final int azimuthCrtModulusB2 = 20;
-      //In order to find the offset, you need to rotate the turret to the 0 degree position and then read the rav value from the encoders in Phoenix Tuner.
+      // In order to find the offset, you need to rotate the turret to the 0 degree position and
+      // then read the rav value from the encoders in Phoenix Tuner.
       public static final double azimuthCanCoderAOffsetRot2 = 0.0;
       public static final double azimuthCanCoderBOffsetRot2 = 0.0;
       public static final double azimuthCrtZeroOffsetDeg2 = 0.0;
 
-      public static final CRT.Parameters azimuthCrtParams = new CRT.Parameters(
-          azimuthCrtModulusA,
-          azimuthCrtModulusB,
-          azimuthCanCoderAOffsetRot,
-          azimuthCanCoderBOffsetRot,
-          azimuthCrtZeroOffsetDeg,
-          minAzimuthAngle,
-          maxAzimuthAngle);
-      public static final CRT.Parameters azimuthCrtParams2 = new CRT.Parameters(
-          azimuthCrtModulusA2,
-          azimuthCrtModulusB2,
-          azimuthCanCoderAOffsetRot2,
-          azimuthCanCoderBOffsetRot2,
-          azimuthCrtZeroOffsetDeg2,
-          minAzimuthAngle,
-          maxAzimuthAngle);
+      public static final CRT.Parameters azimuthCrtParams =
+          new CRT.Parameters(
+              azimuthCrtModulusA,
+              azimuthCrtModulusB,
+              azimuthCanCoderAOffsetRot,
+              azimuthCanCoderBOffsetRot,
+              azimuthCrtZeroOffsetDeg,
+              minAzimuthAngle,
+              maxAzimuthAngle);
+      public static final CRT.Parameters azimuthCrtParams2 =
+          new CRT.Parameters(
+              azimuthCrtModulusA2,
+              azimuthCrtModulusB2,
+              azimuthCanCoderAOffsetRot2,
+              azimuthCanCoderBOffsetRot2,
+              azimuthCrtZeroOffsetDeg2,
+              minAzimuthAngle,
+              maxAzimuthAngle);
 
       public static final int HOOD_SERVO_HUB_CAN_ID = 1;
-      public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 = ServoChannel.ChannelId.kChannelId0;
-      public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_2 = ServoChannel.ChannelId.kChannelId1;
+      public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 =
+          ServoChannel.ChannelId.kChannelId0;
+      public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_2 =
+          ServoChannel.ChannelId.kChannelId1;
       public static final int HOOD_SERVO_MIN_PULSE_US = 500;
       public static final int HOOD_SERVO_CENTER_PULSE_US = 1500;
       public static final int HOOD_SERVO_MAX_PULSE_US = 2500;
@@ -129,8 +135,10 @@ public final class Constants {
       public static final double flywheelKV = 0.11;
 
       // Turret position relative to the robot pose origin (meters).
-      public static final Translation2d robotToTurret1 = new Translation2d(Units.inchesToMeters(-7.75), Units.inchesToMeters(-7.25));
-      public static final Translation2d robotToTurret2 = new Translation2d(Units.inchesToMeters(7.75), Units.inchesToMeters(-7.25));
+      public static final Translation2d robotToTurret1 =
+          new Translation2d(Units.inchesToMeters(-7.75), Units.inchesToMeters(-7.25));
+      public static final Translation2d robotToTurret2 =
+          new Translation2d(Units.inchesToMeters(7.75), Units.inchesToMeters(-7.25));
 
       // Extra latency to account for: vision delay + command pipeline + ball exit
       // time.
@@ -143,8 +151,10 @@ public final class Constants {
         azimuthConfig.Slot0.kP = azimuthKP;
         azimuthConfig.Slot0.kD = azimuthKD;
         azimuthConfig.Slot0.kS = azimuthKS;
-        azimuthConfig.MotionMagic.MotionMagicCruiseVelocity = azimuthMaxVelocity / 360.0 * azimuthGearRatio; // Rotations/s
-        azimuthConfig.MotionMagic.MotionMagicAcceleration = azimuthMaxAcceleration / 360.0 * azimuthGearRatio; // Rotations/s^2
+        azimuthConfig.MotionMagic.MotionMagicCruiseVelocity =
+            azimuthMaxVelocity / 360.0 * azimuthGearRatio; // Rotations/s
+        azimuthConfig.MotionMagic.MotionMagicAcceleration =
+            azimuthMaxAcceleration / 360.0 * azimuthGearRatio; // Rotations/s^2
         azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // Flywheel Motor Config
@@ -245,16 +255,19 @@ public final class Constants {
 
   public static final class FieldConstants {
     // position of Hub
-    public static final Translation2d hubTranslation = AllianceFlipUtil.apply(new Translation2d(4.6256194, 4.0346376));
+    public static final Translation2d hubTranslation =
+        AllianceFlipUtil.apply(new Translation2d(4.6256194, 4.0346376));
     // both in inches
     public static final double fieldWidth = 317.69;
     public static final double fieldLength = 651.2275;
     // positions of ferry shot targets
     // 1 foot = 0.3048 meters
-    public static final Translation2d leftFerryTarget = AllianceFlipUtil.apply(
-        new Translation2d(hubTranslation.getX() - 1.34, hubTranslation.getY() - 0.59));
-    public static final Translation2d rightFerryTarget = AllianceFlipUtil.apply(
-        new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
+    public static final Translation2d leftFerryTarget =
+        AllianceFlipUtil.apply(
+            new Translation2d(hubTranslation.getX() - 1.34, hubTranslation.getY() - 0.59));
+    public static final Translation2d rightFerryTarget =
+        AllianceFlipUtil.apply(
+            new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
 
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;

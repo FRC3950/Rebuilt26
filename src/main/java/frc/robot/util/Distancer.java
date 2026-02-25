@@ -44,8 +44,7 @@ public record Distancer(double hoodAngleDeg, double flywheelRps, double tofSec) 
       ObjectMapper mapper = new ObjectMapper();
       DistancerFile data = mapper.readValue(file, DistancerFile.class);
 
-      if (data == null || data.points == null)
-        return List.of();
+      if (data == null || data.points == null) return List.of();
 
       ArrayList<Row> rows = new ArrayList<>(data.points);
       rows.sort(Comparator.comparingDouble(r -> r.d));

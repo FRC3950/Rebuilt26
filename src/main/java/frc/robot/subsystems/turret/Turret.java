@@ -41,13 +41,14 @@ public class Turret extends SubsystemBase {
       CANBus canbus) {
     hood = new Hood(hoodChannelId);
     flywheels = new Flywheels(flywheelID, flywheelConfig, flywheelFollowerID, canbus);
-    azimuth = new Azimuth(
-        azimuthID,
-        azimuthConfig,
-        azimuthCanCoderAID,
-        azimuthCanCoderBID,
-        canbus,
-        azimuthCrtParams);
+    azimuth =
+        new Azimuth(
+            azimuthID,
+            azimuthConfig,
+            azimuthCanCoderAID,
+            azimuthCanCoderBID,
+            canbus,
+            azimuthCrtParams);
 
     if (!azimuth.syncMotorPositionToCrtIfValid()) {
       azimuth.zeroMotorPosition();
@@ -56,7 +57,8 @@ public class Turret extends SubsystemBase {
 
     mechanism = new Mechanism2d(3, 3);
     mechRoot = mechanism.getRoot("TurretRoot", 1.5, 1.5);
-    turretLigament = mechRoot.append(new MechanismLigament2d("Turret", 0.5, 0, 6, new Color8Bit(Color.kBlue)));
+    turretLigament =
+        mechRoot.append(new MechanismLigament2d("Turret", 0.5, 0, 6, new Color8Bit(Color.kBlue)));
     SmartDashboard.putData("Turret Mechanism", mechanism);
   }
 
@@ -75,8 +77,9 @@ public class Turret extends SubsystemBase {
     double targetAzimuthDegrees = turretAngleRobot.getDegrees();
     double currentAzimuthDegrees = azimuth.getMotorAngleDeg();
 
-    double deltaDegrees = MathUtil.inputModulus(
-        targetAzimuthDegrees - currentAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
+    double deltaDegrees =
+        MathUtil.inputModulus(
+            targetAzimuthDegrees - currentAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
     double setpointDegrees = currentAzimuthDegrees + deltaDegrees;
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
 
@@ -86,8 +89,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void runAutoTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(
-        params.turretAngle(), params.hoodAngleDeg(), params.flywheelSpeed());
+    runSetpoints(params.turretAngle(), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 
   public void stopFlywheel() {

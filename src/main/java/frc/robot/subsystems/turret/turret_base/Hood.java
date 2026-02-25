@@ -27,6 +27,10 @@ public class Hood {
     lastSetpointDeg = clampedHoodAngleDeg;
   }
 
+  public void hoodDown() {
+    setAngleDeg(minHoodAngle);
+  }
+
   public void periodic() {
     double measuredHoodAngleDeg = pulseWidthUsToHoodAngleDeg(hoodServo.getPulseWidth());
     if (!Double.isFinite(measuredHoodAngleDeg)) {
@@ -58,14 +62,16 @@ public class Hood {
       hoodServoHub = new ServoHub(HOOD_SERVO_HUB_CAN_ID);
 
       ServoHubConfig hubConfig = new ServoHubConfig();
-      ServoChannelConfig turret1Config = new ServoChannelConfig(HOOD_SERVO_CHANNEL_1)
-          .pulseRange(
-              HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
-          .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
-      ServoChannelConfig turret2Config = new ServoChannelConfig(HOOD_SERVO_CHANNEL_2)
-          .pulseRange(
-              HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
-          .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
+      ServoChannelConfig turret1Config =
+          new ServoChannelConfig(HOOD_SERVO_CHANNEL_1)
+              .pulseRange(
+                  HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
+              .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
+      ServoChannelConfig turret2Config =
+          new ServoChannelConfig(HOOD_SERVO_CHANNEL_2)
+              .pulseRange(
+                  HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
+              .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
 
       hubConfig.apply(HOOD_SERVO_CHANNEL_1, turret1Config);
       hubConfig.apply(HOOD_SERVO_CHANNEL_2, turret2Config);
@@ -94,7 +100,8 @@ public class Hood {
       return minHoodAngle;
     }
 
-    int clampedPulseUs = Math.max(HOOD_SERVO_MIN_PULSE_US, Math.min(HOOD_SERVO_MAX_PULSE_US, pulseWidthUs));
+    int clampedPulseUs =
+        Math.max(HOOD_SERVO_MIN_PULSE_US, Math.min(HOOD_SERVO_MAX_PULSE_US, pulseWidthUs));
     double t = (double) (clampedPulseUs - HOOD_SERVO_MIN_PULSE_US) / servoPulseRangeUs;
     return minHoodAngle + t * hoodAngleRangeDeg;
   }
