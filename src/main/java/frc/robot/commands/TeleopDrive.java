@@ -119,13 +119,17 @@ public class TeleopDrive extends Command {
         yVel = trenchYController.calculate(drive.getPose().getY(), ySetpoint);
         yVel =
             MathUtil.clamp(
-                yVel, -drive.getMaxLinearSpeedMetersPerSec(), drive.getMaxLinearSpeedMetersPerSec());
+                yVel,
+                -drive.getMaxLinearSpeedMetersPerSec(),
+                drive.getMaxLinearSpeedMetersPerSec());
 
         double headingTarget = getFrontBackHeadingTarget(drive.getRotation());
         omegaVel = headingController.calculate(drive.getRotation().getRadians(), headingTarget);
         omegaVel =
             MathUtil.clamp(
-                omegaVel, -drive.getMaxAngularSpeedRadPerSec(), drive.getMaxAngularSpeedRadPerSec());
+                omegaVel,
+                -drive.getMaxAngularSpeedRadPerSec(),
+                drive.getMaxAngularSpeedRadPerSec());
       } else {
         driveMode = DriveMode.NORMAL;
       }

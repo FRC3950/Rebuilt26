@@ -166,7 +166,8 @@ public class RobotContainer {
     Translation2d turretMidpointRobot = robotToTurret1.plus(robotToTurret2).times(0.5);
     Supplier<Translation2d> turretMidpointFieldSupplier =
         () ->
-            drive.getPose()
+            drive
+                .getPose()
                 .getTranslation()
                 .plus(turretMidpointRobot.rotateBy(drive.getPose().getRotation()));
 

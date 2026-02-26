@@ -13,8 +13,7 @@ public class TeleopDriveModeTest {
 
   @Test
   void snakeWhenEnabledIntakingAndMoving() {
-    assertEquals(
-        TeleopDrive.DriveMode.SNAKE, TeleopDrive.selectDriveMode(false, true, true, true));
+    assertEquals(TeleopDrive.DriveMode.SNAKE, TeleopDrive.selectDriveMode(false, true, true, true));
   }
 
   @Test

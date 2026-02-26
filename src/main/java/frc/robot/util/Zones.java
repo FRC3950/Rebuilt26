@@ -138,9 +138,7 @@ public final class Zones {
     double dy = p1.getY() - p0.getY();
 
     double[] p = {-dx, dx, -dy, dy};
-    double[] q = {
-      p0.getX() - xMin, xMax - p0.getX(), p0.getY() - yMin, yMax - p0.getY()
-    };
+    double[] q = {p0.getX() - xMin, xMax - p0.getX(), p0.getY() - yMin, yMax - p0.getY()};
 
     for (int i = 0; i < 4; i++) {
       if (Math.abs(p[i]) < 1e-9) {
