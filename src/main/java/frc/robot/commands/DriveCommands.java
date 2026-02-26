@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -64,18 +63,7 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier,
-      Supplier<Boolean> snakeModeSupplier,
-      Supplier<Boolean> isIntakingSupplier) {
-
-    // Create PID controller for snake mode
-    ProfiledPIDController snakeController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    snakeController.enableContinuousInput(-Math.PI, Math.PI);
+      DoubleSupplier omegaSupplier) {
 
     return Commands.run(
             () -> {
@@ -89,24 +77,6 @@ public class DriveCommands {
               // Square rotation value for more precise control
               omega = Math.copySign(omega * omega, omega);
 
-              // Snake Mode Logic
-              boolean snakeModeEnabled = snakeModeSupplier.get();
-              boolean isIntaking = isIntakingSupplier.get();
-              boolean isMoving = linearVelocity.getNorm() > 1e-3;
-
-              Logger.recordOutput("Drive/SnakeMode/Enabled", snakeModeEnabled);
-              Logger.recordOutput(
-                  "Drive/SnakeMode/Active", snakeModeEnabled && isIntaking && isMoving);
-
-              if (snakeModeEnabled && isIntaking && isMoving) {
-                Rotation2d targetYaw =
-                    AllianceFlipUtil.apply(
-                        linearVelocity.getAngle().plus(Rotation2d.fromDegrees(180)));
-                omega =
-                    snakeController.calculate(
-                        drive.getRotation().getRadians(), targetYaw.getRadians());
-              }
-
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
@@ -117,9 +87,7 @@ public class DriveCommands {
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds, AllianceFlipUtil.apply(drive.getRotation())));
             },
-            drive)
-        // Reset PID controller when command starts
-        .beforeStarting(() -> snakeController.reset(drive.getRotation().getRadians()));
+            drive);
   }
 
   /**

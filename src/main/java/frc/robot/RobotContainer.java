@@ -6,13 +6,16 @@ import static frc.robot.Constants.SubsystemConstants.Turret.*;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.TeleopDrive;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
@@ -32,6 +35,8 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.SmartShotRelease;
+import frc.robot.util.Zones;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -156,17 +161,39 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     // Primary Driver Layout: https://tinyurl.com/5n7kv2up
-
-    // Snake Mode
     SmartDashboard.setDefaultBoolean("Snake Mode", true);
 
-    // Default command, normal field-relative drive
+    Translation2d turretMidpointRobot = robotToTurret1.plus(robotToTurret2).times(0.5);
+    Supplier<Translation2d> turretMidpointFieldSupplier =
+        () ->
+            drive.getPose()
+                .getTranslation()
+                .plus(turretMidpointRobot.rotateBy(drive.getPose().getRotation()));
+
+    Trigger trenchDangerTrigger =
+        Zones.TRENCH_ZONES
+            .willContain(
+                turretMidpointFieldSupplier, drive::getFieldRelativeSpeeds, TRENCH_ALIGN_TIME_SEC)
+            .debounce(TRENCH_DEBOUNCE_SEC);
+
+    trenchDangerTrigger.onTrue(
+        Commands.runOnce(
+            () -> {
+              turret1.setHoodSafetyForcedDown(true);
+              turret2.setHoodSafetyForcedDown(true);
+            }));
+    trenchDangerTrigger.onFalse(
+        Commands.runOnce(
+            () -> {
+              turret1.setHoodSafetyForcedDown(false);
+              turret2.setHoodSafetyForcedDown(false);
+            }));
+
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
+        new TeleopDrive(
             drive,
-            () -> -driver.getLeftY(),
-            () -> -driver.getLeftX(),
-            () -> -driver.getRightX(),
+            driver,
+            trenchDangerTrigger::getAsBoolean,
             () -> SmartDashboard.getBoolean("Snake Mode", true),
             intake::isIntaking));
 

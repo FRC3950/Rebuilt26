@@ -257,9 +257,9 @@ public final class Constants {
     // position of Hub
     public static final Translation2d hubTranslation =
         AllianceFlipUtil.apply(new Translation2d(4.6256194, 4.0346376));
-    // both in inches
-    public static final double fieldWidth = 317.69;
-    public static final double fieldLength = 651.2275;
+    // Field dimensions in meters (blue-origin WPILib frame).
+    public static final double fieldWidth = 8.0756125;
+    public static final double fieldLength = 16.5411785;
     // positions of ferry shot targets
     // 1 foot = 0.3048 meters
     public static final Translation2d leftFerryTarget =
@@ -271,6 +271,8 @@ public final class Constants {
 
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;
+    public static final double TRENCH_ALIGN_TIME_SEC = 0.40;
+    public static final double TRENCH_DEBOUNCE_SEC = 0.10;
 
     public static final double scoreTime = 0.25;
   }
