@@ -230,6 +230,14 @@ public final class Constants {
       public static final double climberMaxHeight = 20;
       public static final double climbUpHeight = 18;
       public static final double climbFinalPos = 4;
+      public static final double climbOffsetMeters = 0.50;
+      public static final double climbHeadingDeg = -90.0;
+      public static final double climberPositionTolerance = 0.25;
+      public static final double climberMoveTimeoutSecs = 2.5;
+      public static final double climbPathMaxVelocityMetersPerSec = 3.0;
+      public static final double climbPathMaxAccelerationMetersPerSecSq = 3.0;
+      public static final double climbPathMaxAngularVelocityDegPerSec = 540.0;
+      public static final double climbPathMaxAngularAccelerationDegPerSecSq = 540.0;
 
       public static final TalonFXConfiguration climberConfig = new TalonFXConfiguration();
       public static final double climberKP = 0.2;
@@ -268,6 +276,13 @@ public final class Constants {
     public static final Translation2d rightFerryTarget =
         AllianceFlipUtil.apply(
             new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
+    public static final Translation2d climbSouth =
+        AllianceFlipUtil.apply(
+            new Translation2d(1.06045, 3.29803125));
+            
+    public static final Translation2d climbNorth =
+        AllianceFlipUtil.apply(
+            climbSouth.plus(new Translation2d(0,0.89535)));
 
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;

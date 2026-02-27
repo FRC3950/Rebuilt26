@@ -133,7 +133,7 @@ public class RobotContainer {
 
     intake = new Intake();
     indexer = new Indexer();
-    climber = new Climber();
+    climber = new Climber(drive::getPose);
 
     turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
     turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
@@ -244,7 +244,7 @@ public class RobotContainer {
         .whileTrue(indexer.feedCommand());
 
     // Climber
-    driver.povDown().debounce(0.75).onTrue(climber.togglePositionCommand());
+    driver.povDown().debounce(0.5).onTrue(climber.ClimbToggleCommand());
   }
 
   public Command getAutonomousCommand() {
