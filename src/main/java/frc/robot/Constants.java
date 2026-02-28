@@ -277,12 +277,10 @@ public final class Constants {
         AllianceFlipUtil.apply(
             new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
     public static final Translation2d climbSouth =
-        AllianceFlipUtil.apply(
-            new Translation2d(1.06045, 3.29803125));
-            
+        AllianceFlipUtil.apply(new Translation2d(1.06045, 3.29803125));
+
     public static final Translation2d climbNorth =
-        AllianceFlipUtil.apply(
-            climbSouth.plus(new Translation2d(0,0.89535)));
+        AllianceFlipUtil.apply(climbSouth.plus(new Translation2d(0, 0.89535)));
 
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;

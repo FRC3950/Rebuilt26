@@ -73,7 +73,9 @@ public class Climber extends SubsystemBase {
   }
 
   private Translation2d getClimbPoint(ClimbSide side) {
-    return side == ClimbSide.NORTH ? Constants.FieldConstants.climbNorth : Constants.FieldConstants.climbSouth;
+    return side == ClimbSide.NORTH
+        ? Constants.FieldConstants.climbNorth
+        : Constants.FieldConstants.climbSouth;
   }
 
   private Pose2d toClimbPose(ClimbSide side) {
@@ -81,11 +83,13 @@ public class Climber extends SubsystemBase {
   }
 
   private Pose2d toApproachPose(ClimbSide side) {
-    return new Pose2d(getOffsetPoint(side, climbOffsetMeters), Rotation2d.fromDegrees(climbHeadingDeg));
+    return new Pose2d(
+        getOffsetPoint(side, climbOffsetMeters), Rotation2d.fromDegrees(climbHeadingDeg));
   }
 
   private Pose2d toBackoffPose(ClimbSide side) {
-    return new Pose2d(getOffsetPoint(side, climbOffsetMeters), Rotation2d.fromDegrees(climbHeadingDeg));
+    return new Pose2d(
+        getOffsetPoint(side, climbOffsetMeters), Rotation2d.fromDegrees(climbHeadingDeg));
   }
 
   private Translation2d getOffsetPoint(ClimbSide side, double offsetMeters) {
@@ -101,7 +105,8 @@ public class Climber extends SubsystemBase {
     return runOnce(() -> setPosition(targetPosition))
         .andThen(
             Commands.waitUntil(
-                    () -> Math.abs(getClimberPosition() - targetPosition) <= climberPositionTolerance)
+                    () ->
+                        Math.abs(getClimberPosition() - targetPosition) <= climberPositionTolerance)
                 .withTimeout(climberMoveTimeoutSecs));
   }
 
@@ -124,6 +129,7 @@ public class Climber extends SubsystemBase {
   }
 
   public Command ClimbToggleCommand() {
-    return Commands.defer(() -> inClimb ? createUnclimbSequence() : createClimbSequence(), Set.of(this));
+    return Commands.defer(
+        () -> inClimb ? createUnclimbSequence() : createClimbSequence(), Set.of(this));
   }
 }

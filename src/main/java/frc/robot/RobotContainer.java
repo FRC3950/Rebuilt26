@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.AgitatorCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.TeleopDrive;
@@ -241,7 +242,7 @@ public class RobotContainer {
             () ->
                 SmartShotRelease.canShoot(
                     drive.getPose().getTranslation().getDistance(hubTranslation)))
-        .whileTrue(indexer.feedCommand());
+        .whileTrue(indexer.feedCommand().alongWith(new AgitatorCommand(intake)));
 
     // Climber
     driver.povDown().debounce(0.5).onTrue(climber.ClimbToggleCommand());

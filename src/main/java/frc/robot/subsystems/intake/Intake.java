@@ -65,6 +65,10 @@ public class Intake extends SubsystemBase {
     pivotMotor.setControl(mmRequest.withPosition(upPos));
   }
 
+  public boolean isAcceptablePosition(double targetPos) {
+    return Math.abs(pivotMotor.getPosition().getValueAsDouble() - targetPos) < 0.05;
+  }
+
   @AutoLogOutput(key = "Intake/Pivot Position")
   public double getPivotPosition() {
     return pivotMotor.getPosition().getValueAsDouble();
