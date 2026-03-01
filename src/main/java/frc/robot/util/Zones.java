@@ -1,5 +1,9 @@
 package frc.robot.util;
 
+import static frc.robot.Constants.FieldConstants.fieldWidth;
+import static frc.robot.Constants.FieldConstants.neutralZoneMaxX;
+import static frc.robot.Constants.FieldConstants.neutralZoneMinX;
+
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -128,6 +132,9 @@ public final class Zones {
   public static final PredictiveZoneCollection TRENCH_ZONES =
       new PredictiveZoneCollection(
           TRENCH_BOTTOM_LEFT, TRENCH_BOTTOM_RIGHT, TRENCH_TOP_LEFT, TRENCH_TOP_RIGHT);
+
+  public static final PredictiveRectZone NEUTRAL_ZONE =
+      new PredictiveRectZone(neutralZoneMinX, neutralZoneMaxX, 0.0, fieldWidth);
 
   private static boolean segmentIntersectsAabb(
       Translation2d p0, Translation2d p1, double xMin, double xMax, double yMin, double yMax) {

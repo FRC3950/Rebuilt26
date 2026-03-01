@@ -135,7 +135,7 @@ public class TeleopDrive extends Command {
       }
     } else if (driveMode == DriveMode.SNAKE) {
       Rotation2d targetYaw =
-          AllianceFlipUtil.apply(joystickLinear.getAngle().plus(Rotation2d.fromDegrees(180)));
+          AllianceFlipUtil.apply(joystickLinear.getAngle());
       omegaVel =
           snakeController.calculate(drive.getRotation().getRadians(), targetYaw.getRadians());
       omegaVel =

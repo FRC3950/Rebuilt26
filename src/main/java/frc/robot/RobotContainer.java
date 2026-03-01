@@ -30,6 +30,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.FerryMode;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
+import frc.robot.subsystems.turret.TurretTargeting.TargetingMode;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -136,8 +137,6 @@ public class RobotContainer {
     indexer = new Indexer();
     climber = new Climber(drive::getPose);
 
-    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
-    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
     SmartDashboard.putData("Turret Subsystem", turret1);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
@@ -191,6 +190,17 @@ public class RobotContainer {
               turret2.setHoodSafetyForcedDown(false);
             }));
 
+    Supplier<TargetingMode> autoTargetingModeSupplier =
+        () ->
+            TurretTargeting.selectTargetingMode(
+                trenchDangerTrigger.getAsBoolean(),
+                Zones.NEUTRAL_ZONE.contains(drive.getPose().getTranslation()));
+
+    turret1.setDefaultCommand(
+        new TurretTargeting(turret1, drive, robotToTurret1, autoTargetingModeSupplier));
+    turret2.setDefaultCommand(
+        new TurretTargeting(turret2, drive, robotToTurret2, autoTargetingModeSupplier));
+
     drive.setDefaultCommand(
         new TeleopDrive(
             drive,
@@ -198,19 +208,6 @@ public class RobotContainer {
             trenchDangerTrigger::getAsBoolean,
             () -> SmartDashboard.getBoolean("Snake Mode", true),
             intake::isIntaking));
-
-    // Auto Ferry Mode
-    new Trigger(
-            () ->
-                drive.getPose().getX() > neutralZoneMinX
-                    && drive.getPose().getX() < neutralZoneMaxX)
-        .whileTrue(new FerryMode(turret1, drive, robotToTurret1));
-
-    new Trigger(
-            () ->
-                drive.getPose().getX() > neutralZoneMinX
-                    && drive.getPose().getX() < neutralZoneMaxX)
-        .whileTrue(new FerryMode(turret2, drive, robotToTurret2));
 
     // Manual Ferry Mode - Left
     driver

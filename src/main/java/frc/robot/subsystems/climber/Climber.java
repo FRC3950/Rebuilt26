@@ -112,9 +112,10 @@ public class Climber extends SubsystemBase {
 
   private Command createClimbSequence() {
     return Commands.sequence(
-            moveClimberTo(climbUpHeight),
             runOnce(() -> lastClimbSide = getClosestSide()),
-            Commands.defer(() -> pathfindTo(toApproachPose(lastClimbSide)), Set.of()),
+            Commands.parallel(
+                moveClimberTo(climbUpHeight),
+                Commands.defer(() -> pathfindTo(toApproachPose(lastClimbSide)), Set.of())),
             Commands.defer(() -> pathfindTo(toClimbPose(lastClimbSide)), Set.of()),
             moveClimberTo(climbFinalPos))
         .andThen(runOnce(() -> inClimb = true));

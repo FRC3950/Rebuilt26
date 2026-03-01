@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import static frc.robot.Constants.FieldConstants.neutralZoneMaxX;
+import static frc.robot.Constants.FieldConstants.neutralZoneMinX;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -53,5 +55,22 @@ public class ZonesTest {
     ChassisSpeeds still = new ChassisSpeeds();
 
     assertTrue(Zones.TRENCH_ZONES.firstWillContain(inTopLeft, still, 0.4).isPresent());
+  }
+
+  @Test
+  void neutralZoneContainsInsideXRange() {
+    assertTrue(Zones.NEUTRAL_ZONE.contains(new Translation2d(6.0, 4.0)));
+  }
+
+  @Test
+  void neutralZoneExcludesOutsideXRange() {
+    assertFalse(Zones.NEUTRAL_ZONE.contains(new Translation2d(4.0, 4.0)));
+    assertFalse(Zones.NEUTRAL_ZONE.contains(new Translation2d(12.0, 4.0)));
+  }
+
+  @Test
+  void neutralZoneIncludesXBoundaries() {
+    assertTrue(Zones.NEUTRAL_ZONE.contains(new Translation2d(neutralZoneMinX, 4.0)));
+    assertTrue(Zones.NEUTRAL_ZONE.contains(new Translation2d(neutralZoneMaxX, 4.0)));
   }
 }
