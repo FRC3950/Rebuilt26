@@ -7,7 +7,6 @@ import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.subsystems.turret.CRT;
 import frc.robot.util.AllianceFlipUtil;
 
 /**
@@ -54,16 +53,13 @@ public final class Constants {
 
     public static final class Turret {
       public static final int azimuthID = 14;
-      public static final int azimuthCanCoderAID = 15;
-      public static final int azimuthCanCoderBID = 16;
-      public static final int flywheelID = 17;
-      public static final int flywheelFollowerID = 18;
+      public static final int TURRET_CANDI_ID = 15;
+      public static final int flywheelID = 16;
+      public static final int flywheelFollowerID = 17;
 
-      public static final int azimuthID2 = 19;
-      public static final int azimuthCanCoderAID2 = 20;
-      public static final int azimuthCanCoderBID2 = 21;
-      public static final int flywheelID2 = 22;
-      public static final int flywheelFollowerID2 = 23;
+      public static final int azimuthID2 = 18;
+      public static final int flywheelID2 = 19;
+      public static final int flywheelFollowerID2 = 20;
 
       public static final TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration flywheelConfig = new TalonFXConfiguration();
@@ -77,42 +73,7 @@ public final class Constants {
       public static final double maxAzimuthAngle = 270.0;
       public static final double minHoodAngle = 10.0;
       public static final double maxHoodAngle = 50.0;
-
-      // CRT constants are placeholders. Fill with real turret gearing/offset values.
-      public static final int azimuthCrtModulusA = 20;
-      public static final int azimuthCrtModulusB = 20;
-      // In order to find the offset, you need to rotate the turret to the 0 degree position and
-      // then read the rav value from the encoders in Phoenix Tuner.
-      public static final double azimuthCanCoderAOffsetRot = 0.0;
-      public static final double azimuthCanCoderBOffsetRot = 0.0;
-      public static final double azimuthCrtZeroOffsetDeg = 0.0;
-
-      public static final int azimuthCrtModulusA2 = 20;
-      public static final int azimuthCrtModulusB2 = 20;
-      // In order to find the offset, you need to rotate the turret to the 0 degree position and
-      // then read the rav value from the encoders in Phoenix Tuner.
-      public static final double azimuthCanCoderAOffsetRot2 = 0.0;
-      public static final double azimuthCanCoderBOffsetRot2 = 0.0;
-      public static final double azimuthCrtZeroOffsetDeg2 = 0.0;
-
-      public static final CRT.Parameters azimuthCrtParams =
-          new CRT.Parameters(
-              azimuthCrtModulusA,
-              azimuthCrtModulusB,
-              azimuthCanCoderAOffsetRot,
-              azimuthCanCoderBOffsetRot,
-              azimuthCrtZeroOffsetDeg,
-              minAzimuthAngle,
-              maxAzimuthAngle);
-      public static final CRT.Parameters azimuthCrtParams2 =
-          new CRT.Parameters(
-              azimuthCrtModulusA2,
-              azimuthCrtModulusB2,
-              azimuthCanCoderAOffsetRot2,
-              azimuthCanCoderBOffsetRot2,
-              azimuthCrtZeroOffsetDeg2,
-              minAzimuthAngle,
-              maxAzimuthAngle);
+      public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0.0;
 
       public static final int HOOD_SERVO_HUB_CAN_ID = 1;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 =
@@ -166,8 +127,8 @@ public final class Constants {
     }
 
     public static final class Intake {
-      public static final int intakeMotorID = 24;
-      public static final int pivotMotorID = 25;
+      public static final int intakeMotorID = 22;
+      public static final int pivotMotorID = 23;
 
       // Intake Positions - UPDATE ME!!!
       public static final double downPos = -2.5;
@@ -199,8 +160,8 @@ public final class Constants {
     }
 
     public static final class Indexer {
-      public static final int hotdogMotorID = 26;
-      public static final int indexerMotorID = 27;
+      public static final int hotdogMotorID = 25;
+      public static final int indexerMotorID = 26;
 
       public static final double indexerSpeed = 20.0; // RPS
       public static final double hotdogSpeed = 20.0; // RPS

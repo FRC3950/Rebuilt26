@@ -6,7 +6,9 @@ import static frc.robot.Constants.SubsystemConstants.Turret.*;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,6 +33,7 @@ import frc.robot.subsystems.turret.FerryMode;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
 import frc.robot.subsystems.turret.TurretTargeting.TargetingMode;
+import frc.robot.subsystems.turret.turret_base.Azimuth.LimitSwitchChannel;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -112,9 +115,7 @@ public class RobotContainer {
         new Turret(
             azimuthID,
             azimuthConfig,
-            azimuthCanCoderAID,
-            azimuthCanCoderBID,
-            azimuthCrtParams,
+            LimitSwitchChannel.S1,
             HOOD_SERVO_CHANNEL_1,
             flywheelID,
             flywheelConfig,
@@ -124,9 +125,7 @@ public class RobotContainer {
         new Turret(
             azimuthID2,
             azimuthConfig,
-            azimuthCanCoderAID2,
-            azimuthCanCoderBID2,
-            azimuthCrtParams2,
+            LimitSwitchChannel.S2,
             HOOD_SERVO_CHANNEL_2,
             flywheelID2,
             flywheelConfig,
@@ -136,6 +135,21 @@ public class RobotContainer {
     intake = new Intake();
     indexer = new Indexer();
     climber = new Climber(drive::getPose);
+
+    NamedCommands.registerCommand(
+        "EnableHoodSafetyMode",
+        Commands.runOnce(
+            () -> {
+              turret1.setHoodSafetyForcedDown(true);
+              turret2.setHoodSafetyForcedDown(true);
+            }));
+    NamedCommands.registerCommand(
+        "DisableHoodSafetyMode",
+        Commands.runOnce(
+            () -> {
+              turret1.setHoodSafetyForcedDown(false);
+              turret2.setHoodSafetyForcedDown(false);
+            }));
 
     SmartDashboard.putData("Turret Subsystem", turret1);
 
@@ -177,22 +191,33 @@ public class RobotContainer {
                 turretMidpointFieldSupplier, drive::getFieldRelativeSpeeds, TRENCH_ALIGN_TIME_SEC)
             .debounce(TRENCH_DEBOUNCE_SEC);
 
-    trenchDangerTrigger.onTrue(
+    Trigger trenchSafetyEnabledTrigger = new Trigger(() -> !DriverStation.isAutonomousEnabled());
+    Trigger activeTrenchSafetyTrigger = trenchSafetyEnabledTrigger.and(trenchDangerTrigger);
+
+    activeTrenchSafetyTrigger.onTrue(
         Commands.runOnce(
             () -> {
               turret1.setHoodSafetyForcedDown(true);
               turret2.setHoodSafetyForcedDown(true);
             }));
-    trenchDangerTrigger.onFalse(
+    activeTrenchSafetyTrigger.onFalse(
         Commands.runOnce(
             () -> {
               turret1.setHoodSafetyForcedDown(false);
               turret2.setHoodSafetyForcedDown(false);
             }));
+    new Trigger(DriverStation::isAutonomousEnabled)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  turret1.setHoodSafetyForcedDown(false);
+                  turret2.setHoodSafetyForcedDown(false);
+                }));
 
     Supplier<TargetingMode> autoTargetingModeSupplier =
         () ->
             TurretTargeting.selectTargetingMode(
+                !DriverStation.isAutonomousEnabled(),
                 trenchDangerTrigger.getAsBoolean(),
                 Zones.NEUTRAL_ZONE.contains(drive.getPose().getTranslation()));
 

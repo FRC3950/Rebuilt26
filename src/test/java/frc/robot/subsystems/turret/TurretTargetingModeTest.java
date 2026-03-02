@@ -8,18 +8,28 @@ public class TurretTargetingModeTest {
   @Test
   void trenchOverridesNeutralZoneFerry() {
     assertEquals(
-        TurretTargeting.TargetingMode.HUB_AUTO, TurretTargeting.selectTargetingMode(true, true));
+        TurretTargeting.TargetingMode.HUB_AUTO,
+        TurretTargeting.selectTargetingMode(true, true, true));
   }
 
   @Test
   void neutralZoneEnablesAutoFerryWhenTrenchNotActive() {
     assertEquals(
-        TurretTargeting.TargetingMode.FERRY_AUTO, TurretTargeting.selectTargetingMode(false, true));
+        TurretTargeting.TargetingMode.FERRY_AUTO,
+        TurretTargeting.selectTargetingMode(true, false, true));
   }
 
   @Test
   void defaultIsHubWhenNotInNeutralZone() {
     assertEquals(
-        TurretTargeting.TargetingMode.HUB_AUTO, TurretTargeting.selectTargetingMode(false, false));
+        TurretTargeting.TargetingMode.HUB_AUTO,
+        TurretTargeting.selectTargetingMode(true, false, false));
+  }
+
+  @Test
+  void trenchDoesNotOverrideWhenSafetyDisabled() {
+    assertEquals(
+        TurretTargeting.TargetingMode.FERRY_AUTO,
+        TurretTargeting.selectTargetingMode(false, true, true));
   }
 }

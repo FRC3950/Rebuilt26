@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.turret.turret_base.Azimuth;
+import frc.robot.subsystems.turret.turret_base.Azimuth.LimitSwitchChannel;
 import frc.robot.subsystems.turret.turret_base.Flywheels;
 import frc.robot.subsystems.turret.turret_base.Hood;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -32,9 +33,7 @@ public class Turret extends SubsystemBase {
   public Turret(
       int azimuthID,
       TalonFXConfiguration azimuthConfig,
-      int azimuthCanCoderAID,
-      int azimuthCanCoderBID,
-      CRT.Parameters azimuthCrtParams,
+      LimitSwitchChannel limitSwitchChannel,
       ServoChannel.ChannelId hoodChannelId,
       int flywheelID,
       TalonFXConfiguration flywheelConfig,
@@ -42,18 +41,8 @@ public class Turret extends SubsystemBase {
       CANBus canbus) {
     hood = new Hood(hoodChannelId);
     flywheels = new Flywheels(flywheelID, flywheelConfig, flywheelFollowerID, canbus);
-    azimuth =
-        new Azimuth(
-            azimuthID,
-            azimuthConfig,
-            azimuthCanCoderAID,
-            azimuthCanCoderBID,
-            canbus,
-            azimuthCrtParams);
-
-    if (!azimuth.syncMotorPositionToCrtIfValid()) {
-      azimuth.zeroMotorPosition();
-    }
+    azimuth = new Azimuth(azimuthID, azimuthConfig, canbus, limitSwitchChannel);
+    azimuth.zeroMotorPosition();
     flywheels.zeroPosition();
 
     mechanism = new Mechanism2d(3, 3);
@@ -71,6 +60,7 @@ public class Turret extends SubsystemBase {
   @Override
   public void periodic() {
     turretLigament.setAngle(azimuth.getMotorAngleDeg());
+    azimuth.syncMotorPositionToLimitSwitchIfTriggered();
     hood.periodic();
   }
 
@@ -123,26 +113,6 @@ public class Turret extends SubsystemBase {
   @AutoLogOutput(key = "Turret/Azimuth/SetpointDeg")
   public double getAzimuthSetpointDeg() {
     return azimuth.getSetpointDeg();
-  }
-
-  @AutoLogOutput(key = "Turret/Azimuth/CANcoderAAbsRot")
-  public double getAzimuthCanCoderAAbsRot() {
-    return azimuth.getEncoderAAbsRot();
-  }
-
-  @AutoLogOutput(key = "Turret/Azimuth/CANcoderBAbsRot")
-  public double getAzimuthCanCoderBAbsRot() {
-    return azimuth.getEncoderBAbsRot();
-  }
-
-  @AutoLogOutput(key = "Turret/Azimuth/CRTAbsoluteDeg")
-  public double getAzimuthCrtAbsoluteDeg() {
-    return azimuth.getCrtAbsoluteAngleDeg();
-  }
-
-  @AutoLogOutput(key = "Turret/Azimuth/CRTValid")
-  public boolean getAzimuthCrtValid() {
-    return azimuth.isCrtAbsoluteAngleValid();
   }
 
   @AutoLogOutput(key = "Turret/Hood/PositionDeg")

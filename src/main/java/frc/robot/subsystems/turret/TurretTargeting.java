@@ -40,8 +40,9 @@ public class TurretTargeting extends Command {
     addRequirements(turret);
   }
 
-  public static TargetingMode selectTargetingMode(boolean trenchDanger, boolean inNeutralZone) {
-    if (trenchDanger) {
+  public static TargetingMode selectTargetingMode(
+      boolean trenchSafetyEnabled, boolean trenchDanger, boolean inNeutralZone) {
+    if (trenchSafetyEnabled && trenchDanger) {
       return TargetingMode.HUB_AUTO;
     }
     if (inNeutralZone) {
