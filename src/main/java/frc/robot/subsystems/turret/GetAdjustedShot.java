@@ -42,14 +42,30 @@ public class GetAdjustedShot {
 
   private static double minDistance;
   private static double maxDistance;
+  private static double minTimeOfFlightSec;
+  private static double maxTimeOfFlightSec;
 
   private static final InterpolatingTreeMap<Double, Distancer> shotMap =
       new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Distancer::interpolate);
 
   static {
     var rows = Distancer.loadRowsFromDeploy("shot_table.json");
+    if (rows.isEmpty()) {
+      minDistance = 0.0;
+      maxDistance = 0.0;
+      minTimeOfFlightSec = 0.0;
+      maxTimeOfFlightSec = 0.0;
+    } else {
+      minDistance = rows.get(0).d;
+      maxDistance = rows.get(rows.size() - 1).d;
+      minTimeOfFlightSec = Double.POSITIVE_INFINITY;
+      maxTimeOfFlightSec = Double.NEGATIVE_INFINITY;
+    }
+
     for (var r : rows) {
       shotMap.put(r.d, new Distancer(r.hoodDeg, r.rps, r.tof));
+      minTimeOfFlightSec = Math.min(minTimeOfFlightSec, r.tof);
+      maxTimeOfFlightSec = Math.max(maxTimeOfFlightSec, r.tof);
     }
   }
 
@@ -133,6 +149,14 @@ public class GetAdjustedShot {
 
   public double getTimeOfFlight(double distance) {
     return shotMap.get(distance).tofSec();
+  }
+
+  public static double getMinTimeOfFlight() {
+    return minTimeOfFlightSec + shotExtraLatencySec;
+  }
+
+  public static double getMaxTimeOfFlight() {
+    return maxTimeOfFlightSec + shotExtraLatencySec;
   }
 
   public void clearShootingParameters() {

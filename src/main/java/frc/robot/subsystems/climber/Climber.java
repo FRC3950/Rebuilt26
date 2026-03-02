@@ -87,6 +87,8 @@ public class Climber extends SubsystemBase {
         getOffsetPoint(side, climbOffsetMeters), Rotation2d.fromDegrees(climbHeadingDeg));
   }
 
+  //Bryce likes men 67** --OSCAR
+
   private Pose2d toBackoffPose(ClimbSide side) {
     return new Pose2d(
         getOffsetPoint(side, climbOffsetMeters), Rotation2d.fromDegrees(climbHeadingDeg));

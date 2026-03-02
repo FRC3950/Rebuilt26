@@ -39,6 +39,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.HubShiftUtil;
 import frc.robot.util.SmartShotRelease;
 import frc.robot.util.Zones;
 import java.util.function.Supplier;
@@ -59,6 +60,7 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedDashboardChooser<HubShiftUtil.AutoWinnerMode> autoWinnerChooser;
 
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -169,6 +171,12 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    autoWinnerChooser = new LoggedDashboardChooser<>("Auto Winner Override");
+    autoWinnerChooser.addDefaultOption("Auto", HubShiftUtil.AutoWinnerMode.AUTO);
+    autoWinnerChooser.addOption("Red", HubShiftUtil.AutoWinnerMode.RED);
+    autoWinnerChooser.addOption("Blue", HubShiftUtil.AutoWinnerMode.BLUE);
+    HubShiftUtil.setAutoWinnerModeSupplier(() -> autoWinnerChooser.get());
 
     configureButtonBindings();
   }
