@@ -7,6 +7,8 @@ import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,6 +48,9 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
+  private static final double CLIMBER_MANUAL_OUTPUT = 0.25;
+  private static final double TURRET_STICK_DEADBAND = 0.20;
+
   // Subsystems
   private final Drive drive;
   private final Turret turret1;
@@ -57,6 +62,7 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController driver = new CommandXboxController(0);
+  private final CommandXboxController operator = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -242,6 +248,15 @@ public class RobotContainer {
             () -> SmartDashboard.getBoolean("Snake Mode", true),
             intake::isIntaking));
 
+    Turret leftOperatorTurret = turret1;
+    Turret rightOperatorTurret = turret2;
+    if (robotToTurret2.getY() > robotToTurret1.getY()) {
+      leftOperatorTurret = turret2;
+      rightOperatorTurret = turret1;
+    }
+    final Turret finalLeftOperatorTurret = leftOperatorTurret;
+    final Turret finalRightOperatorTurret = rightOperatorTurret;
+
     // Manual Ferry Mode - Left
     driver
         .povLeft()
@@ -276,6 +291,72 @@ public class RobotContainer {
 
     // Climber
     driver.povDown().debounce(0.5).onTrue(climber.ClimbToggleCommand());
+
+    // Operator Controls
+    operator
+        .rightTrigger()
+        .whileTrue(Commands.startEnd(indexer::startIndexer, indexer::stopIndexer, indexer));
+    operator.x().whileTrue(Commands.startEnd(indexer::startHotdog, indexer::stopHotdog, indexer));
+    operator
+        .y()
+        .onTrue(
+            Commands.runOnce(
+                () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                drive));
+    operator.a().whileTrue(Commands.startEnd(intake::startIntake, intake::stopIntake, intake));
+    operator
+        .b()
+        .and(operator.start().negate())
+        .whileTrue(
+            Commands.startEnd(
+                () -> intake.setIntakeSpeed(-Constants.SubsystemConstants.Intake.intakeSpeed),
+                intake::stopIntake,
+                intake));
+    operator
+        .start()
+        .and(operator.b())
+        .whileTrue(
+            Commands.startEnd(
+                () -> {
+                  indexer.setIndexerSpeed(-Constants.SubsystemConstants.Indexer.indexerSpeed);
+                  indexer.setHotdogSpeed(-Constants.SubsystemConstants.Indexer.hotdogSpeed);
+                },
+                () -> {
+                  indexer.stopIndexer();
+                  indexer.stopHotdog();
+                },
+                indexer));
+    operator.leftBumper().onTrue(intake.retractCommand());
+    operator.rightBumper().onTrue(Commands.runOnce(intake::extend, intake));
+    operator.povUp().whileTrue(climber.manualUpCommand(CLIMBER_MANUAL_OUTPUT));
+    operator.povDown().whileTrue(climber.manualDownCommand(CLIMBER_MANUAL_OUTPUT));
+
+    operator
+        .start()
+        .and(
+            () ->
+                Turret.isManualStickActive(
+                    operator.getLeftX(), operator.getLeftY(), TURRET_STICK_DEADBAND))
+        .whileTrue(
+            Commands.run(
+                () ->
+                    finalLeftOperatorTurret.runManualFieldHeading(
+                        Turret.getFieldHeadingFromStick(operator.getLeftX(), operator.getLeftY()),
+                        drive.getPose().getRotation()),
+                finalLeftOperatorTurret));
+    operator
+        .start()
+        .and(
+            () ->
+                Turret.isManualStickActive(
+                    operator.getRightX(), operator.getRightY(), TURRET_STICK_DEADBAND))
+        .whileTrue(
+            Commands.run(
+                () ->
+                    finalRightOperatorTurret.runManualFieldHeading(
+                        Turret.getFieldHeadingFromStick(operator.getRightX(), operator.getRightY()),
+                        drive.getPose().getRotation()),
+                finalRightOperatorTurret));
   }
 
   public Command getAutonomousCommand() {

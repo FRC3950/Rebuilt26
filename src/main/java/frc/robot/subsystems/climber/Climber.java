@@ -55,6 +55,28 @@ public class Climber extends SubsystemBase {
     climberMotor.setControl(mmRequest.withPosition(targetPosition));
   }
 
+  public void setManualOutput(double output) {
+    climberMotor.set(output);
+  }
+
+  public void stop() {
+    setManualOutput(0.0);
+  }
+
+  public boolean isAtLowerLimit() {
+    return limitSwitch.get();
+  }
+
+  public Command manualUpCommand(double output) {
+    double upOutput = Math.abs(output);
+    return runEnd(() -> setManualOutput(upOutput), this::stop);
+  }
+
+  public Command manualDownCommand(double output) {
+    double downOutput = -Math.abs(output);
+    return runEnd(() -> setManualOutput(isAtLowerLimit() ? 0.0 : downOutput), this::stop);
+  }
+
   @AutoLogOutput(key = "Climber/Climber Zero'd?")
   public boolean getClimberZeroed() {
     return limitSwitch.get();
@@ -87,7 +109,7 @@ public class Climber extends SubsystemBase {
         getOffsetPoint(side, climbOffsetMeters), Rotation2d.fromDegrees(climbHeadingDeg));
   }
 
-  //Bryce likes men 67** --OSCAR
+  // Bryce likes men 67** --OSCAR
 
   private Pose2d toBackoffPose(ClimbSide side) {
     return new Pose2d(

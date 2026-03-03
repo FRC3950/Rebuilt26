@@ -91,6 +91,22 @@ public class Turret extends SubsystemBase {
     runSetpoints(params.turretAngle(), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 
+  public static boolean isManualStickActive(double stickX, double stickY, double deadband) {
+    return Math.hypot(stickX, stickY) > deadband;
+  }
+
+  public static Rotation2d getFieldHeadingFromStick(double stickX, double stickY) {
+    // Operator "forward" is fixed to +X in the WPILib field frame.
+    double x = -stickY;
+    double y = -stickX;
+    return new Rotation2d(Math.atan2(y, x));
+  }
+
+  public void runManualFieldHeading(Rotation2d desiredFieldHeading, Rotation2d robotHeading) {
+    Rotation2d turretRobotHeading = desiredFieldHeading.minus(robotHeading);
+    runSetpoints(turretRobotHeading, getHoodSetpointDeg(), getFlywheelSetpointRps());
+  }
+
   public void stopFlywheel() {
     flywheels.stop();
   }
