@@ -77,4 +77,12 @@ public class Intake extends SubsystemBase {
   public Command retractCommand() {
     return this.runOnce(this::retract);
   }
+
+  public Command onIntake() {
+    return this.runOnce(this::startIntake);
+  }
+
+  public Command offIntake() {
+    return this.runOnce(this::stopIntake);
+  }
 }

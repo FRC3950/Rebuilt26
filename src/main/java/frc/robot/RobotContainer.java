@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AgitatorCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.TeleopDrive;
@@ -158,6 +157,30 @@ public class RobotContainer {
               turret1.setHoodSafetyForcedDown(false);
               turret2.setHoodSafetyForcedDown(false);
             }));
+    NamedCommands.registerCommand("Extend Intake", Commands.runOnce(intake::extend, intake));
+    NamedCommands.registerCommand("Retract Intake", Commands.runOnce(intake::retract, intake));
+    NamedCommands.registerCommand("Start Intake", Commands.runOnce(intake::startIntake, intake));
+    NamedCommands.registerCommand("Stop Intake", Commands.runOnce(intake::stopIntake, intake));
+
+    NamedCommands.registerCommand("Start Hotdog", Commands.runOnce(indexer::startHotdog, indexer));
+    NamedCommands.registerCommand("Stop Hotdog", Commands.runOnce(indexer::stopHotdog, indexer));
+
+    NamedCommands.registerCommand(
+        "Start Shoot",
+        Commands.runOnce(
+            () -> {
+              indexer.startIndexer();
+              indexer.startHotdog();
+            },
+            indexer));
+    NamedCommands.registerCommand(
+        "End Shoot",
+        Commands.runOnce(
+            () -> {
+              indexer.stopIndexer();
+              indexer.stopHotdog();
+            },
+            indexer));
 
     SmartDashboard.putData("Turret Subsystem", turret1);
 
@@ -229,11 +252,15 @@ public class RobotContainer {
                 }));
 
     Supplier<TargetingMode> autoTargetingModeSupplier =
-        () ->
-            TurretTargeting.selectTargetingMode(
-                !DriverStation.isAutonomousEnabled(),
-                trenchDangerTrigger.getAsBoolean(),
-                Zones.NEUTRAL_ZONE.contains(drive.getPose().getTranslation()));
+        () -> {
+          if (DriverStation.isAutonomousEnabled()) {
+            return TargetingMode.HUB_AUTO;
+          }
+          return TurretTargeting.selectTargetingMode(
+              true,
+              trenchDangerTrigger.getAsBoolean(),
+              Zones.NEUTRAL_ZONE.contains(drive.getPose().getTranslation()));
+        };
 
     turret1.setDefaultCommand(
         new TurretTargeting(turret1, drive, robotToTurret1, autoTargetingModeSupplier));
@@ -254,6 +281,7 @@ public class RobotContainer {
       leftOperatorTurret = turret2;
       rightOperatorTurret = turret1;
     }
+    // Created as effectively final so we can pass it into the manual targeting.
     final Turret finalLeftOperatorTurret = leftOperatorTurret;
     final Turret finalRightOperatorTurret = rightOperatorTurret;
 
@@ -287,23 +315,38 @@ public class RobotContainer {
             () ->
                 SmartShotRelease.canShoot(
                     drive.getPose().getTranslation().getDistance(hubTranslation)))
-        .whileTrue(indexer.feedCommand().alongWith(new AgitatorCommand(intake)));
+        .whileTrue(
+            Commands.startEnd(
+                () -> {
+                  indexer.startIndexer();
+                  indexer.startHotdog();
+                },
+                () -> {
+                  indexer.stopIndexer();
+                  indexer.stopHotdog();
+                },
+                indexer));
 
     // Climber
     driver.povDown().debounce(0.5).onTrue(climber.ClimbToggleCommand());
 
     // Operator Controls
+    // Run Indexer
     operator
         .rightTrigger()
         .whileTrue(Commands.startEnd(indexer::startIndexer, indexer::stopIndexer, indexer));
+    // Run HotDog
     operator.x().whileTrue(Commands.startEnd(indexer::startHotdog, indexer::stopHotdog, indexer));
+    // Reset field-centric heading (Does nothing if robot can see tags to update its pose)
     operator
         .y()
         .onTrue(
             Commands.runOnce(
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                 drive));
+    // Runs Intake
     operator.a().whileTrue(Commands.startEnd(intake::startIntake, intake::stopIntake, intake));
+    // BackTake Intake
     operator
         .b()
         .and(operator.start().negate())
@@ -312,6 +355,7 @@ public class RobotContainer {
                 () -> intake.setIntakeSpeed(-Constants.SubsystemConstants.Intake.intakeSpeed),
                 intake::stopIntake,
                 intake));
+    // Backtake Indexer and HotDog
     operator
         .start()
         .and(operator.b())
@@ -326,11 +370,15 @@ public class RobotContainer {
                   indexer.stopHotdog();
                 },
                 indexer));
+    // Retract Intake
     operator.leftBumper().onTrue(intake.retractCommand());
+    // Extend Intake
     operator.rightBumper().onTrue(Commands.runOnce(intake::extend, intake));
+    // Climber move up
     operator.povUp().whileTrue(climber.manualUpCommand(CLIMBER_MANUAL_OUTPUT));
+    // Climber move down
     operator.povDown().whileTrue(climber.manualDownCommand(CLIMBER_MANUAL_OUTPUT));
-
+    // Manual Turret Left
     operator
         .start()
         .and(
@@ -344,6 +392,7 @@ public class RobotContainer {
                         Turret.getFieldHeadingFromStick(operator.getLeftX(), operator.getLeftY()),
                         drive.getPose().getRotation()),
                 finalLeftOperatorTurret));
+    // Manual Turret Right
     operator
         .start()
         .and(
