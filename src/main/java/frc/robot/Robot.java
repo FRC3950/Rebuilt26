@@ -76,6 +76,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     HubShiftUtil.periodic();
+    robotContainer.periodic();
 
     // Optionally switch the thread to high priority to improve loop
     // timing (see the template project documentation for details)

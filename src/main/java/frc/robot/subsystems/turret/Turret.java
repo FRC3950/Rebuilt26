@@ -107,6 +107,10 @@ public class Turret extends SubsystemBase {
     runSetpoints(turretRobotHeading, getHoodSetpointDeg(), getFlywheelSetpointRps());
   }
 
+  public void holdCurrentPositionWithStoppedFlywheel() {
+    runSetpoints(Rotation2d.fromDegrees(getAzimuthPositionDeg()), getHoodPositionDeg(), 0.0);
+  }
+
   public void stopFlywheel() {
     flywheels.stop();
   }
