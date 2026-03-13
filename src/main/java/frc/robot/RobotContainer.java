@@ -1,7 +1,7 @@
 package frc.robot;
 
 import static frc.robot.Constants.FieldConstants.*;
-import static frc.robot.Constants.SubsystemConstants.*;
+import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 
@@ -63,6 +63,8 @@ public class RobotContainer {
   private final Drive drive;
   private final Turret turret1;
   private final Turret turret2;
+  private final Turret leftSideTurret;
+  private final Turret rightSideTurret;
   private final Vision vision;
   private final Intake intake;
   private final Indexer indexer;
@@ -147,6 +149,15 @@ public class RobotContainer {
             flywheelFollowerID2,
             CANivore);
 
+    Turret computedLeftSideTurret = turret1;
+    Turret computedRightSideTurret = turret2;
+    if (robotToTurret2.getY() > robotToTurret1.getY()) {
+      computedLeftSideTurret = turret2;
+      computedRightSideTurret = turret1;
+    }
+    leftSideTurret = computedLeftSideTurret;
+    rightSideTurret = computedRightSideTurret;
+
     intake = new Intake();
     indexer = new Indexer();
     climber = new Climber(drive::getPose);
@@ -199,14 +210,16 @@ public class RobotContainer {
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
     autoChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        drive.sysIdTranslationQuasistatic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        drive.sysIdTranslationQuasistatic(SysIdRoutine.Direction.kReverse));
     autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        "Drive SysId (Dynamic Forward)",
+        drive.sysIdTranslationDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        "Drive SysId (Dynamic Reverse)",
+        drive.sysIdTranslationDynamic(SysIdRoutine.Direction.kReverse));
 
     autoWinnerChooser = new LoggedDashboardChooser<>("Auto Winner Override");
     autoWinnerChooser.addDefaultOption("Auto", HubShiftUtil.AutoWinnerMode.AUTO);
@@ -369,10 +382,10 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () ->
-                    turret1.runManualFieldHeading(
+                    leftSideTurret.runManualFieldHeading(
                         Turret.getFieldHeadingFromStick(operator.getLeftX(), operator.getLeftY()),
                         drive.getPose().getRotation()),
-                turret1));
+                leftSideTurret));
     operator
         .start(competitionButtonLoop)
         .and(
@@ -382,14 +395,15 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () ->
-                    turret2.runManualFieldHeading(
+                    rightSideTurret.runManualFieldHeading(
                         Turret.getFieldHeadingFromStick(operator.getRightX(), operator.getRightY()),
                         drive.getPose().getRotation()),
-                turret2));
+                rightSideTurret));
   }
 
   private void configureTuneModeBindings() {
-    TuneModeBindings.configure(tuneButtonLoop, driver, drive, intake, indexer, turret1, turret2);
+    TuneModeBindings.configure(
+        tuneButtonLoop, driver, drive, intake, indexer, leftSideTurret, rightSideTurret);
   }
 
   private void applyCodeMode(CodeMode codeMode) {

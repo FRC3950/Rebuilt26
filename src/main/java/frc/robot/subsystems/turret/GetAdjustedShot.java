@@ -32,8 +32,6 @@ public class GetAdjustedShot {
       double flywheelSpeed // same units as flywheelSpeeds[] (ex: RPS)
       ) {}
 
-  private ShootingParameters latestParameters = null;
-
   // Filters (match MA style: moving average of velocity estimates)
   private final LinearFilter turretAngleFilter =
       LinearFilter.movingAverage((int) (0.1 / Constants.loopPeriodSecs));
@@ -79,10 +77,6 @@ public class GetAdjustedShot {
       ChassisSpeeds fieldVelocity,
       Translation2d target,
       Translation2d robotToTurret) {
-    if (latestParameters != null && target.equals(hubTranslation)) {
-      return latestParameters;
-    }
-
     // Turret position on the field (robot pose + turret offset)
     Pose2d turretPosition = robotPose.transformBy(new Transform2d(robotToTurret, new Rotation2d()));
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
@@ -140,10 +134,6 @@ public class GetAdjustedShot {
             turretVelocity,
             hoodAngleDeg,
             interpolatedShot.flywheelRps());
-
-    if (target.equals(hubTranslation)) {
-      latestParameters = params;
-    }
     return params;
   }
 
@@ -160,6 +150,7 @@ public class GetAdjustedShot {
   }
 
   public void clearShootingParameters() {
-    latestParameters = null;
+    // Shot parameters are recomputed on every request. This method remains as a no-op so
+    // existing callers do not need to change.
   }
 }
