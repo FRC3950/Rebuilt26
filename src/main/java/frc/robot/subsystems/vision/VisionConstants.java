@@ -24,7 +24,12 @@ public class VisionConstants {
   // Robot to camera transforms
   // stupid things needed for sim. update real ones in limelight interface and update here for sim.
   public static Transform3d robotToCamera0 =
-      new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
+      new Transform3d(
+          -0.3118612,
+          0.2235454,
+          0.2118868,
+          new Rotation3d(0.0, -1 * Math.toRadians(30.0), Math.toRadians(180.0)));
+  //   new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
 
   public static String camera0Name = "limelight";
 
