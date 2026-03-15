@@ -1,7 +1,7 @@
 package frc.robot;
 
 import static frc.robot.Constants.FieldConstants.*;
-import static frc.robot.Constants.SubsystemConstants.*;
+import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 
@@ -11,8 +11,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.controls.TuneModeBindings;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
@@ -43,36 +46,45 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.HubShiftUtil;
 import frc.robot.util.SmartShotRelease;
 import frc.robot.util.Zones;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
+  public enum CodeMode {
+    COMPETITION,
+    TUNE
+  }
+
   private static final double CLIMBER_MANUAL_OUTPUT = 0.25;
   private static final double TURRET_STICK_DEADBAND = 0.20;
 
-  // Subsystems
   private final Drive drive;
   private final Turret turret1;
   private final Turret turret2;
+  private final Turret leftSideTurret;
+  private final Turret rightSideTurret;
   private final Vision vision;
   private final Intake intake;
   private final Indexer indexer;
   private final Climber climber;
 
-  // Controller
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
 
-  // Dashboard inputs
+  private final EventLoop competitionButtonLoop = new EventLoop();
+  private final EventLoop tuneButtonLoop = new EventLoop();
+
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<HubShiftUtil.AutoWinnerMode> autoWinnerChooser;
+  private final LoggedDashboardChooser<CodeMode> codeModeChooser;
+
+  private CodeMode appliedCodeMode;
 
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL:
-        // Real robot, instantiate hardware IO implementations
-        // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
-        // a CANcoder
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -88,7 +100,6 @@ public class RobotContainer {
         break;
 
       case SIM:
-        // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
                 new GyroIO() {},
@@ -105,7 +116,6 @@ public class RobotContainer {
         break;
 
       default:
-        // Replayed robot, disable IO implementations
         drive =
             new Drive(
                 new GyroIO() {},
@@ -138,6 +148,15 @@ public class RobotContainer {
             flywheelConfig,
             flywheelFollowerID2,
             CANivore);
+
+    Turret computedLeftSideTurret = turret1;
+    Turret computedRightSideTurret = turret2;
+    if (robotToTurret2.getY() > robotToTurret1.getY()) {
+      computedLeftSideTurret = turret2;
+      computedRightSideTurret = turret1;
+    }
+    leftSideTurret = computedLeftSideTurret;
+    rightSideTurret = computedRightSideTurret;
 
     intake = new Intake();
     indexer = new Indexer();
@@ -185,50 +204,68 @@ public class RobotContainer {
     SmartDashboard.putData("Turret Subsystem", turret1);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
-
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
     autoChooser.addOption(
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
     autoChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        drive.sysIdTranslationQuasistatic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        drive.sysIdTranslationQuasistatic(SysIdRoutine.Direction.kReverse));
     autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        "Drive SysId (Dynamic Forward)",
+        drive.sysIdTranslationDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        "Drive SysId (Dynamic Reverse)",
+        drive.sysIdTranslationDynamic(SysIdRoutine.Direction.kReverse));
 
     autoWinnerChooser = new LoggedDashboardChooser<>("Auto Winner Override");
     autoWinnerChooser.addDefaultOption("Auto", HubShiftUtil.AutoWinnerMode.AUTO);
     autoWinnerChooser.addOption("Red", HubShiftUtil.AutoWinnerMode.RED);
     autoWinnerChooser.addOption("Blue", HubShiftUtil.AutoWinnerMode.BLUE);
-    HubShiftUtil.setAutoWinnerModeSupplier(() -> autoWinnerChooser.get());
+    HubShiftUtil.setAutoWinnerModeSupplier(autoWinnerChooser::get);
+
+    codeModeChooser = new LoggedDashboardChooser<>("Code Mode");
+    codeModeChooser.addDefaultOption("Competition", CodeMode.COMPETITION);
+    codeModeChooser.addOption("TUNE", CodeMode.TUNE);
 
     configureButtonBindings();
+    configureTuneModeBindings();
+    SmartDashboard.setDefaultBoolean("Snake Mode", true);
+
+    applyCodeMode(getSelectedCodeMode());
+  }
+
+  public void periodic() {
+    CodeMode selectedCodeMode = getSelectedCodeMode();
+    SmartDashboard.putString("Code Mode/Selected", selectedCodeMode.name());
+    Logger.recordOutput("Controls/CodeModeSelected", selectedCodeMode.name());
+
+    if (!shouldApplyCodeMode(selectedCodeMode, appliedCodeMode, DriverStation.isDisabled())) {
+      return;
+    }
+
+    applyCodeMode(selectedCodeMode);
+  }
+
+  static boolean shouldApplyCodeMode(
+      CodeMode selectedCodeMode, CodeMode currentCodeMode, boolean isDisabled) {
+    return isDisabled && selectedCodeMode != currentCodeMode;
+  }
+
+  public Command getAutonomousCommand() {
+    return autoChooser.get();
   }
 
   private void configureButtonBindings() {
-    // Primary Driver Layout: https://tinyurl.com/5n7kv2up
-    SmartDashboard.setDefaultBoolean("Snake Mode", true);
-
-    Translation2d turretMidpointRobot = robotToTurret1.plus(robotToTurret2).times(0.5);
-    Supplier<Translation2d> turretMidpointFieldSupplier =
-        () ->
-            drive
-                .getPose()
-                .getTranslation()
-                .plus(turretMidpointRobot.rotateBy(drive.getPose().getRotation()));
+    BooleanSupplier trenchDangerSupplier = this::isTrenchDanger;
 
     Trigger trenchDangerTrigger =
-        Zones.TRENCH_ZONES
-            .willContain(
-                turretMidpointFieldSupplier, drive::getFieldRelativeSpeeds, TRENCH_ALIGN_TIME_SEC)
-            .debounce(TRENCH_DEBOUNCE_SEC);
-
-    Trigger trenchSafetyEnabledTrigger = new Trigger(() -> !DriverStation.isAutonomousEnabled());
+        new Trigger(competitionButtonLoop, trenchDangerSupplier).debounce(TRENCH_DEBOUNCE_SEC);
+    Trigger trenchSafetyEnabledTrigger =
+        new Trigger(competitionButtonLoop, () -> !DriverStation.isAutonomousEnabled());
     Trigger activeTrenchSafetyTrigger = trenchSafetyEnabledTrigger.and(trenchDangerTrigger);
 
     activeTrenchSafetyTrigger.onTrue(
@@ -243,7 +280,7 @@ public class RobotContainer {
               turret1.setHoodSafetyForcedDown(false);
               turret2.setHoodSafetyForcedDown(false);
             }));
-    new Trigger(DriverStation::isAutonomousEnabled)
+    new Trigger(competitionButtonLoop, DriverStation::isAutonomousEnabled)
         .onTrue(
             Commands.runOnce(
                 () -> {
@@ -251,66 +288,28 @@ public class RobotContainer {
                   turret2.setHoodSafetyForcedDown(false);
                 }));
 
-    Supplier<TargetingMode> autoTargetingModeSupplier =
-        () -> {
-          if (DriverStation.isAutonomousEnabled()) {
-            return TargetingMode.HUB_AUTO;
-          }
-          return TurretTargeting.selectTargetingMode(
-              true,
-              trenchDangerTrigger.getAsBoolean(),
-              Zones.NEUTRAL_ZONE.contains(drive.getPose().getTranslation()));
-        };
-
-    turret1.setDefaultCommand(
-        new TurretTargeting(turret1, drive, robotToTurret1, autoTargetingModeSupplier));
-    turret2.setDefaultCommand(
-        new TurretTargeting(turret2, drive, robotToTurret2, autoTargetingModeSupplier));
-
-    drive.setDefaultCommand(
-        new TeleopDrive(
-            drive,
-            driver,
-            trenchDangerTrigger::getAsBoolean,
-            () -> SmartDashboard.getBoolean("Snake Mode", true),
-            intake::isIntaking));
-
-    Turret leftOperatorTurret = turret1;
-    Turret rightOperatorTurret = turret2;
-    if (robotToTurret2.getY() > robotToTurret1.getY()) {
-      leftOperatorTurret = turret2;
-      rightOperatorTurret = turret1;
-    }
-    // Created as effectively final so we can pass it into the manual targeting.
-    final Turret finalLeftOperatorTurret = leftOperatorTurret;
-    final Turret finalRightOperatorTurret = rightOperatorTurret;
-
-    // Manual Ferry Mode - Left
-    driver
-        .povLeft()
+    new Trigger(competitionButtonLoop, () -> driver.getHID().getPOV() == 270)
         .and(() -> drive.getPose().getX() > neutralZoneMinX)
         .whileTrue(
             new FerryMode(turret1, drive, robotToTurret1, leftFerryTarget)
                 .alongWith(new FerryMode(turret2, drive, robotToTurret2, leftFerryTarget)));
 
-    // Manual Ferry Mode - Right
-    driver
-        .povRight()
+    new Trigger(competitionButtonLoop, () -> driver.getHID().getPOV() == 90)
         .and(() -> drive.getPose().getY() > neutralZoneMinX)
         .whileTrue(
             new FerryMode(turret1, drive, robotToTurret1, rightFerryTarget)
                 .alongWith(new FerryMode(turret2, drive, robotToTurret2, rightFerryTarget)));
 
-    // Intake
     driver
-        .leftTrigger()
-        .whileTrue(new IntakeCommand(intake, indexer, driver.rightTrigger()::getAsBoolean));
+        .leftTrigger(0.5, competitionButtonLoop)
+        .whileTrue(
+            new IntakeCommand(
+                intake, indexer, driver.rightTrigger(0.5, competitionButtonLoop)::getAsBoolean));
 
-    driver.rightBumper().onTrue(intake.retractCommand());
+    driver.rightBumper(competitionButtonLoop).onTrue(intake.retractCommand());
 
-    // Shoot/Feed Fuel
     driver
-        .rightTrigger()
+        .rightTrigger(0.5, competitionButtonLoop)
         .and(
             () ->
                 SmartShotRelease.canShoot(
@@ -327,38 +326,36 @@ public class RobotContainer {
                 },
                 indexer));
 
-    // Climber
-    driver.povDown().debounce(0.5).onTrue(climber.ClimbToggleCommand());
+    new Trigger(competitionButtonLoop, () -> driver.getHID().getPOV() == 180)
+        .debounce(0.5)
+        .onTrue(climber.ClimbToggleCommand());
 
-    // Operator Controls
-    // Run Indexer
     operator
-        .rightTrigger()
+        .rightTrigger(0.5, competitionButtonLoop)
         .whileTrue(Commands.startEnd(indexer::startIndexer, indexer::stopIndexer, indexer));
-    // Run HotDog
-    operator.x().whileTrue(Commands.startEnd(indexer::startHotdog, indexer::stopHotdog, indexer));
-    // Reset field-centric heading (Does nothing if robot can see tags to update its pose)
     operator
-        .y()
+        .x(competitionButtonLoop)
+        .whileTrue(Commands.startEnd(indexer::startHotdog, indexer::stopHotdog, indexer));
+    operator
+        .y(competitionButtonLoop)
         .onTrue(
             Commands.runOnce(
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                 drive));
-    // Runs Intake
-    operator.a().whileTrue(Commands.startEnd(intake::startIntake, intake::stopIntake, intake));
-    // BackTake Intake
     operator
-        .b()
-        .and(operator.start().negate())
+        .a(competitionButtonLoop)
+        .whileTrue(Commands.startEnd(intake::startIntake, intake::stopIntake, intake));
+    operator
+        .b(competitionButtonLoop)
+        .and(operator.start(competitionButtonLoop).negate())
         .whileTrue(
             Commands.startEnd(
                 () -> intake.setIntakeSpeed(-Constants.SubsystemConstants.Intake.intakeSpeed),
                 intake::stopIntake,
                 intake));
-    // Backtake Indexer and HotDog
     operator
-        .start()
-        .and(operator.b())
+        .start(competitionButtonLoop)
+        .and(operator.b(competitionButtonLoop))
         .whileTrue(
             Commands.startEnd(
                 () -> {
@@ -370,17 +367,14 @@ public class RobotContainer {
                   indexer.stopHotdog();
                 },
                 indexer));
-    // Retract Intake
-    operator.leftBumper().onTrue(intake.retractCommand());
-    // Extend Intake
-    operator.rightBumper().onTrue(Commands.runOnce(intake::extend, intake));
-    // Climber move up
-    operator.povUp().whileTrue(climber.manualUpCommand(CLIMBER_MANUAL_OUTPUT));
-    // Climber move down
-    operator.povDown().whileTrue(climber.manualDownCommand(CLIMBER_MANUAL_OUTPUT));
-    // Manual Turret Left
+    operator.leftBumper(competitionButtonLoop).onTrue(intake.retractCommand());
+    operator.rightBumper(competitionButtonLoop).onTrue(Commands.runOnce(intake::extend, intake));
+    new Trigger(competitionButtonLoop, () -> operator.getHID().getPOV() == 0)
+        .whileTrue(climber.manualUpCommand(CLIMBER_MANUAL_OUTPUT));
+    new Trigger(competitionButtonLoop, () -> operator.getHID().getPOV() == 180)
+        .whileTrue(climber.manualDownCommand(CLIMBER_MANUAL_OUTPUT));
     operator
-        .start()
+        .start(competitionButtonLoop)
         .and(
             () ->
                 Turret.isManualStickActive(
@@ -388,13 +382,12 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () ->
-                    finalLeftOperatorTurret.runManualFieldHeading(
+                    leftSideTurret.runManualFieldHeading(
                         Turret.getFieldHeadingFromStick(operator.getLeftX(), operator.getLeftY()),
                         drive.getPose().getRotation()),
-                finalLeftOperatorTurret));
-    // Manual Turret Right
+                leftSideTurret));
     operator
-        .start()
+        .start(competitionButtonLoop)
         .and(
             () ->
                 Turret.isManualStickActive(
@@ -402,13 +395,89 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () ->
-                    finalRightOperatorTurret.runManualFieldHeading(
+                    rightSideTurret.runManualFieldHeading(
                         Turret.getFieldHeadingFromStick(operator.getRightX(), operator.getRightY()),
                         drive.getPose().getRotation()),
-                finalRightOperatorTurret));
+                rightSideTurret));
   }
 
-  public Command getAutonomousCommand() {
-    return autoChooser.get();
+  private void configureTuneModeBindings() {
+    TuneModeBindings.configure(
+        tuneButtonLoop, driver, drive, intake, indexer, leftSideTurret, rightSideTurret);
+  }
+
+  private void applyCodeMode(CodeMode codeMode) {
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+    scheduler.cancelAll();
+    scheduler.removeDefaultCommand(drive);
+    scheduler.removeDefaultCommand(turret1);
+    scheduler.removeDefaultCommand(turret2);
+
+    switch (codeMode) {
+      case COMPETITION:
+        scheduler.setActiveButtonLoop(competitionButtonLoop);
+        applyCompetitionDefaults();
+        break;
+      case TUNE:
+        scheduler.setActiveButtonLoop(tuneButtonLoop);
+        applyTuneDefaults();
+        break;
+    }
+
+    appliedCodeMode = codeMode;
+    SmartDashboard.putString("Code Mode/Applied", appliedCodeMode.name());
+    Logger.recordOutput("Controls/CodeModeApplied", appliedCodeMode.name());
+  }
+
+  private void applyCompetitionDefaults() {
+    BooleanSupplier trenchDangerSupplier = this::isTrenchDanger;
+    Supplier<TargetingMode> autoTargetingModeSupplier =
+        () -> {
+          if (DriverStation.isAutonomousEnabled()) {
+            return TargetingMode.HUB_AUTO;
+          }
+          return TurretTargeting.selectTargetingMode(
+              true,
+              trenchDangerSupplier.getAsBoolean(),
+              Zones.NEUTRAL_ZONE.contains(drive.getPose().getTranslation()));
+        };
+
+    turret1.setDefaultCommand(
+        new TurretTargeting(turret1, drive, robotToTurret1, autoTargetingModeSupplier));
+    turret2.setDefaultCommand(
+        new TurretTargeting(turret2, drive, robotToTurret2, autoTargetingModeSupplier));
+    drive.setDefaultCommand(
+        new TeleopDrive(
+            drive,
+            driver,
+            trenchDangerSupplier,
+            () -> SmartDashboard.getBoolean("Snake Mode", true),
+            intake::isIntaking));
+  }
+
+  private void applyTuneDefaults() {
+    drive.setDefaultCommand(TuneModeBindings.createDriveDefaultCommand(drive, driver));
+    turret1.setDefaultCommand(
+        Commands.run(turret1::holdCurrentPositionWithStoppedFlywheel, turret1));
+    turret2.setDefaultCommand(
+        Commands.run(turret2::holdCurrentPositionWithStoppedFlywheel, turret2));
+  }
+
+  private CodeMode getSelectedCodeMode() {
+    CodeMode selectedCodeMode = codeModeChooser.get();
+    return selectedCodeMode != null ? selectedCodeMode : CodeMode.COMPETITION;
+  }
+
+  private boolean isTrenchDanger() {
+    return Zones.TRENCH_ZONES.willContain(
+        getTurretMidpointField(), drive.getFieldRelativeSpeeds(), TRENCH_ALIGN_TIME_SEC);
+  }
+
+  private Translation2d getTurretMidpointField() {
+    Translation2d turretMidpointRobot = robotToTurret1.plus(robotToTurret2).times(0.5);
+    return drive
+        .getPose()
+        .getTranslation()
+        .plus(turretMidpointRobot.rotateBy(drive.getPose().getRotation()));
   }
 }

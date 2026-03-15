@@ -82,7 +82,8 @@ public class Drive extends SubsystemBase {
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
-  private final SysIdRoutine sysId;
+  private final SysIdRoutine translationSysId;
+  private final SysIdRoutine rotationSysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
@@ -138,15 +139,24 @@ public class Drive extends SubsystemBase {
         });
 
     // Configure SysId
-    sysId =
+    translationSysId =
         new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
                 null,
                 null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                (state) -> Logger.recordOutput("Drive/SysIdTranslationState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+    rotationSysId =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null,
+                null,
+                null,
+                (state) -> Logger.recordOutput("Drive/SysIdRotationState", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> runRotationCharacterization(voltage.in(Volts)), null, this));
   }
 
   @Override
@@ -239,6 +249,15 @@ public class Drive extends SubsystemBase {
     }
   }
 
+  /** Runs the drive in a pure spin configuration with the specified drive output. */
+  public void runRotationCharacterization(double output) {
+    Translation2d[] moduleTranslations = getModuleTranslations();
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].runCharacterization(
+          output, getRotationCharacterizationHeading(moduleTranslations[i]));
+    }
+  }
+
   /** Stops the drive. */
   public void stop() {
     runVelocity(new ChassisSpeeds());
@@ -259,14 +278,40 @@ public class Drive extends SubsystemBase {
 
   /** Returns a command to run a quasistatic test in the specified direction. */
   public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return run(() -> runCharacterization(0.0))
-        .withTimeout(1.0)
-        .andThen(sysId.quasistatic(direction));
+    return sysIdTranslationQuasistatic(direction);
   }
 
   /** Returns a command to run a dynamic test in the specified direction. */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
+    return sysIdTranslationDynamic(direction);
+  }
+
+  /** Returns a command to run a translation quasistatic test in the specified direction. */
+  public Command sysIdTranslationQuasistatic(SysIdRoutine.Direction direction) {
+    return run(() -> runCharacterization(0.0))
+        .withTimeout(1.0)
+        .andThen(translationSysId.quasistatic(direction));
+  }
+
+  /** Returns a command to run a translation dynamic test in the specified direction. */
+  public Command sysIdTranslationDynamic(SysIdRoutine.Direction direction) {
+    return run(() -> runCharacterization(0.0))
+        .withTimeout(1.0)
+        .andThen(translationSysId.dynamic(direction));
+  }
+
+  /** Returns a command to run a rotation quasistatic test in the specified direction. */
+  public Command sysIdRotationQuasistatic(SysIdRoutine.Direction direction) {
+    return run(() -> runRotationCharacterization(0.0))
+        .withTimeout(1.0)
+        .andThen(rotationSysId.quasistatic(direction));
+  }
+
+  /** Returns a command to run a rotation dynamic test in the specified direction. */
+  public Command sysIdRotationDynamic(SysIdRoutine.Direction direction) {
+    return run(() -> runRotationCharacterization(0.0))
+        .withTimeout(1.0)
+        .andThen(rotationSysId.dynamic(direction));
   }
 
   /** Returns the module states (turn angles and drive velocities) for all of the modules. */
@@ -365,5 +410,9 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
+  }
+
+  static Rotation2d getRotationCharacterizationHeading(Translation2d moduleTranslation) {
+    return moduleTranslation.getAngle().plus(Rotation2d.kCCW_90deg);
   }
 }
