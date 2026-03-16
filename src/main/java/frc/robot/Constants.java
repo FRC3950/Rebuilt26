@@ -67,7 +67,6 @@ public final class Constants {
       public static final TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration flywheelConfig = new TalonFXConfiguration();
 
-      // Gear Ratios (Placeholders - UPDATE ME)
       public static final double azimuthGearRatio = 10;
       public static final double flywheelGearRatio = 1.0;
 
@@ -109,7 +108,8 @@ public final class Constants {
       // Tune this on-field until moving shots land consistently.
       // if everything doesnt work consistently, try adjusting this value
       public static final double shotExtraLatencySec = 0.08;
-
+      //hi cj love you-ruby
+      //where where t square
       static {
         // Azimuth Motor Config
         azimuthConfig.Slot0.kP = azimuthKP;
