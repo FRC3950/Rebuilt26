@@ -3,7 +3,6 @@ package frc.robot;
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
-import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -93,7 +92,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
+                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
         break;
 
       case SIM:
@@ -109,7 +109,9 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    camera0Name, VisionConstants.robotToCamera0, drive::getPose));
+                    VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
         break;
 
       default:
