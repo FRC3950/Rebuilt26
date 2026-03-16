@@ -24,7 +24,6 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.controls.TuneModeBindings;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -57,7 +56,6 @@ public class RobotContainer {
     TUNE
   }
 
-  private static final double CLIMBER_MANUAL_OUTPUT = 0.25;
   private static final double TURRET_STICK_DEADBAND = 0.20;
 
   private final Drive drive;
@@ -68,7 +66,6 @@ public class RobotContainer {
   private final Vision vision;
   private final Intake intake;
   private final Indexer indexer;
-  private final Climber climber;
 
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
@@ -160,7 +157,6 @@ public class RobotContainer {
 
     intake = new Intake();
     indexer = new Indexer();
-    climber = new Climber(drive::getPose);
 
     NamedCommands.registerCommand(
         "EnableHoodSafetyMode",
@@ -326,10 +322,6 @@ public class RobotContainer {
                 },
                 indexer));
 
-    new Trigger(competitionButtonLoop, () -> driver.getHID().getPOV() == 180)
-        .debounce(0.5)
-        .onTrue(climber.ClimbToggleCommand());
-
     operator
         .rightTrigger(0.5, competitionButtonLoop)
         .whileTrue(Commands.startEnd(indexer::startIndexer, indexer::stopIndexer, indexer));
@@ -369,10 +361,6 @@ public class RobotContainer {
                 indexer));
     operator.leftBumper(competitionButtonLoop).onTrue(intake.retractCommand());
     operator.rightBumper(competitionButtonLoop).onTrue(Commands.runOnce(intake::extend, intake));
-    new Trigger(competitionButtonLoop, () -> operator.getHID().getPOV() == 0)
-        .whileTrue(climber.manualUpCommand(CLIMBER_MANUAL_OUTPUT));
-    new Trigger(competitionButtonLoop, () -> operator.getHID().getPOV() == 180)
-        .whileTrue(climber.manualDownCommand(CLIMBER_MANUAL_OUTPUT));
     operator
         .start(competitionButtonLoop)
         .and(

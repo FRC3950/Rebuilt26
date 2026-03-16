@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -37,35 +38,37 @@ public final class Constants {
     public static final CANBus CANivore = new CANBus("CANivore");
 
     public static final class Drive {
-      public static final int fLeftDriveID = 1;
-      public static final int fLeftSteerID = 2;
-      public static final int fLeftEncoderID = 3;
-      public static final int fRightDriveID = 4;
-      public static final int fRightSteerID = 5;
-      public static final int fRightEncoderID = 6;
-      public static final int bLeftDriveID = 7;
-      public static final int bLeftSteerID = 8;
-      public static final int bLeftEncoderID = 9;
+      public static final int fLeftDriveID = 9;
+      public static final int fLeftSteerID = 8;
+      public static final int fLeftEncoderID = 44;
+      public static final int fRightDriveID = 6;
+      public static final int fRightSteerID = 7;
+      public static final int fRightEncoderID = 41;
+      public static final int bLeftDriveID = 0;
+      public static final int bLeftSteerID = 1;
+      public static final int bLeftEncoderID = 43;
       public static final int bRightDriveID = 10;
       public static final int bRightSteerID = 11;
-      public static final int bRightEncoderID = 12;
+      public static final int bRightEncoderID = 42;
+
+      public static final int pigeonID = 46;
     }
 
     public static final class Turret {
-      public static final int azimuthID = 14;
-      public static final int TURRET_CANDI_ID = 15;
-      public static final int flywheelID = 16;
-      public static final int flywheelFollowerID = 17;
+      public static final int azimuthID = 19;
+      public static final int TURRET_CANDI_ID = 45;
+      public static final int flywheelID = 3;
+      public static final int flywheelFollowerID = 2;
 
-      public static final int azimuthID2 = 18;
-      public static final int flywheelID2 = 19;
-      public static final int flywheelFollowerID2 = 20;
+      public static final int azimuthID2 = 17;
+      public static final int flywheelID2 = 16;
+      public static final int flywheelFollowerID2 = 18;
 
       public static final TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration flywheelConfig = new TalonFXConfiguration();
 
       // Gear Ratios (Placeholders - UPDATE ME)
-      public static final double azimuthGearRatio = 0.1;
+      public static final double azimuthGearRatio = 10;
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
@@ -73,7 +76,7 @@ public final class Constants {
       public static final double maxAzimuthAngle = 270.0;
       public static final double minHoodAngle = 10.0;
       public static final double maxHoodAngle = 50.0;
-      public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0.0;
+      public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 180.0;
 
       public static final int HOOD_SERVO_HUB_CAN_ID = 1;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 =
@@ -91,9 +94,9 @@ public final class Constants {
       public static final double azimuthMaxVelocity = 100.0; // deg/s
       public static final double azimuthMaxAcceleration = 200.0; // deg/s^2
 
-      public static final double flywheelKP = 0.2;
-      public static final double flywheelKS = 0.0;
-      public static final double flywheelKV = 0.11;
+      public static final double flywheelKP = 1.2;
+      public static final double flywheelKD = 0.25;
+      public static final double flywheelKV = 0.0925;
 
       // Turret position relative to the robot pose origin (meters).
       public static final Translation2d robotToTurret1 =
@@ -120,15 +123,15 @@ public final class Constants {
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
-        flywheelConfig.Slot0.kS = flywheelKS;
+        flywheelConfig.Slot0.kD = flywheelKD;
         flywheelConfig.Slot0.kV = flywheelKV;
         flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
       }
     }
 
     public static final class Intake {
-      public static final int intakeMotorID = 22;
-      public static final int pivotMotorID = 23;
+      public static final int intakeMotorID = 5;
+      public static final int pivotMotorID = 12;
 
       // Intake Positions - UPDATE ME!!!
       public static final double downPos = -2.5;
@@ -161,10 +164,10 @@ public final class Constants {
 
     public static final class Indexer {
       public static final int hotdogMotorID = 25;
-      public static final int indexerMotorID = 26;
+      public static final int indexerMotorID = 14;
 
-      public static final double indexerSpeed = 20.0; // RPS
-      public static final double hotdogSpeed = 20.0; // RPS
+      public static final double indexerSpeed = 50.0; // RPS
+      public static final double hotdogSpeed = 40.0; // RPS
 
       public static final TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration hotdogConfig = new TalonFXConfiguration();
@@ -178,43 +181,11 @@ public final class Constants {
       static {
         indexerConfig.Slot0.kP = indexerKP;
         indexerConfig.Slot0.kV = indexerKV;
+        indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         hotdogConfig.Slot0.kP = hotdogKP;
         hotdogConfig.Slot0.kV = hotdogKV;
-      }
-    }
-
-    public static final class Climber {
-      public static final int climberMotorID = 28;
-      public static final int limitSwitchPort = 0;
-
-      public static final double climberMaxHeight = 20;
-      public static final double climbUpHeight = 18;
-      public static final double climbFinalPos = 4;
-      public static final double climbOffsetMeters = 0.50;
-      public static final double climbHeadingDeg = -90.0;
-      public static final double climberPositionTolerance = 0.25;
-      public static final double climberMoveTimeoutSecs = 2.5;
-      public static final double climbPathMaxVelocityMetersPerSec = 3.0;
-      public static final double climbPathMaxAccelerationMetersPerSecSq = 3.0;
-      public static final double climbPathMaxAngularVelocityDegPerSec = 540.0;
-      public static final double climbPathMaxAngularAccelerationDegPerSecSq = 540.0;
-
-      public static final TalonFXConfiguration climberConfig = new TalonFXConfiguration();
-      public static final double climberKP = 0.2;
-      public static final double climberKV = 0.11;
-      public static final int climberMMVelocity = 25;
-      public static final int climberMMAcceleration = 10;
-
-      static {
-        climberConfig.Slot0.kP = climberKP;
-        climberConfig.Slot0.kV = climberKV;
-        climberConfig.MotionMagic.MotionMagicAcceleration = climberMMAcceleration;
-        climberConfig.MotionMagic.MotionMagicCruiseVelocity = climberMMVelocity;
-        climberConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        climberConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = climberMaxHeight;
-        climberConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        climberConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+        hotdogConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
       }
     }
     // Josh wrote this part of the code, easter egg of 2026
