@@ -86,12 +86,12 @@ public final class Constants {
       public static final int HOOD_SERVO_CENTER_PULSE_US = 1500;
       public static final int HOOD_SERVO_MAX_PULSE_US = 2500;
 
-      // PID / Motion Magic Gains (Placeholders - UPDATE ME)
-      public static final double azimuthKP = 2.0;
-      public static final double azimuthKD = 0.12;
-      public static final double azimuthKS = 0.25;
-      public static final double azimuthMaxVelocity = 100.0; // deg/s
-      public static final double azimuthMaxAcceleration = 200.0; // deg/s^2
+      // PID / Motion Magic Gains
+      public static final double azimuthKP = 24;
+      public static final double azimuthKS = 0.75;
+      public static final double azimuthKV = 0.12;
+      public static final double azimuthMMVelocity = 24; 
+      public static final double azimuthMMAcceleration = 48; 
 
       public static final double flywheelKP = 1.2;
       public static final double flywheelKD = 0.25;
@@ -108,17 +108,15 @@ public final class Constants {
       // Tune this on-field until moving shots land consistently.
       // if everything doesnt work consistently, try adjusting this value
       public static final double shotExtraLatencySec = 0.08;
-      //hi cj love you-ruby
-      //where where t square
+      //hi cj love you -ruby
+      //where where t-square?
       static {
         // Azimuth Motor Config
         azimuthConfig.Slot0.kP = azimuthKP;
-        azimuthConfig.Slot0.kD = azimuthKD;
+        azimuthConfig.Slot0.kV = azimuthKV;
         azimuthConfig.Slot0.kS = azimuthKS;
-        azimuthConfig.MotionMagic.MotionMagicCruiseVelocity =
-            azimuthMaxVelocity / 360.0 * azimuthGearRatio; // Rotations/s
-        azimuthConfig.MotionMagic.MotionMagicAcceleration =
-            azimuthMaxAcceleration / 360.0 * azimuthGearRatio; // Rotations/s^2
+        azimuthConfig.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity; 
+        azimuthConfig.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration; 
         azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // Flywheel Motor Config
@@ -134,23 +132,27 @@ public final class Constants {
       public static final int pivotMotorID = 12;
 
       // Intake Positions - UPDATE ME!!!
-      public static final double downPos = -2.5;
-      public static final double upPos = 2.5;
+      public static final double downPos = -1;
+      public static final double upPos = 19;
 
-      public static final double intakeSpeed = 40.0; // RPS
+      public static final double intakeSpeed = 40.0; 
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
       public static final double intakeKP = 0.1;
       public static final double intakeKV = 0.12;
 
       public static final TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
-      public static final double pivotKP = 0.2;
-      public static final double pivotKV = 0.11;
-      public static final int pivotMMVelocity = 25;
-      public static final int pivotMMAcceleration = 10;
+      public static final double pivotKP = 15;
+      public static final double pivotKS = 0.5;
+      public static final double pivotKV = 0.12;
+      public static final double pivotKG = 1;
+      public static final int pivotMMVelocity = 60;
+      public static final int pivotMMAcceleration = 120;
 
       static {
         pivotConfig.Slot0.kP = pivotKP;
         pivotConfig.Slot0.kV = pivotKV;
+        pivotConfig.Slot0.kS = pivotKS;
+        pivotConfig.Slot0.kG = pivotKG;
         pivotConfig.MotionMagic.MotionMagicAcceleration = pivotMMAcceleration;
         pivotConfig.MotionMagic.MotionMagicCruiseVelocity = pivotMMVelocity;
 
@@ -159,7 +161,7 @@ public final class Constants {
         intakeConfig.Slot0.kV = intakeKV;
       }
 
-      // for the pivot: motion magic with kv and kp, for intake: duty cycle.
+      
     }
 
     public static final class Indexer {
@@ -172,11 +174,11 @@ public final class Constants {
       public static final TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration hotdogConfig = new TalonFXConfiguration();
 
-      public static final double indexerKP = 0.1;
-      public static final double indexerKV = 0.12;
+      public static final double indexerKP = 0;
+      public static final double indexerKV = 0.1285;
 
-      public static final double hotdogKP = 0.1;
-      public static final double hotdogKV = 0.12;
+      public static final double hotdogKP = 0;
+      public static final double hotdogKV = 0.1175;
 
       static {
         indexerConfig.Slot0.kP = indexerKP;

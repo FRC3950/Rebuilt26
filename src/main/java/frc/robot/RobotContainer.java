@@ -241,6 +241,10 @@ public class RobotContainer {
     SmartDashboard.putString("Code Mode/Selected", selectedCodeMode.name());
     Logger.recordOutput("Controls/CodeModeSelected", selectedCodeMode.name());
 
+    if (appliedCodeMode == CodeMode.TUNE) {
+      TuneModeBindings.publishTuneTelemetry(drive.getPose());
+    }
+
     if (!shouldApplyCodeMode(selectedCodeMode, appliedCodeMode, DriverStation.isDisabled())) {
       return;
     }

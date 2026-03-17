@@ -1,13 +1,16 @@
 package frc.robot.controls;
 
+import static frc.robot.Constants.FieldConstants.hubTranslation;
 import static frc.robot.Constants.SubsystemConstants.Intake.downPos;
 import static frc.robot.Constants.SubsystemConstants.Intake.upPos;
-import static frc.robot.Constants.SubsystemConstants.Turret.maxAzimuthAngle;
 import static frc.robot.Constants.SubsystemConstants.Turret.maxHoodAngle;
-import static frc.robot.Constants.SubsystemConstants.Turret.minAzimuthAngle;
 import static frc.robot.Constants.SubsystemConstants.Turret.minHoodAngle;
+import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1;
+import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,11 +26,11 @@ import frc.robot.subsystems.turret.Turret;
 public final class TuneModeBindings {
   private static final String LEFT_PREFIX = "Tune/Left";
   private static final String RIGHT_PREFIX = "Tune/Right";
-  private static final String ANGLE_SUFFIX = " Turret Angle Deg";
   private static final String HOOD_SUFFIX = " Hood Deg";
   private static final String FLYWHEEL_SUFFIX = " Flywheel RPS";
   private static final String VALID_SUFFIX = " Valid";
   private static final String STATUS_SUFFIX = " Status";
+  private static final String LEFT_TURRET_DISTANCE_KEY = "Tune/Left Turret To Hub Distance M";
 
   private TuneModeBindings() {}
 
@@ -59,8 +62,8 @@ public final class TuneModeBindings {
         .whileTrue(
             Commands.run(
                 () -> {
-                  applyTurretTune(LEFT_PREFIX, leftTurret);
-                  applyTurretTune(RIGHT_PREFIX, rightTurret);
+                  applyTurretTune(LEFT_PREFIX, leftTurret, drive.getPose(), robotToTurret1);
+                  applyTurretTune(RIGHT_PREFIX, rightTurret, drive.getPose(), robotToTurret2);
                 },
                 leftTurret,
                 rightTurret));
@@ -89,31 +92,24 @@ public final class TuneModeBindings {
         drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX());
   }
 
-  static TurretTuneSetpoint validateTuneSetpoint(
-      double turretAngleDeg, double hoodAngleDeg, double flywheelRps) {
-    if (!Double.isFinite(turretAngleDeg)) {
-      return new TurretTuneSetpoint(turretAngleDeg, hoodAngleDeg, flywheelRps, false, "Angle NaN");
-    }
-    if (turretAngleDeg < minAzimuthAngle || turretAngleDeg > maxAzimuthAngle) {
-      return new TurretTuneSetpoint(
-          turretAngleDeg, hoodAngleDeg, flywheelRps, false, "Angle out of range");
-    }
+  public static void publishTuneTelemetry(Pose2d robotPose) {
+    SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, getDistanceToHub(robotPose, robotToTurret1));
+  }
+
+  static TurretTuneSetpoint validateTuneSetpoint(double hoodAngleDeg, double flywheelRps) {
     if (!Double.isFinite(hoodAngleDeg)) {
-      return new TurretTuneSetpoint(turretAngleDeg, hoodAngleDeg, flywheelRps, false, "Hood NaN");
+      return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, false, "Hood NaN");
     }
     if (hoodAngleDeg < minHoodAngle || hoodAngleDeg > maxHoodAngle) {
-      return new TurretTuneSetpoint(
-          turretAngleDeg, hoodAngleDeg, flywheelRps, false, "Hood out of range");
+      return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, false, "Hood out of range");
     }
     if (!Double.isFinite(flywheelRps)) {
-      return new TurretTuneSetpoint(
-          turretAngleDeg, hoodAngleDeg, flywheelRps, false, "Flywheel NaN");
+      return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, false, "Flywheel NaN");
     }
     if (flywheelRps < 0.0) {
-      return new TurretTuneSetpoint(
-          turretAngleDeg, hoodAngleDeg, flywheelRps, false, "Flywheel must be non-negative");
+      return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, false, "Flywheel must be non-negative");
     }
-    return new TurretTuneSetpoint(turretAngleDeg, hoodAngleDeg, flywheelRps, true, "OK");
+    return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, true, "OK");
   }
 
   static double getIntakeToggleTarget(double currentPivotPosition) {
@@ -126,17 +122,17 @@ public final class TuneModeBindings {
   }
 
   private static void publishDefaultTuneValues(String prefix, Turret turret) {
-    SmartDashboard.setDefaultNumber(prefix + ANGLE_SUFFIX, 0.0);
     SmartDashboard.setDefaultNumber(prefix + HOOD_SUFFIX, turret.getHoodSetpointDeg());
     SmartDashboard.setDefaultNumber(prefix + FLYWHEEL_SUFFIX, 0.0);
     SmartDashboard.putBoolean(prefix + VALID_SUFFIX, true);
     SmartDashboard.putString(prefix + STATUS_SUFFIX, "Idle");
+    SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, 0.0);
   }
 
-  private static void applyTurretTune(String prefix, Turret turret) {
+  private static void applyTurretTune(
+      String prefix, Turret turret, Pose2d robotPose, Translation2d robotToTurret) {
     TurretTuneSetpoint setpoint =
         validateTuneSetpoint(
-            SmartDashboard.getNumber(prefix + ANGLE_SUFFIX, 0.0),
             SmartDashboard.getNumber(prefix + HOOD_SUFFIX, turret.getHoodSetpointDeg()),
             SmartDashboard.getNumber(prefix + FLYWHEEL_SUFFIX, 0.0));
 
@@ -149,15 +145,23 @@ public final class TuneModeBindings {
     }
 
     turret.runSetpoints(
-        Rotation2d.fromDegrees(setpoint.turretAngleDeg()),
+        getHubHeadingRobot(robotPose, robotToTurret),
         setpoint.hoodAngleDeg(),
         setpoint.flywheelRps());
   }
 
-  record TurretTuneSetpoint(
-      double turretAngleDeg,
-      double hoodAngleDeg,
-      double flywheelRps,
-      boolean valid,
-      String status) {}
+  static double getDistanceToHub(Pose2d robotPose, Translation2d robotToTurret) {
+    return getTurretFieldPosition(robotPose, robotToTurret).getDistance(hubTranslation);
+  }
+
+  private static Rotation2d getHubHeadingRobot(Pose2d robotPose, Translation2d robotToTurret) {
+    Rotation2d fieldHeading = hubTranslation.minus(getTurretFieldPosition(robotPose, robotToTurret)).getAngle();
+    return fieldHeading.minus(robotPose.getRotation());
+  }
+
+  private static Translation2d getTurretFieldPosition(Pose2d robotPose, Translation2d robotToTurret) {
+    return robotPose.getTranslation().plus(robotToTurret.rotateBy(robotPose.getRotation()));
+  }
+
+  record TurretTuneSetpoint(double hoodAngleDeg, double flywheelRps, boolean valid, String status) {}
 }
