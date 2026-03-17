@@ -24,12 +24,10 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.Turret;
 
 public final class TuneModeBindings {
-  private static final String LEFT_PREFIX = "Tune/Left";
-  private static final String RIGHT_PREFIX = "Tune/Right";
-  private static final String HOOD_SUFFIX = " Hood Deg";
-  private static final String FLYWHEEL_SUFFIX = " Flywheel RPS";
-  private static final String VALID_SUFFIX = " Valid";
-  private static final String STATUS_SUFFIX = " Status";
+  private static final String SHARED_HOOD_KEY = "Tune/Hood Deg";
+  private static final String SHARED_FLYWHEEL_KEY = "Tune/Flywheel RPS";
+  private static final String SHARED_VALID_KEY = "Tune/Setpoints Valid";
+  private static final String SHARED_STATUS_KEY = "Tune/Setpoints Status";
   private static final String LEFT_TURRET_DISTANCE_KEY = "Tune/Left Turret To Hub Distance M";
 
   private TuneModeBindings() {}
@@ -42,8 +40,7 @@ public final class TuneModeBindings {
       Indexer indexer,
       Turret leftTurret,
       Turret rightTurret) {
-    publishDefaultTuneValues(LEFT_PREFIX, leftTurret);
-    publishDefaultTuneValues(RIGHT_PREFIX, rightTurret);
+    publishDefaultTuneValues(leftTurret);
 
     driver
         .leftTrigger(0.5, buttonLoop)
@@ -62,8 +59,22 @@ public final class TuneModeBindings {
         .whileTrue(
             Commands.run(
                 () -> {
-                  applyTurretTune(LEFT_PREFIX, leftTurret, drive.getPose(), robotToTurret1);
-                  applyTurretTune(RIGHT_PREFIX, rightTurret, drive.getPose(), robotToTurret2);
+                  TurretTuneSetpoint setpoint =
+                      validateTuneSetpoint(
+                          SmartDashboard.getNumber(SHARED_HOOD_KEY, leftTurret.getHoodSetpointDeg()),
+                          SmartDashboard.getNumber(SHARED_FLYWHEEL_KEY, 0.0));
+
+                  SmartDashboard.putBoolean(SHARED_VALID_KEY, setpoint.valid());
+                  SmartDashboard.putString(SHARED_STATUS_KEY, setpoint.status());
+
+                  if (!setpoint.valid()) {
+                    leftTurret.stopFlywheel();
+                    rightTurret.stopFlywheel();
+                    return;
+                  }
+
+                  applyTurretTune(leftTurret, drive.getPose(), robotToTurret1, setpoint);
+                  applyTurretTune(rightTurret, drive.getPose(), robotToTurret2, setpoint);
                 },
                 leftTurret,
                 rightTurret));
@@ -122,29 +133,19 @@ public final class TuneModeBindings {
     intake.setPivotPosition(getIntakeToggleTarget(intake.getPivotPosition()));
   }
 
-  private static void publishDefaultTuneValues(String prefix, Turret turret) {
-    SmartDashboard.setDefaultNumber(prefix + HOOD_SUFFIX, turret.getHoodSetpointDeg());
-    SmartDashboard.setDefaultNumber(prefix + FLYWHEEL_SUFFIX, 0.0);
-    SmartDashboard.putBoolean(prefix + VALID_SUFFIX, true);
-    SmartDashboard.putString(prefix + STATUS_SUFFIX, "Idle");
+  private static void publishDefaultTuneValues(Turret turret) {
+    SmartDashboard.setDefaultNumber(SHARED_HOOD_KEY, turret.getHoodSetpointDeg());
+    SmartDashboard.setDefaultNumber(SHARED_FLYWHEEL_KEY, 0.0);
+    SmartDashboard.putBoolean(SHARED_VALID_KEY, true);
+    SmartDashboard.putString(SHARED_STATUS_KEY, "Idle");
     SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, 0.0);
   }
 
   private static void applyTurretTune(
-      String prefix, Turret turret, Pose2d robotPose, Translation2d robotToTurret) {
-    TurretTuneSetpoint setpoint =
-        validateTuneSetpoint(
-            SmartDashboard.getNumber(prefix + HOOD_SUFFIX, turret.getHoodSetpointDeg()),
-            SmartDashboard.getNumber(prefix + FLYWHEEL_SUFFIX, 0.0));
-
-    SmartDashboard.putBoolean(prefix + VALID_SUFFIX, setpoint.valid());
-    SmartDashboard.putString(prefix + STATUS_SUFFIX, setpoint.status());
-
-    if (!setpoint.valid()) {
-      turret.stopFlywheel();
-      return;
-    }
-
+      Turret turret,
+      Pose2d robotPose,
+      Translation2d robotToTurret,
+      TurretTuneSetpoint setpoint) {
     turret.runSetpoints(
         getHubHeadingRobot(robotPose, robotToTurret),
         setpoint.hoodAngleDeg(),
