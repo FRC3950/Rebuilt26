@@ -36,7 +36,7 @@ public class VisionConstants {
           Units.inchesToMeters(13.747),
           Units.inchesToMeters(-2.875),
           Units.inchesToMeters(7.443),
-          new Rotation3d(0.0, -Math.toRadians(30.0), Math.toRadians(-90.0)));
+          new Rotation3d(0.0, -Math.toRadians(20.0), Math.toRadians(-90.0)));
 
   public static final String camera0Name = "limelight-back";
   public static final String camera1Name = "limelight-right";

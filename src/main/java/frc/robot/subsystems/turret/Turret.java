@@ -7,12 +7,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.turret.turret_base.Azimuth;
 import frc.robot.subsystems.turret.turret_base.Azimuth.LimitSwitchChannel;
@@ -26,9 +20,9 @@ public class Turret extends SubsystemBase {
   private final Azimuth azimuth;
   private boolean hoodSafetyForcedDown = false;
 
-  private final Mechanism2d mechanism;
-  private final MechanismRoot2d mechRoot;
-  private final MechanismLigament2d turretLigament;
+  // private final Mechanism2d mechanism;
+  // private final MechanismRoot2d mechRoot;
+  // private final MechanismLigament2d turretLigament;
 
   public Turret(
       int azimuthID,
@@ -45,11 +39,12 @@ public class Turret extends SubsystemBase {
     azimuth.zeroMotorPosition();
     flywheels.zeroPosition();
 
-    mechanism = new Mechanism2d(3, 3);
-    mechRoot = mechanism.getRoot("TurretRoot", 1.5, 1.5);
-    turretLigament =
-        mechRoot.append(new MechanismLigament2d("Turret", 0.5, 0, 6, new Color8Bit(Color.kBlue)));
-    SmartDashboard.putData("Turret Mechanism", mechanism);
+    // mechanism = new Mechanism2d(3, 3);
+    // mechRoot = mechanism.getRoot("TurretRoot", 1.5, 1.5);
+    // turretLigament =
+    //     mechRoot.append(new MechanismLigament2d("Turret", 0.5, 0, 6, new
+    // Color8Bit(Color.kBlue)));
+    // SmartDashboard.putData("Turret Mechanism", mechanism);
   }
 
   public void zeroEncoders() {
@@ -59,7 +54,7 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    turretLigament.setAngle(azimuth.getMotorAngleDeg());
+    // turretLigament.setAngle(azimuth.getMotorAngleDeg());
     azimuth.syncMotorPositionToLimitSwitchIfTriggered();
     hood.periodic();
   }
@@ -115,10 +110,10 @@ public class Turret extends SubsystemBase {
     flywheels.stop();
   }
 
-  @AutoLogOutput(key = "Turret/Mechanism")
-  public Mechanism2d getMechanism() {
-    return mechanism;
-  }
+  // @AutoLogOutput(key = "Turret/Mechanism")
+  // public Mechanism2d getMechanism() {
+  //   return mechanism;
+  // }
 
   @AutoLogOutput(key = "Turret/Azimuth/PositionDeg")
   public double getAzimuthPositionDeg() {

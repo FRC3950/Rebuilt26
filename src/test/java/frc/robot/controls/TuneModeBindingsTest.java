@@ -37,7 +37,8 @@ public class TuneModeBindingsTest {
   @Test
   void calculatesLeftTurretDistanceToHub() {
     double distance =
-        TuneModeBindings.getDistanceToHub(Pose2d.kZero, frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1);
+        TuneModeBindings.getDistanceToHub(
+            Pose2d.kZero, frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1);
 
     assertEquals(
         frc.robot.Constants.FieldConstants.hubTranslation.getDistance(

@@ -71,11 +71,11 @@ public final class Constants {
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
-      public static final double minAzimuthAngle = -270.0;
-      public static final double maxAzimuthAngle = 270.0;
+      public static final double minAzimuthAngle = -180;
+      public static final double maxAzimuthAngle = 180;
       public static final double minHoodAngle = 10.0;
       public static final double maxHoodAngle = 50.0;
-      public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 180.0;
+      public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0;
 
       public static final int HOOD_SERVO_HUB_CAN_ID = 1;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 =
@@ -90,8 +90,8 @@ public final class Constants {
       public static final double azimuthKP = 24;
       public static final double azimuthKS = 0.75;
       public static final double azimuthKV = 0.12;
-      public static final double azimuthMMVelocity = 24; 
-      public static final double azimuthMMAcceleration = 48; 
+      public static final double azimuthMMVelocity = 24;
+      public static final double azimuthMMAcceleration = 48;
 
       public static final double flywheelKP = 1.2;
       public static final double flywheelKD = 0.25;
@@ -108,22 +108,24 @@ public final class Constants {
       // Tune this on-field until moving shots land consistently.
       // if everything doesnt work consistently, try adjusting this value
       public static final double shotExtraLatencySec = 0.08;
-      //hi cj love you -ruby
-      //where where t-square?
+      // hi cj love you -ruby
+      // where where t-square?
       static {
         // Azimuth Motor Config
         azimuthConfig.Slot0.kP = azimuthKP;
         azimuthConfig.Slot0.kV = azimuthKV;
         azimuthConfig.Slot0.kS = azimuthKS;
-        azimuthConfig.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity; 
-        azimuthConfig.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration; 
-        azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        azimuthConfig.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity;
+        azimuthConfig.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
+        azimuthConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
         flywheelConfig.Slot0.kD = flywheelKD;
         flywheelConfig.Slot0.kV = flywheelKV;
         flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        flywheelConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 1;
       }
     }
 
@@ -135,7 +137,7 @@ public final class Constants {
       public static final double downPos = -1;
       public static final double upPos = 19;
 
-      public static final double intakeSpeed = 40.0; 
+      public static final double intakeSpeed = 40.0;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
       public static final double intakeKP = 0.1;
       public static final double intakeKV = 0.12;
@@ -160,12 +162,10 @@ public final class Constants {
         intakeConfig.Slot0.kP = intakeKP;
         intakeConfig.Slot0.kV = intakeKV;
       }
-
-      
     }
 
     public static final class Indexer {
-      public static final int hotdogMotorID = 25;
+      public static final int hotdogMotorID = 4;
       public static final int indexerMotorID = 14;
 
       public static final double indexerSpeed = 50.0; // RPS

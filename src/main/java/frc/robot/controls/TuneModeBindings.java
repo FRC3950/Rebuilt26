@@ -107,7 +107,8 @@ public final class TuneModeBindings {
       return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, false, "Flywheel NaN");
     }
     if (flywheelRps < 0.0) {
-      return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, false, "Flywheel must be non-negative");
+      return new TurretTuneSetpoint(
+          hoodAngleDeg, flywheelRps, false, "Flywheel must be non-negative");
     }
     return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, true, "OK");
   }
@@ -155,13 +156,16 @@ public final class TuneModeBindings {
   }
 
   private static Rotation2d getHubHeadingRobot(Pose2d robotPose, Translation2d robotToTurret) {
-    Rotation2d fieldHeading = hubTranslation.minus(getTurretFieldPosition(robotPose, robotToTurret)).getAngle();
+    Rotation2d fieldHeading =
+        hubTranslation.minus(getTurretFieldPosition(robotPose, robotToTurret)).getAngle();
     return fieldHeading.minus(robotPose.getRotation());
   }
 
-  private static Translation2d getTurretFieldPosition(Pose2d robotPose, Translation2d robotToTurret) {
+  private static Translation2d getTurretFieldPosition(
+      Pose2d robotPose, Translation2d robotToTurret) {
     return robotPose.getTranslation().plus(robotToTurret.rotateBy(robotPose.getRotation()));
   }
 
-  record TurretTuneSetpoint(double hoodAngleDeg, double flywheelRps, boolean valid, String status) {}
+  record TurretTuneSetpoint(
+      double hoodAngleDeg, double flywheelRps, boolean valid, String status) {}
 }
