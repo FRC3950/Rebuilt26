@@ -29,8 +29,16 @@ public class GetAdjustedShot {
       Rotation2d turretAngle, // robot-relative
       double turretVelocity, // rad/s (robot-relative)
       double hoodAngleDeg, // degrees
-      double flywheelSpeed // same units as flywheelSpeeds[] (ex: RPS)
-      ) {}
+      double flywheelSpeed, // same units as flywheelSpeeds[] (ex: RPS)
+      String invalidReason
+      ) {
+    public boolean isValid() {
+      if (!isValid) {
+        System.out.println("Invalid shot parameters: " + invalidReason);
+      }
+      return isValid;
+    }
+  }
 
   // Filters (match MA style: moving average of velocity estimates)
   private final LinearFilter turretAngleFilter =
@@ -126,14 +134,24 @@ public class GetAdjustedShot {
 
     lastTurretAngle = turretAngleRobot;
 
+    boolean isDistanceValid =
+        lookaheadTurretToTargetDistance >= minDistance
+            && lookaheadTurretToTargetDistance <= maxDistance;
+    String invalidReason =
+        isDistanceValid
+            ? ""
+            : String.format(
+                "lookahead distance %.2f m is outside shot table range [%.2f, %.2f] m",
+                lookaheadTurretToTargetDistance, minDistance, maxDistance);
+
     ShootingParameters params =
         new ShootingParameters(
-            lookaheadTurretToTargetDistance >= minDistance
-                && lookaheadTurretToTargetDistance <= maxDistance,
+            isDistanceValid,
             turretAngleRobot,
             turretVelocity,
             hoodAngleDeg,
-            interpolatedShot.flywheelRps());
+            interpolatedShot.flywheelRps(),
+            invalidReason);
     return params;
   }
 

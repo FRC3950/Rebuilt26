@@ -70,8 +70,6 @@ public class TurretTargeting extends Command {
 
     if (params.isValid()) {
       turret.runAutoTarget(params);
-    } else {
-      System.out.println("Invalid shot parameters");
     }
   }
 
