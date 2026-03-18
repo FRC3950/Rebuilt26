@@ -29,7 +29,6 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
-import frc.robot.subsystems.turret.TurretTargeting.TargetingMode;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -37,10 +36,12 @@ import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Zones;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
+  private static final String TURRET_HOOD_ANGLE_KEY = "Turret/Hood Angle Deg";
+  private static final String TURRET_FLYWHEEL_SPEED_KEY = "Turret/Flywheel Speed RPS";
+  private static final String LEFT_TURRET_DISTANCE_KEY = "Turret/Left Turret Hub Distance M";
 
   private final Drive drive;
   private final Turret turret1;
@@ -165,6 +166,9 @@ public class RobotContainer {
             indexer));
 
     SmartDashboard.putData("Turret Subsystem", turret1);
+    SmartDashboard.putNumber(TURRET_HOOD_ANGLE_KEY, minHoodAngle);
+    SmartDashboard.putNumber(TURRET_FLYWHEEL_SPEED_KEY, 0.0);
+    SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, 0.0);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
     autoChooser.addOption(
@@ -263,30 +267,47 @@ public class RobotContainer {
                   indexer.stopHotdog();
                 },
                 indexer));
-    operator.leftBumper().onTrue(intake.retractCommand());
+    operator.leftBumper().whileTrue(createTurretDashboardShotCommand());
     operator.rightBumper().onTrue(Commands.runOnce(intake::extend, intake));
   }
 
   private void applyCompetitionDefaults() {
-    BooleanSupplier trenchDangerSupplier = this::isTrenchDanger;
-    Supplier<TargetingMode> autoTargetingModeSupplier =
-        () -> {
-          if (DriverStation.isAutonomousEnabled()) {
-            return TargetingMode.HUB_AUTO;
-          }
-          return TurretTargeting.selectTargetingMode(
-              true,
-              trenchDangerSupplier.getAsBoolean(),
-              Zones.NEUTRAL_ZONE.contains(drive.getPose().getTranslation()));
-        };
-
     turret1.setDefaultCommand(
-        new TurretTargeting(turret1, drive, robotToTurret1, autoTargetingModeSupplier));
+        new TurretTargeting(
+            turret1, drive, robotToTurret1, hubTranslation, this::updateLeftTurretDistance));
     turret2.setDefaultCommand(
-        new TurretTargeting(turret2, drive, robotToTurret2, autoTargetingModeSupplier));
+        new TurretTargeting(turret2, drive, robotToTurret2, hubTranslation, () -> {}));
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
+  }
+
+  private Command createTurretDashboardShotCommand() {
+    return Commands.run(
+        () -> {
+          double hoodAngleDeg = SmartDashboard.getNumber(TURRET_HOOD_ANGLE_KEY, minHoodAngle);
+          double flywheelSpeedRps = SmartDashboard.getNumber(TURRET_FLYWHEEL_SPEED_KEY, 0.0);
+          Pose2d robotPose = drive.getPose();
+
+          turret1.runSetpoints(
+              TurretTargeting.calculateTargetAngleRobot(robotPose, robotToTurret1, hubTranslation),
+              hoodAngleDeg,
+              flywheelSpeedRps);
+          turret2.runSetpoints(
+              TurretTargeting.calculateTargetAngleRobot(robotPose, robotToTurret2, hubTranslation),
+              hoodAngleDeg,
+              flywheelSpeedRps);
+
+          updateLeftTurretDistance();
+        },
+        turret1,
+        turret2);
+  }
+
+  private void updateLeftTurretDistance() {
+    SmartDashboard.putNumber(
+        LEFT_TURRET_DISTANCE_KEY,
+        TurretTargeting.getDistanceToTargetMeters(drive.getPose(), robotToTurret1, hubTranslation));
   }
 
   private boolean isTrenchDanger() {

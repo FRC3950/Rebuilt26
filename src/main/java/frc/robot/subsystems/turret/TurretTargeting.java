@@ -1,80 +1,52 @@
 package frc.robot.subsystems.turret;
 
-import static frc.robot.Constants.FieldConstants.leftFerryTarget;
-import static frc.robot.Constants.FieldConstants.rightFerryTarget;
-
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
-import java.util.function.Supplier;
 
-/**
- * Default turret targeting command.
- *
- * <p>Calculates compensated shot parameters (shoot-on-the-move) and feeds the turret/hood/flywheel
- * controllers each loop.
- */
+/** Default turret command that only keeps azimuth pointed at a field target. */
 public class TurretTargeting extends Command {
-  public enum TargetingMode {
-    HUB_AUTO,
-    FERRY_AUTO
-  }
-
   private final Turret turret;
   private final Drive drive;
   private final Translation2d robotToTurret;
-  private final Supplier<TargetingMode> modeSupplier;
-  private final GetAdjustedShot shotCalc = GetAdjustedShot.getInstance();
+  private final Translation2d target;
+  private final Runnable loopHook;
 
   public TurretTargeting(
       Turret turret,
       Drive drive,
       Translation2d robotToTurret,
-      Supplier<TargetingMode> modeSupplier) {
+      Translation2d target,
+      Runnable loopHook) {
     this.turret = turret;
     this.drive = drive;
     this.robotToTurret = robotToTurret;
-    this.modeSupplier = modeSupplier;
+    this.target = target;
+    this.loopHook = loopHook;
     addRequirements(turret);
-  }
-
-  public static TargetingMode selectTargetingMode(
-      boolean trenchSafetyEnabled, boolean trenchDanger, boolean inNeutralZone) {
-    if (trenchSafetyEnabled && trenchDanger) {
-      return TargetingMode.HUB_AUTO;
-    }
-    if (inNeutralZone) {
-      return TargetingMode.FERRY_AUTO;
-    }
-    return TargetingMode.HUB_AUTO;
   }
 
   @Override
   public void execute() {
-    // Match MA style: clear cache once per loop, then calculate.
-    shotCalc.clearShootingParameters();
-    Pose2d robotPose = drive.getPose();
-    ChassisSpeeds fieldSpeeds = drive.getFieldRelativeSpeeds();
-    var params =
-        switch (modeSupplier.get()) {
-          case FERRY_AUTO -> {
-            double distLeft = robotPose.getTranslation().getDistance(leftFerryTarget);
-            double distRight = robotPose.getTranslation().getDistance(rightFerryTarget);
-            Translation2d target = (distLeft < distRight) ? leftFerryTarget : rightFerryTarget;
-            yield shotCalc.getParameters(robotPose, fieldSpeeds, target, robotToTurret);
-          }
-          case HUB_AUTO -> shotCalc.getParameters(robotPose, fieldSpeeds, robotToTurret);
-        };
-
-    if (params.isValid()) {
-      turret.runAutoTarget(params);
-    }
+    turret.trackTargetOnly(calculateTargetAngleRobot(drive.getPose(), robotToTurret, target));
+    loopHook.run();
   }
 
-  @Override
-  public void end(boolean interrupted) {}
+  public static Rotation2d calculateTargetAngleRobot(
+      Pose2d robotPose, Translation2d robotToTurret, Translation2d target) {
+    Pose2d turretPose = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
+    Rotation2d turretAngleField = target.minus(turretPose.getTranslation()).getAngle();
+    return turretAngleField.minus(robotPose.getRotation());
+  }
+
+  public static double getDistanceToTargetMeters(
+      Pose2d robotPose, Translation2d robotToTurret, Translation2d target) {
+    Pose2d turretPose = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
+    return target.getDistance(turretPose.getTranslation());
+  }
 
   @Override
   public boolean isFinished() {

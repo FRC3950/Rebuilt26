@@ -36,29 +36,37 @@ public class Turret extends SubsystemBase {
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
+    setAzimuthTarget(turretAngleRobot);
+    applyHoodAngle(hoodAngleDeg);
+    flywheels.setTargetRps(flywheelSpeed);
+  }
+
+  public void trackTargetOnly(Rotation2d turretAngleRobot) {
+    setAzimuthTarget(turretAngleRobot);
+    hood.hoodDown();
+    flywheels.setTargetRps(0.0);
+  }
+
+  private void setAzimuthTarget(Rotation2d turretAngleRobot) {
     double targetAzimuthDegrees = turretAngleRobot.getDegrees();
     double currentAzimuthDegrees = azimuth.getMotorAngleDeg();
 
     double deltaDegrees =
         MathUtil.inputModulus(
             targetAzimuthDegrees - currentAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
-    double setpointDegrees = currentAzimuthDegrees + deltaDegrees;
-    double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
+    azimuth.setTargetAngleDeg(currentAzimuthDegrees + deltaDegrees);
+  }
 
-    azimuth.setTargetAngleDeg(setpointDegrees);
+  private void applyHoodAngle(double hoodAngleDeg) {
+    double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
     if (hoodSafetyForcedDown) {
       hood.hoodDown();
     } else {
       hood.setAngleDeg(clampedHoodAngleDeg);
     }
-    flywheels.setTargetRps(flywheelSpeed);
   }
 
   public void setHoodSafetyForcedDown(boolean enabled) {
     hoodSafetyForcedDown = enabled;
-  }
-
-  public void runAutoTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(params.turretAngle(), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 }

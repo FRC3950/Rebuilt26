@@ -103,13 +103,6 @@ public final class Constants {
       public static final Translation2d robotToTurret2 =
           new Translation2d(Units.inchesToMeters(7.75), Units.inchesToMeters(-7.25));
 
-      // Extra latency to account for: vision delay + command pipeline + ball exit
-      // time.
-      // Tune this on-field until moving shots land consistently.
-      // if everything doesnt work consistently, try adjusting this value
-      public static final double shotExtraLatencySec = 0.08;
-      // hi cj love you -ruby
-      // where where t-square?
       static {
         // Azimuth Motor Config
         azimuthConfig.Slot0.kP = azimuthKP;
@@ -206,15 +199,6 @@ public final class Constants {
     // Field dimensions in meters (blue-origin WPILib frame).
     public static final double fieldWidth = 8.0756125;
     public static final double fieldLength = 16.5411785;
-    // positions of ferry shot targets
-    // 1 foot = 0.3048 meters
-    public static final Translation2d leftFerryTarget =
-        AllianceFlipUtil.apply(
-            new Translation2d(hubTranslation.getX() - 1.34, hubTranslation.getY() - 0.59));
-    public static final Translation2d rightFerryTarget =
-        AllianceFlipUtil.apply(
-            new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
-
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;
     public static final double TRENCH_ALIGN_TIME_SEC = 0.40;
