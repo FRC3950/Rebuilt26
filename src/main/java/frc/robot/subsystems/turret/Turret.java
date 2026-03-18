@@ -18,6 +18,7 @@ public class Turret extends SubsystemBase {
   private final Hood hood;
   private final Flywheels flywheels;
   private final Azimuth azimuth;
+  private final Rotation2d azimuthTargetOffset;
   private boolean hoodSafetyForcedDown = false;
 
   // private final Mechanism2d mechanism;
@@ -31,14 +32,16 @@ public class Turret extends SubsystemBase {
       int flywheelID,
       TalonFXConfiguration flywheelConfig,
       int flywheelFollowerID,
+      Rotation2d azimuthTargetOffset,
       CANBus canbus) {
     hood = new Hood(hoodChannelId);
     flywheels = new Flywheels(flywheelID, flywheelConfig, flywheelFollowerID, canbus);
     azimuth = new Azimuth(azimuthID, azimuthConfig, canbus);
+    this.azimuthTargetOffset = azimuthTargetOffset;
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
-    double targetAzimuthDegrees = turretAngleRobot.getDegrees();
+    double targetAzimuthDegrees = turretAngleRobot.plus(azimuthTargetOffset).getDegrees();
     double setpointDegrees = selectSafeSetpointDegrees(targetAzimuthDegrees);
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
 

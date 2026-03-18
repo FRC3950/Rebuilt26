@@ -111,6 +111,7 @@ public class RobotContainer {
             flywheelID,
             flywheelConfig,
             flywheelFollowerID,
+            Rotation2d.fromDegrees(azimuthAngleOffsetDeg),
             CANivore);
     turret2 =
         new Turret(
@@ -120,6 +121,7 @@ public class RobotContainer {
             flywheelID2,
             flywheelConfig,
             flywheelFollowerID2,
+            Rotation2d.fromDegrees(azimuthAngleOffsetDeg2),
             CANivore);
 
     intake = new Intake();
