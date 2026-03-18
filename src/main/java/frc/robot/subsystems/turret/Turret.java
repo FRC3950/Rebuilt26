@@ -13,6 +13,8 @@ import frc.robot.subsystems.turret.turret_base.Flywheels;
 import frc.robot.subsystems.turret.turret_base.Hood;
 
 public class Turret extends SubsystemBase {
+  private static final double ANGLE_WRAP_DEGREES = 360.0;
+
   private final Hood hood;
   private final Flywheels flywheels;
   private final Azimuth azimuth;
@@ -37,12 +39,7 @@ public class Turret extends SubsystemBase {
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
     double targetAzimuthDegrees = turretAngleRobot.getDegrees();
-    double currentAzimuthDegrees = azimuth.getMotorAngleDeg();
-
-    double deltaDegrees =
-        MathUtil.inputModulus(
-            targetAzimuthDegrees - currentAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
-    double setpointDegrees = currentAzimuthDegrees + deltaDegrees;
+    double setpointDegrees = selectSafeSetpointDegrees(targetAzimuthDegrees);
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
 
     azimuth.setTargetAngleDeg(setpointDegrees);
@@ -60,5 +57,29 @@ public class Turret extends SubsystemBase {
 
   public void runAutoTarget(GetAdjustedShot.ShootingParameters params) {
     runSetpoints(params.turretAngle(), params.hoodAngleDeg(), params.flywheelSpeed());
+  }
+
+  private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
+    double referenceSetpointDegrees =
+        MathUtil.clamp(azimuth.getSetpointDeg(), minAzimuthAngle, maxAzimuthAngle);
+    double bestCandidateDegrees = Double.NaN;
+    double bestErrorDegrees = Double.POSITIVE_INFINITY;
+
+    int minWrapIndex = (int) Math.ceil((minAzimuthAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
+    int maxWrapIndex = (int) Math.floor((maxAzimuthAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
+
+    for (int wrapIndex = minWrapIndex; wrapIndex <= maxWrapIndex; wrapIndex++) {
+      double candidateDegrees = targetAzimuthDegrees + ANGLE_WRAP_DEGREES * wrapIndex;
+      double errorDegrees = Math.abs(candidateDegrees - referenceSetpointDegrees);
+      if (errorDegrees < bestErrorDegrees) {
+        bestCandidateDegrees = candidateDegrees;
+        bestErrorDegrees = errorDegrees;
+      }
+    }
+
+    if (Double.isNaN(bestCandidateDegrees)) {
+      return MathUtil.clamp(targetAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
+    }
+    return bestCandidateDegrees;
   }
 }

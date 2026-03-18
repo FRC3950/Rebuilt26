@@ -89,17 +89,13 @@ public class GetAdjustedShot {
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
 
     // Turret point velocity in FIELD coordinates (robot linear + omega cross r)
-    double robotAngle = robotPose.getRotation().getRadians();
+    Translation2d turretOffsetField = robotToTurret.rotateBy(robotPose.getRotation());
     double turretVelocityX =
         fieldVelocity.vxMetersPerSecond
-            + fieldVelocity.omegaRadiansPerSecond
-                * (robotToTurret.getY() * Math.cos(robotAngle)
-                    - robotToTurret.getX() * Math.sin(robotAngle));
+            - fieldVelocity.omegaRadiansPerSecond * turretOffsetField.getY();
     double turretVelocityY =
         fieldVelocity.vyMetersPerSecond
-            + fieldVelocity.omegaRadiansPerSecond
-                * (robotToTurret.getX() * Math.cos(robotAngle)
-                    - robotToTurret.getY() * Math.sin(robotAngle));
+            + fieldVelocity.omegaRadiansPerSecond * turretOffsetField.getX();
 
     // Time-of-flight from distance (plus extra latency)
     Distancer interpolatedForTof = shotMap.get(turretToTargetDistance);
@@ -118,7 +114,11 @@ public class GetAdjustedShot {
     // Aim at target from lookahead position (FIELD), then convert to ROBOT-relative
     // for your turret setpoint
     Rotation2d turretAngleField = target.minus(lookaheadPose.getTranslation()).getAngle();
-    Rotation2d turretAngleRobot = turretAngleField.minus(robotPose.getRotation());
+    Rotation2d launchRobotHeading =
+        robotPose
+            .getRotation()
+            .plus(new Rotation2d(fieldVelocity.omegaRadiansPerSecond * shotExtraLatencySec));
+    Rotation2d turretAngleRobot = turretAngleField.minus(launchRobotHeading);
 
     // Hood & flywheel from lookahead distance
     Distancer interpolatedShot = shotMap.get(lookaheadTurretToTargetDistance);

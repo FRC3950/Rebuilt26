@@ -122,6 +122,14 @@ public final class Constants {
         azimuthConfig.HardwareLimitSwitch.ForwardLimitAutosetPositionEnable = true;
         azimuthConfig.HardwareLimitSwitch.ForwardLimitAutosetPositionValue = 0;
         azimuthConfig.HardwareLimitSwitch.ForwardLimitRemoteSensorID = TURRET_CANDI_ID;
+        azimuthConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        azimuthConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+            Units.degreesToRotations(maxAzimuthAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG+10)
+                * azimuthGearRatio;
+        azimuthConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        azimuthConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+            Units.degreesToRotations(minAzimuthAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG+10)
+                * azimuthGearRatio;
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
