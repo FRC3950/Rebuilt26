@@ -30,8 +30,7 @@ public class GetAdjustedShot {
       double turretVelocity, // rad/s (robot-relative)
       double hoodAngleDeg, // degrees
       double flywheelSpeed, // same units as flywheelSpeeds[] (ex: RPS)
-      String invalidReason
-      ) {
+      String invalidReason) {
     public boolean isValid() {
       if (!isValid) {
         System.out.println("Invalid shot parameters: " + invalidReason);

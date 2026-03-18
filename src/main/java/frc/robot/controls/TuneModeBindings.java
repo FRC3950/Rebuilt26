@@ -61,7 +61,8 @@ public final class TuneModeBindings {
                 () -> {
                   TurretTuneSetpoint setpoint =
                       validateTuneSetpoint(
-                          SmartDashboard.getNumber(SHARED_HOOD_KEY, leftTurret.getHoodSetpointDeg()),
+                          SmartDashboard.getNumber(
+                              SHARED_HOOD_KEY, leftTurret.getHoodSetpointDeg()),
                           SmartDashboard.getNumber(SHARED_FLYWHEEL_KEY, 0.0));
 
                   SmartDashboard.putBoolean(SHARED_VALID_KEY, setpoint.valid());
@@ -142,10 +143,7 @@ public final class TuneModeBindings {
   }
 
   private static void applyTurretTune(
-      Turret turret,
-      Pose2d robotPose,
-      Translation2d robotToTurret,
-      TurretTuneSetpoint setpoint) {
+      Turret turret, Pose2d robotPose, Translation2d robotToTurret, TurretTuneSetpoint setpoint) {
     turret.runSetpoints(
         getHubHeadingRobot(robotPose, robotToTurret),
         setpoint.hoodAngleDeg(),

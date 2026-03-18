@@ -87,8 +87,8 @@ public final class Constants {
       public static final int HOOD_SERVO_MAX_PULSE_US = 2500;
 
       // PID / Motion Magic Gains
-      public static final double azimuthKP = 24;
-      public static final double azimuthKS = 0.75;
+      public static final double azimuthKP = 2;
+      public static final double azimuthKS = 0.25;
       public static final double azimuthKV = 0.12;
       public static final double azimuthMMVelocity = 24;
       public static final double azimuthMMAcceleration = 48;
@@ -117,7 +117,6 @@ public final class Constants {
         azimuthConfig.Slot0.kS = azimuthKS;
         azimuthConfig.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity;
         azimuthConfig.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
-        azimuthConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         // Flywheel Motor Config
@@ -183,11 +182,11 @@ public final class Constants {
       static {
         indexerConfig.Slot0.kP = indexerKP;
         indexerConfig.Slot0.kV = indexerKV;
-        indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         hotdogConfig.Slot0.kP = hotdogKP;
         hotdogConfig.Slot0.kV = hotdogKV;
-        hotdogConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        hotdogConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       }
     }
     // Josh wrote this part of the code, easter egg of 2026
