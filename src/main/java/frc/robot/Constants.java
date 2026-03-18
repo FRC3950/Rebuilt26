@@ -71,8 +71,8 @@ public final class Constants {
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
-      public static final double minAzimuthAngle = -180;
-      public static final double maxAzimuthAngle = 180;
+      public static final double minAzimuthAngle = -200;
+      public static final double maxAzimuthAngle = 200;
       public static final double minHoodAngle = 13;
       public static final double maxHoodAngle = 29.85;
       public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0;
@@ -124,11 +124,11 @@ public final class Constants {
         azimuthConfig.HardwareLimitSwitch.ForwardLimitRemoteSensorID = TURRET_CANDI_ID;
         azimuthConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         azimuthConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-            Units.degreesToRotations(maxAzimuthAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG+10)
+            Units.degreesToRotations(maxAzimuthAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG + 10)
                 * azimuthGearRatio;
         azimuthConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         azimuthConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-            Units.degreesToRotations(minAzimuthAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG+10)
+            Units.degreesToRotations(minAzimuthAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG + 10)
                 * azimuthGearRatio;
 
         // Flywheel Motor Config

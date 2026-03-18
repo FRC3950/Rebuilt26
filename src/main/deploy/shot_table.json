@@ -7,27 +7,75 @@
   },
   "points": [
     {
-      "d": 1.50,
+      "d": 1.3,
+      "hoodDeg": 13.0,
+      "rps": 30,
+      "tof": 1
+    },
+    {
+      "d": 2,
       "hoodDeg": 18.0,
-      "rps": 60,
+      "rps": 30,
       "tof": 1
     },
     {
-      "d": 2.50,
-      "hoodDeg": 22.5,
-      "rps": 62,
+      "d": 2.5,
+      "hoodDeg": 22,
+      "rps": 32,
       "tof": 1
     },
     {
-      "d": 3.50,
-      "hoodDeg": 27.0,
-      "rps": 64,
+      "d": 3,
+      "hoodDeg": 24,
+      "rps": 34,
       "tof": 1
     },
     {
-      "d": 4.50,
-      "hoodDeg": 31.5,
-      "rps": 66,
+      "d": 3.5,
+      "hoodDeg": 26,
+      "rps": 36,
+      "tof": 1
+    },
+    {
+      "d": 4,
+      "hoodDeg": 28,
+      "rps": 38,
+      "tof": 1
+    },
+    {
+      "d": 4.5,
+      "hoodDeg": 29,
+      "rps": 40,
+      "tof": 1
+    },
+    {
+      "d": 5,
+      "hoodDeg": 29,
+      "rps": 42,
+      "tof": 1
+    },
+    {
+      "d": 5.5,
+      "hoodDeg": 29,
+      "rps": 44,
+      "tof": 1
+    },
+    {
+      "d": 6,
+      "hoodDeg": 29,
+      "rps": 46,
+      "tof": 1
+    },
+    {
+      "d": 6.5,
+      "hoodDeg": 29,
+      "rps": 48,
+      "tof": 1
+    },
+    {
+      "d": 7,
+      "hoodDeg": 29,
+      "rps": 50,
       "tof": 1
     }
   ]

@@ -65,8 +65,10 @@ public class Turret extends SubsystemBase {
     double bestCandidateDegrees = Double.NaN;
     double bestErrorDegrees = Double.POSITIVE_INFINITY;
 
-    int minWrapIndex = (int) Math.ceil((minAzimuthAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
-    int maxWrapIndex = (int) Math.floor((maxAzimuthAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
+    int minWrapIndex =
+        (int) Math.ceil((minAzimuthAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
+    int maxWrapIndex =
+        (int) Math.floor((maxAzimuthAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
 
     for (int wrapIndex = minWrapIndex; wrapIndex <= maxWrapIndex; wrapIndex++) {
       double candidateDegrees = targetAzimuthDegrees + ANGLE_WRAP_DEGREES * wrapIndex;
