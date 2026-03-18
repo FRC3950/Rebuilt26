@@ -13,18 +13,21 @@ public class Hood {
   private static ServoHub hoodServoHub;
 
   private final ServoChannel hoodServo;
+  private final boolean invertPulseDirection;
   private double lastSetpointDeg = minHoodAngle;
   private double positionDeg = minHoodAngle;
 
   public Hood(ServoChannel.ChannelId hoodChannelId) {
     hoodServo = getConfiguredHoodServoHub().getServoChannel(hoodChannelId);
+    invertPulseDirection = hoodChannelId == HOOD_SERVO_CHANNEL_2;
     initializeAtMinimum();
   }
 
   public void setAngleDeg(double hoodAngleDeg) {
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
-    hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(clampedHoodAngleDeg));
+    hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(clampedHoodAngleDeg, invertPulseDirection));
     lastSetpointDeg = clampedHoodAngleDeg;
+    positionDeg = clampedHoodAngleDeg;
   }
 
   public void hoodDown() {
@@ -45,7 +48,7 @@ public class Hood {
 
     hoodServo.setEnabled(true);
     hoodServo.setPowered(true);
-    hoodServo.setPulseWidth(HOOD_SERVO_MIN_PULSE_US);
+    hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(minHoodAngle, invertPulseDirection));
   }
 
   private static synchronized ServoHub getConfiguredHoodServoHub() {
@@ -71,7 +74,7 @@ public class Hood {
     return hoodServoHub;
   }
 
-  private static int hoodAngleToPulseWidthUs(double hoodAngleDeg) {
+  private static int hoodAngleToPulseWidthUs(double hoodAngleDeg, boolean invertPulseDirection) {
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
     double hoodAngleRangeDeg = maxHoodAngle - minHoodAngle;
     int servoPulseRangeUs = HOOD_SERVO_MAX_PULSE_US - HOOD_SERVO_MIN_PULSE_US;
@@ -80,6 +83,9 @@ public class Hood {
     }
 
     double t = (clampedHoodAngleDeg - minHoodAngle) / hoodAngleRangeDeg;
+    if (invertPulseDirection) {
+      t = 1.0 - t;
+    }
     int pulseUs = (int) Math.round(HOOD_SERVO_MIN_PULSE_US + t * servoPulseRangeUs);
     return Math.max(HOOD_SERVO_MIN_PULSE_US, Math.min(HOOD_SERVO_MAX_PULSE_US, pulseUs));
   }
