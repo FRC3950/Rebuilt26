@@ -136,7 +136,7 @@ public final class Constants {
       public static final int pivotMotorID = 12;
 
       // Intake Positions - UPDATE ME!!!
-      public static final double downPos = -1;
+      public static final double downPos = 0;
       public static final double upPos = 19;
 
       public static final double intakeSpeed = 40.0;
@@ -163,6 +163,7 @@ public final class Constants {
         // Intake Motor Config
         intakeConfig.Slot0.kP = intakeKP;
         intakeConfig.Slot0.kV = intakeKV;
+        intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
       }
     }
 
@@ -212,11 +213,6 @@ public final class Constants {
     public static final Translation2d rightFerryTarget =
         AllianceFlipUtil.apply(
             new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
-    public static final Translation2d climbSouth =
-        AllianceFlipUtil.apply(new Translation2d(1.06045, 3.29803125));
-
-    public static final Translation2d climbNorth =
-        AllianceFlipUtil.apply(climbSouth.plus(new Translation2d(0, 0.89535)));
 
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;

@@ -185,6 +185,7 @@ public class RobotContainer {
         drive.sysIdTranslationDynamic(SysIdRoutine.Direction.kReverse));
 
     configureButtonBindings();
+    applyCompetitionDefaults();
   }
 
   public Command getAutonomousCommand() {
