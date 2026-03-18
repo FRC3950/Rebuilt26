@@ -267,7 +267,7 @@ public class RobotContainer {
                   indexer.stopHotdog();
                 },
                 indexer));
-    operator.leftBumper().whileTrue(createTurretDashboardShotCommand());
+    driver.leftBumper().whileTrue(createTurretDashboardShotCommand());
     operator.rightBumper().onTrue(Commands.runOnce(intake::extend, intake));
   }
 
