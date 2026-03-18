@@ -13,7 +13,6 @@ public class Flywheels {
   private final TalonFX flywheel;
   private final TalonFX flywheelFollower;
 
-  private double lastSetpointRps = 0.0;
   private final VelocityVoltage velocityVoltage = new VelocityVoltage(0);
 
   public Flywheels(
@@ -26,34 +25,12 @@ public class Flywheels {
   }
 
   public void setTargetRps(double flywheelSpeedRps) {
-    lastSetpointRps = flywheelSpeedRps;
     double targetVel = flywheelSpeedRps * flywheelGearRatio;
     flywheel.setControl(velocityVoltage.withVelocity(targetVel));
   }
 
-  public void stop() {
-    flywheel.set(0.0);
-    lastSetpointRps = 0.0;
-  }
-
-  public void zeroPosition() {
-    flywheel.setPosition(0.0);
-  }
-
-  public double getPositionRot() {
-    return flywheel.getPosition().getValueAsDouble();
-  }
-
   public double getVelocityRps() {
     return flywheel.getVelocity().getValueAsDouble();
-  }
-
-  public double getSetpointRps() {
-    return lastSetpointRps;
-  }
-
-  public double getFollowerPositionRot() {
-    return flywheelFollower.getPosition().getValueAsDouble();
   }
 
   public double getFollowerVelocityRps() {

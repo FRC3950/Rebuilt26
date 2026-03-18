@@ -73,11 +73,11 @@ public final class Constants {
       // Limits (Placeholders - UPDATE ME)
       public static final double minAzimuthAngle = -180;
       public static final double maxAzimuthAngle = 180;
-      public static final double minHoodAngle = 10.0;
-      public static final double maxHoodAngle = 50.0;
+      public static final double minHoodAngle = 13;
+      public static final double maxHoodAngle = 29.85;
       public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0;
 
-      public static final int HOOD_SERVO_HUB_CAN_ID = 1;
+      public static final int HOOD_SERVO_HUB_CAN_ID = 63;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 =
           ServoChannel.ChannelId.kChannelId0;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_2 =
@@ -118,6 +118,9 @@ public final class Constants {
         azimuthConfig.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity;
         azimuthConfig.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
         azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        azimuthConfig.HardwareLimitSwitch.ForwardLimitAutosetPositionEnable = true;
+        azimuthConfig.HardwareLimitSwitch.ForwardLimitAutosetPositionValue = 0;
+        azimuthConfig.HardwareLimitSwitch.ForwardLimitRemoteSensorID = TURRET_CANDI_ID;
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;

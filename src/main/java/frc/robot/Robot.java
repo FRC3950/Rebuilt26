@@ -9,7 +9,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.util.HubShiftUtil;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -75,8 +74,6 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    HubShiftUtil.periodic();
-    robotContainer.periodic();
 
     // Optionally switch the thread to high priority to improve loop
     // timing (see the template project documentation for details)
@@ -104,7 +101,6 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    HubShiftUtil.initializeMatchTimer();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -120,8 +116,6 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    HubShiftUtil.ensureMatchTimerStarted();
-    HubShiftUtil.markTeleopStart();
 
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to

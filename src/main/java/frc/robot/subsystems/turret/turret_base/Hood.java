@@ -31,15 +31,6 @@ public class Hood {
     setAngleDeg(minHoodAngle);
   }
 
-  public void periodic() {
-    double measuredHoodAngleDeg = pulseWidthUsToHoodAngleDeg(hoodServo.getPulseWidth());
-    if (!Double.isFinite(measuredHoodAngleDeg)) {
-      measuredHoodAngleDeg = lastSetpointDeg;
-    }
-
-    positionDeg = measuredHoodAngleDeg;
-  }
-
   public double getPositionDeg() {
     return positionDeg;
   }
@@ -91,18 +82,5 @@ public class Hood {
     double t = (clampedHoodAngleDeg - minHoodAngle) / hoodAngleRangeDeg;
     int pulseUs = (int) Math.round(HOOD_SERVO_MIN_PULSE_US + t * servoPulseRangeUs);
     return Math.max(HOOD_SERVO_MIN_PULSE_US, Math.min(HOOD_SERVO_MAX_PULSE_US, pulseUs));
-  }
-
-  private static double pulseWidthUsToHoodAngleDeg(int pulseWidthUs) {
-    double hoodAngleRangeDeg = maxHoodAngle - minHoodAngle;
-    int servoPulseRangeUs = HOOD_SERVO_MAX_PULSE_US - HOOD_SERVO_MIN_PULSE_US;
-    if (hoodAngleRangeDeg <= 0.0 || servoPulseRangeUs <= 0) {
-      return minHoodAngle;
-    }
-
-    int clampedPulseUs =
-        Math.max(HOOD_SERVO_MIN_PULSE_US, Math.min(HOOD_SERVO_MAX_PULSE_US, pulseWidthUs));
-    double t = (double) (clampedPulseUs - HOOD_SERVO_MIN_PULSE_US) / servoPulseRangeUs;
-    return minHoodAngle + t * hoodAngleRangeDeg;
   }
 }
