@@ -63,8 +63,6 @@ public final class Constants {
       public static final int azimuthID2 = 17;
       public static final int flywheelID2 = 16;
       public static final int flywheelFollowerID2 = 18;
-      public static final double azimuthAngleOffsetDeg = 0.0;
-      public static final double azimuthAngleOffsetDeg2 = 180.0;
 
       public static final TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration flywheelConfig = new TalonFXConfiguration();
