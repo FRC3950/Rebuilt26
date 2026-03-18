@@ -117,6 +117,7 @@ public final class Constants {
         azimuthConfig.Slot0.kS = azimuthKS;
         azimuthConfig.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity;
         azimuthConfig.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
+        azimuthConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         azimuthConfig.HardwareLimitSwitch.ForwardLimitAutosetPositionEnable = true;
         azimuthConfig.HardwareLimitSwitch.ForwardLimitAutosetPositionValue = 0;
