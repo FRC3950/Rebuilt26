@@ -71,8 +71,8 @@ public final class Constants {
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
-      public static final double minAzimuthAngle = -200;
-      public static final double maxAzimuthAngle = 200;
+      public static final double minAzimuthAngle = -320;
+      public static final double maxAzimuthAngle = 0;
       public static final double minHoodAngle = 13;
       public static final double maxHoodAngle = 29.85;
       public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0;
@@ -145,8 +145,8 @@ public final class Constants {
       public static final int pivotMotorID = 12;
 
       // Intake Positions - UPDATE ME!!!
-      public static final double downPos = 0;
-      public static final double upPos = 19;
+      public static final double downPos = 19;
+      public static final double upPos = -1;
 
       public static final double intakeSpeed = 40.0;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
