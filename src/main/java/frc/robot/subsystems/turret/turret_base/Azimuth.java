@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
 import frc.robot.Constants.SubsystemConstants.Turret;
 
 public class Azimuth {
@@ -27,9 +28,12 @@ public class Azimuth {
     azimuth.getConfigurator().apply(azimuthConfig);
   }
 
-  public void setTargetAngleDeg(double targetAngleDeg) {
+  public void setTargetAngleDeg(double targetAngleDeg, double targetVelocityRadPerSec) {
     lastSetpointDeg = targetAngleDeg;
-    double motorRotations = Units.degreesToRotations(targetAngleDeg) * azimuthGearRatio;
+    double predictiveLeadDeg =
+        Units.radiansToDegrees(targetVelocityRadPerSec) * Constants.loopPeriodSecs;
+    double motorRotations =
+        Units.degreesToRotations(targetAngleDeg + predictiveLeadDeg) * azimuthGearRatio;
     azimuth.setControl(azimuthControl.withPosition(motorRotations));
   }
 

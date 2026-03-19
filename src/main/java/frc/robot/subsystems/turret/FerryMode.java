@@ -25,7 +25,7 @@ public class FerryMode extends Command {
     this.turret = turret;
     this.drive = drive;
     this.robotToTurret = robotToTurret;
-    this.calculator = GetAdjustedShot.getInstance();
+    this.calculator = new GetAdjustedShot();
     this.forcedTarget = forcedTarget;
     addRequirements(turret);
   }

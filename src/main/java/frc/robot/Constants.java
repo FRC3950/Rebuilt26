@@ -71,8 +71,10 @@ public final class Constants {
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
-      public static final double minAzimuthAngle = -320;
-      public static final double maxAzimuthAngle = 0;
+      public static final double minAzimuthControlAngle = -320;
+      public static final double maxAzimuthControlAngle = 0;
+      public static final double minAzimuthSoftLimitAngle = -330;
+      public static final double maxAzimuthSoftLimitAngle = 10;
       public static final double minHoodAngle = 13;
       public static final double maxHoodAngle = 29.85;
       public static final double minFlywheelRps = 0.0;
@@ -105,11 +107,6 @@ public final class Constants {
       public static final Translation2d robotToTurret2 =
           new Translation2d(Units.inchesToMeters(7.75), Units.inchesToMeters(-7.25));
 
-      // Extra latency to account for: vision delay + command pipeline + ball exit
-      // time.
-      // Tune this on-field until moving shots land consistently.
-      // if everything doesnt work consistently, try adjusting this value
-      public static final double shotExtraLatencySec = 0.08;
       // hi cj love you -ruby
       // where where t-square?
       static {
@@ -126,11 +123,11 @@ public final class Constants {
         azimuthConfig.HardwareLimitSwitch.ForwardLimitRemoteSensorID = TURRET_CANDI_ID;
         azimuthConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         azimuthConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-            Units.degreesToRotations(maxAzimuthAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG + 10)
+            Units.degreesToRotations(maxAzimuthSoftLimitAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG)
                 * azimuthGearRatio;
         azimuthConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         azimuthConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-            Units.degreesToRotations(minAzimuthAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG + 10)
+            Units.degreesToRotations(minAzimuthSoftLimitAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG)
                 * azimuthGearRatio;
 
         // Flywheel Motor Config

@@ -28,7 +28,7 @@ public class TurretTargeting extends Command {
   private final Drive drive;
   private final Translation2d robotToTurret;
   private final Supplier<TargetingMode> modeSupplier;
-  private final GetAdjustedShot shotCalc = GetAdjustedShot.getInstance();
+  private final GetAdjustedShot shotCalc = new GetAdjustedShot();
 
   public TurretTargeting(
       Turret turret,
@@ -55,8 +55,6 @@ public class TurretTargeting extends Command {
 
   @Override
   public void execute() {
-    // Match MA style: clear cache once per loop, then calculate.
-    shotCalc.clearShootingParameters();
     Pose2d robotPose = drive.getPose();
     ChassisSpeeds fieldSpeeds = drive.getFieldRelativeSpeeds();
     var params =

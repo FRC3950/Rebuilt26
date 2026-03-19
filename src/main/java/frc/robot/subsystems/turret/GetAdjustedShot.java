@@ -16,14 +16,7 @@ import frc.robot.util.Distancer;
 import java.util.List;
 
 public class GetAdjustedShot {
-  private static GetAdjustedShot instance;
-
-  private GetAdjustedShot() {}
-
-  public static GetAdjustedShot getInstance() {
-    if (instance == null) instance = new GetAdjustedShot();
-    return instance;
-  }
+  public GetAdjustedShot() {}
 
   public record ShootingParameters(
       boolean isValid,
@@ -99,13 +92,13 @@ public class GetAdjustedShot {
         fieldVelocity.vyMetersPerSecond
             + fieldVelocity.omegaRadiansPerSecond * turretOffsetField.getX();
 
-    // Time-of-flight from distance (plus extra latency)
+    // Time-of-flight from distance
     Distancer interpolatedForTof = getShotForDistance(turretToTargetDistance);
     if (interpolatedForTof == null) {
       return new ShootingParameters(
           false, turretPosition.getRotation(), 0.0, 0.0, 0.0, "shot table is empty");
     }
-    double timeOfFlight = interpolatedForTof.tofSec() + shotExtraLatencySec;
+    double timeOfFlight = interpolatedForTof.tofSec();
 
     // Lookahead turret position (where the turret will be when the shot lands,
     // assuming constant velocity)
@@ -120,11 +113,7 @@ public class GetAdjustedShot {
     // Aim at target from lookahead position (FIELD), then convert to ROBOT-relative
     // for your turret setpoint
     Rotation2d turretAngleField = target.minus(lookaheadPose.getTranslation()).getAngle();
-    Rotation2d launchRobotHeading =
-        robotPose
-            .getRotation()
-            .plus(new Rotation2d(fieldVelocity.omegaRadiansPerSecond * shotExtraLatencySec));
-    Rotation2d turretAngleRobot = turretAngleField.minus(launchRobotHeading);
+    Rotation2d turretAngleRobot = turretAngleField.minus(robotPose.getRotation());
 
     // Hood & flywheel from lookahead distance
     Distancer interpolatedShot = getShotForDistance(lookaheadTurretToTargetDistance);
@@ -156,16 +145,11 @@ public class GetAdjustedShot {
   }
 
   public static double getMinTimeOfFlight() {
-    return minTimeOfFlightSec + shotExtraLatencySec;
+    return minTimeOfFlightSec;
   }
 
   public static double getMaxTimeOfFlight() {
-    return maxTimeOfFlightSec + shotExtraLatencySec;
-  }
-
-  public void clearShootingParameters() {
-    // Shot parameters are recomputed on every request. This method remains as a no-op so
-    // existing callers do not need to change.
+    return maxTimeOfFlightSec;
   }
 
   private static Distancer getShotForDistance(double distance) {
