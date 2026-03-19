@@ -18,6 +18,8 @@ public class Turret extends SubsystemBase {
   private final Hood hood;
   private final Flywheels flywheels;
   private final Azimuth azimuth;
+  private final double minAzimuthControlAngleDeg;
+  private final double maxAzimuthControlAngleDeg;
 
   // private final Mechanism2d mechanism;
   // private final MechanismRoot2d mechRoot;
@@ -26,11 +28,15 @@ public class Turret extends SubsystemBase {
   public Turret(
       int azimuthID,
       TalonFXConfiguration azimuthConfig,
+      double minAzimuthControlAngleDeg,
+      double maxAzimuthControlAngleDeg,
       ServoChannel.ChannelId hoodChannelId,
       int flywheelID,
       TalonFXConfiguration flywheelConfig,
       int flywheelFollowerID,
       CANBus canbus) {
+    this.minAzimuthControlAngleDeg = minAzimuthControlAngleDeg;
+    this.maxAzimuthControlAngleDeg = maxAzimuthControlAngleDeg;
     hood = new Hood(hoodChannelId);
     flywheels = new Flywheels(flywheelID, flywheelConfig, flywheelFollowerID, canbus);
     azimuth = new Azimuth(azimuthID, azimuthConfig, canbus);
@@ -60,14 +66,17 @@ public class Turret extends SubsystemBase {
 
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
     double referenceSetpointDegrees =
-        MathUtil.clamp(azimuth.getSetpointDeg(), minAzimuthControlAngle, maxAzimuthControlAngle);
+        MathUtil.clamp(
+            azimuth.getSetpointDeg(), minAzimuthControlAngleDeg, maxAzimuthControlAngleDeg);
     double bestCandidateDegrees = Double.NaN;
     double bestErrorDegrees = Double.POSITIVE_INFINITY;
 
     int minWrapIndex =
-        (int) Math.ceil((minAzimuthControlAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
+        (int)
+            Math.ceil((minAzimuthControlAngleDeg - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
     int maxWrapIndex =
-        (int) Math.floor((maxAzimuthControlAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
+        (int)
+            Math.floor((maxAzimuthControlAngleDeg - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
 
     for (int wrapIndex = minWrapIndex; wrapIndex <= maxWrapIndex; wrapIndex++) {
       double candidateDegrees = targetAzimuthDegrees + ANGLE_WRAP_DEGREES * wrapIndex;
@@ -79,7 +88,8 @@ public class Turret extends SubsystemBase {
     }
 
     if (Double.isNaN(bestCandidateDegrees)) {
-      return MathUtil.clamp(targetAzimuthDegrees, minAzimuthControlAngle, maxAzimuthControlAngle);
+      return MathUtil.clamp(
+          targetAzimuthDegrees, minAzimuthControlAngleDeg, maxAzimuthControlAngleDeg);
     }
     return bestCandidateDegrees;
   }

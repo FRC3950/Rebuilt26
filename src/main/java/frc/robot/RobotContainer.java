@@ -106,6 +106,8 @@ public class RobotContainer {
         new Turret(
             azimuthID,
             leftAzimuthConfig,
+            leftMinAzimuthControlAngle,
+            leftMaxAzimuthControlAngle,
             HOOD_SERVO_CHANNEL_1,
             flywheelID,
             flywheelConfig,
@@ -115,6 +117,8 @@ public class RobotContainer {
         new Turret(
             azimuthID2,
             rightAzimuthConfig,
+            rightMinAzimuthControlAngle,
+            rightMaxAzimuthControlAngle,
             HOOD_SERVO_CHANNEL_2,
             flywheelID2,
             flywheelConfig,

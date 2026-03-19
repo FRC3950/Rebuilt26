@@ -73,10 +73,11 @@ public final class Constants {
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
-      public static final double minAzimuthControlAngle = -320;
-      public static final double maxAzimuthControlAngle = 0;
-      public static final double minAzimuthSoftLimitAngle = -330;
-      public static final double maxAzimuthSoftLimitAngle = 10;
+      public static final double leftMinAzimuthControlAngle = -320;
+      public static final double leftMaxAzimuthControlAngle = 0;
+      public static final double rightMinAzimuthControlAngle = -320;
+      public static final double rightMaxAzimuthControlAngle = 0;
+      public static final double azimuthSoftLimitMarginDeg = 10.0;
       public static final double minHoodAngle = 13;
       public static final double maxHoodAngle = 29.85;
       public static final double minFlywheelRps = 0.0;
@@ -113,8 +114,16 @@ public final class Constants {
       // where where t-square?
       static {
         // Azimuth Motor Config
-        applyAzimuthConfig(leftAzimuthConfig, ForwardLimitSourceValue.RemoteCANdiS1);
-        applyAzimuthConfig(rightAzimuthConfig, ForwardLimitSourceValue.RemoteCANdiS2);
+        applyAzimuthConfig(
+            leftAzimuthConfig,
+            ForwardLimitSourceValue.RemoteCANdiS1,
+            leftMinAzimuthControlAngle,
+            leftMaxAzimuthControlAngle);
+        applyAzimuthConfig(
+            rightAzimuthConfig,
+            ForwardLimitSourceValue.RemoteCANdiS2,
+            rightMinAzimuthControlAngle,
+            rightMaxAzimuthControlAngle);
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
@@ -125,7 +134,10 @@ public final class Constants {
       }
 
       private static void applyAzimuthConfig(
-          TalonFXConfiguration config, ForwardLimitSourceValue forwardLimitSource) {
+          TalonFXConfiguration config,
+          ForwardLimitSourceValue forwardLimitSource,
+          double minControlAngleDeg,
+          double maxControlAngleDeg) {
         config.Slot0.kP = azimuthKP;
         config.Slot0.kV = azimuthKV;
         config.Slot0.kS = azimuthKS;
@@ -139,11 +151,13 @@ public final class Constants {
         config.HardwareLimitSwitch.ForwardLimitSource = forwardLimitSource;
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-            Units.degreesToRotations(maxAzimuthSoftLimitAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG)
+            Units.degreesToRotations(
+                    maxControlAngleDeg + azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
                 * azimuthGearRatio;
         config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-            Units.degreesToRotations(minAzimuthSoftLimitAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG)
+            Units.degreesToRotations(
+                    minControlAngleDeg - azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
                 * azimuthGearRatio;
       }
     }
