@@ -18,11 +18,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.SubsystemConstants.Turret;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.AllianceFlipUtil;
 import java.text.DecimalFormat;
@@ -89,13 +86,6 @@ public class DriveCommands {
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds, AllianceFlipUtil.apply(drive.getRotation())));
-
-          SmartDashboard.putNumber(
-              "THIS",
-              drive
-                  .getPose()
-                  .getTranslation()
-                  .getDistance(FieldConstants.hubTranslation.plus(Turret.robotToTurret1)));
         },
         drive);
   }
