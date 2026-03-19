@@ -30,10 +30,6 @@ public class Hood {
     positionDeg = clampedHoodAngleDeg;
   }
 
-  public void hoodDown() {
-    setAngleDeg(minHoodAngle);
-  }
-
   public double getPositionDeg() {
     return positionDeg;
   }

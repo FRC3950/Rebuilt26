@@ -1,6 +1,8 @@
 package frc.robot.subsystems.turret.turret_base;
 
 import static frc.robot.Constants.SubsystemConstants.Turret.flywheelGearRatio;
+import static frc.robot.Constants.SubsystemConstants.Turret.maxFlywheelRps;
+import static frc.robot.Constants.SubsystemConstants.Turret.minFlywheelRps;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -8,6 +10,8 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
+import edu.wpi.first.math.MathUtil;
 
 public class Flywheels {
   private final TalonFX flywheel;
@@ -26,7 +30,7 @@ public class Flywheels {
 
   public void setTargetRps(double flywheelSpeedRps) {
     double targetVel = flywheelSpeedRps * flywheelGearRatio;
-    flywheel.setControl(velocityVoltage.withVelocity(targetVel));
+    flywheel.setControl(velocityVoltage.withVelocity(MathUtil.clamp(targetVel, minFlywheelRps, maxFlywheelRps)));
   }
 
   public double getVelocityRps() {

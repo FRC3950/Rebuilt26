@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
@@ -125,20 +124,6 @@ public class RobotContainer {
     intake = new Intake();
     indexer = new Indexer();
 
-    NamedCommands.registerCommand(
-        "EnableHoodSafetyMode",
-        Commands.runOnce(
-            () -> {
-              turret1.setHoodSafetyForcedDown(true);
-              turret2.setHoodSafetyForcedDown(true);
-            }));
-    NamedCommands.registerCommand(
-        "DisableHoodSafetyMode",
-        Commands.runOnce(
-            () -> {
-              turret1.setHoodSafetyForcedDown(false);
-              turret2.setHoodSafetyForcedDown(false);
-            }));
     NamedCommands.registerCommand("Extend Intake", Commands.runOnce(intake::extend, intake));
     NamedCommands.registerCommand("Retract Intake", Commands.runOnce(intake::retract, intake));
     NamedCommands.registerCommand("Start Intake", Commands.runOnce(intake::startIntake, intake));
@@ -192,25 +177,6 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    BooleanSupplier trenchDangerSupplier = this::isTrenchDanger;
-
-    Trigger trenchDangerTrigger = new Trigger(trenchDangerSupplier).debounce(TRENCH_DEBOUNCE_SEC);
-    Trigger trenchSafetyEnabledTrigger = new Trigger(() -> !DriverStation.isAutonomousEnabled());
-    Trigger activeTrenchSafetyTrigger = trenchSafetyEnabledTrigger.and(trenchDangerTrigger);
-
-    activeTrenchSafetyTrigger.onTrue(
-        Commands.runOnce(
-            () -> {
-              turret1.setHoodSafetyForcedDown(true);
-              turret2.setHoodSafetyForcedDown(true);
-            }));
-    activeTrenchSafetyTrigger.onFalse(
-        Commands.runOnce(
-            () -> {
-              turret1.setHoodSafetyForcedDown(false);
-              turret2.setHoodSafetyForcedDown(false);
-            }));
-
     driver.leftTrigger(0.5).whileTrue(new IntakeCommand(intake));
 
     driver.rightBumper().onTrue(intake.retractCommand());

@@ -18,7 +18,6 @@ public class Turret extends SubsystemBase {
   private final Hood hood;
   private final Flywheels flywheels;
   private final Azimuth azimuth;
-  private boolean hoodSafetyForcedDown = false;
 
   // private final Mechanism2d mechanism;
   // private final MechanismRoot2d mechRoot;
@@ -43,16 +42,8 @@ public class Turret extends SubsystemBase {
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
 
     azimuth.setTargetAngleDeg(setpointDegrees);
-    if (hoodSafetyForcedDown) {
-      hood.hoodDown();
-    } else {
-      hood.setAngleDeg(clampedHoodAngleDeg);
-    }
+    hood.setAngleDeg(clampedHoodAngleDeg);
     flywheels.setTargetRps(flywheelSpeed);
-  }
-
-  public void setHoodSafetyForcedDown(boolean enabled) {
-    hoodSafetyForcedDown = enabled;
   }
 
   public void runAutoTarget(GetAdjustedShot.ShootingParameters params) {
