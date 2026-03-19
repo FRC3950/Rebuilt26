@@ -73,10 +73,10 @@ public final class Constants {
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
-      public static final double leftMinAzimuthControlAngle = -320;
-      public static final double leftMaxAzimuthControlAngle = 0;
-      public static final double rightMinAzimuthControlAngle = -320;
-      public static final double rightMaxAzimuthControlAngle = 0;
+      public static final double leftMinAzimuthControlAngle = -270;
+      public static final double leftMaxAzimuthControlAngle = 90;
+      public static final double rightMinAzimuthControlAngle = -90;
+      public static final double rightMaxAzimuthControlAngle = 270;
       public static final double azimuthSoftLimitMarginDeg = 10.0;
       public static final double minHoodAngle = 13;
       public static final double maxHoodAngle = 29.85;
