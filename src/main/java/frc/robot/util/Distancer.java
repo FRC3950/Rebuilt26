@@ -10,13 +10,15 @@ import java.util.List;
 public record Distancer(double hoodAngleDeg, double flywheelRps, double tofSec) {
 
   public Distancer interpolate(Distancer endValue, double t) {
-    t = clamp01(t);
-
     double hood = lerp(this.hoodAngleDeg, endValue.hoodAngleDeg, t);
     double rps = lerp(this.flywheelRps, endValue.flywheelRps, t);
     double tof = lerp(this.tofSec, endValue.tofSec, t);
 
     return new Distancer(hood, rps, tof);
+  }
+
+  public static Distancer fromRow(Row row) {
+    return new Distancer(row.hoodDeg, row.rps, row.tof);
   }
 
   public static class DistancerFile {
@@ -58,9 +60,5 @@ public record Distancer(double hoodAngleDeg, double flywheelRps, double tofSec) 
 
   private static double lerp(double a, double b, double t) {
     return a + (b - a) * t;
-  }
-
-  private static double clamp01(double x) {
-    return Math.max(0.0, Math.min(1.0, x));
   }
 }

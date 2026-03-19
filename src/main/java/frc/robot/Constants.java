@@ -75,6 +75,8 @@ public final class Constants {
       public static final double maxAzimuthAngle = 0;
       public static final double minHoodAngle = 13;
       public static final double maxHoodAngle = 29.85;
+      public static final double minFlywheelRps = 0.0;
+      public static final double maxFlywheelRps = 100.0;
       public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0;
 
       public static final int HOOD_SERVO_HUB_CAN_ID = 63;

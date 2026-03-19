@@ -13,6 +13,7 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
 import frc.robot.util.Distancer;
+import java.util.List;
 
 public class GetAdjustedShot {
   private static GetAdjustedShot instance;
@@ -49,25 +50,26 @@ public class GetAdjustedShot {
   private static double maxDistance;
   private static double minTimeOfFlightSec;
   private static double maxTimeOfFlightSec;
+  private static final List<Distancer.Row> shotRows;
 
   private static final InterpolatingTreeMap<Double, Distancer> shotMap =
       new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Distancer::interpolate);
 
   static {
-    var rows = Distancer.loadRowsFromDeploy("shot_table.json");
-    if (rows.isEmpty()) {
+    shotRows = Distancer.loadRowsFromDeploy("shot_table.json");
+    if (shotRows.isEmpty()) {
       minDistance = 0.0;
       maxDistance = 0.0;
       minTimeOfFlightSec = 0.0;
       maxTimeOfFlightSec = 0.0;
     } else {
-      minDistance = rows.get(0).d;
-      maxDistance = rows.get(rows.size() - 1).d;
+      minDistance = shotRows.get(0).d;
+      maxDistance = shotRows.get(shotRows.size() - 1).d;
       minTimeOfFlightSec = Double.POSITIVE_INFINITY;
       maxTimeOfFlightSec = Double.NEGATIVE_INFINITY;
     }
 
-    for (var r : rows) {
+    for (var r : shotRows) {
       shotMap.put(r.d, new Distancer(r.hoodDeg, r.rps, r.tof));
       minTimeOfFlightSec = Math.min(minTimeOfFlightSec, r.tof);
       maxTimeOfFlightSec = Math.max(maxTimeOfFlightSec, r.tof);
@@ -98,7 +100,11 @@ public class GetAdjustedShot {
             + fieldVelocity.omegaRadiansPerSecond * turretOffsetField.getX();
 
     // Time-of-flight from distance (plus extra latency)
-    Distancer interpolatedForTof = shotMap.get(turretToTargetDistance);
+    Distancer interpolatedForTof = getShotForDistance(turretToTargetDistance);
+    if (interpolatedForTof == null) {
+      return new ShootingParameters(
+          false, turretPosition.getRotation(), 0.0, 0.0, 0.0, "shot table is empty");
+    }
     double timeOfFlight = interpolatedForTof.tofSec() + shotExtraLatencySec;
 
     // Lookahead turret position (where the turret will be when the shot lands,
@@ -121,7 +127,7 @@ public class GetAdjustedShot {
     Rotation2d turretAngleRobot = turretAngleField.minus(launchRobotHeading);
 
     // Hood & flywheel from lookahead distance
-    Distancer interpolatedShot = shotMap.get(lookaheadTurretToTargetDistance);
+    Distancer interpolatedShot = getShotForDistance(lookaheadTurretToTargetDistance);
     double hoodAngleDeg = interpolatedShot.hoodAngleDeg();
 
     // Velocity estimates (filtered)
@@ -133,29 +139,20 @@ public class GetAdjustedShot {
 
     lastTurretAngle = turretAngleRobot;
 
-    boolean isDistanceValid =
-        lookaheadTurretToTargetDistance >= minDistance
-            && lookaheadTurretToTargetDistance <= maxDistance;
-    String invalidReason =
-        isDistanceValid
-            ? ""
-            : String.format(
-                "lookahead distance %.2f m is outside shot table range [%.2f, %.2f] m",
-                lookaheadTurretToTargetDistance, minDistance, maxDistance);
-
     ShootingParameters params =
         new ShootingParameters(
-            isDistanceValid,
+            true,
             turretAngleRobot,
             turretVelocity,
             hoodAngleDeg,
             interpolatedShot.flywheelRps(),
-            invalidReason);
+            "");
     return params;
   }
 
   public double getTimeOfFlight(double distance) {
-    return shotMap.get(distance).tofSec();
+    Distancer shot = getShotForDistance(distance);
+    return shot == null ? 0.0 : shot.tofSec();
   }
 
   public static double getMinTimeOfFlight() {
@@ -169,5 +166,28 @@ public class GetAdjustedShot {
   public void clearShootingParameters() {
     // Shot parameters are recomputed on every request. This method remains as a no-op so
     // existing callers do not need to change.
+  }
+
+  private static Distancer getShotForDistance(double distance) {
+    if (shotRows.isEmpty()) {
+      return null;
+    }
+    if (shotRows.size() == 1) {
+      return Distancer.fromRow(shotRows.get(0));
+    }
+    if (distance < minDistance) {
+      return interpolateBetweenRows(shotRows.get(0), shotRows.get(1), distance);
+    }
+    if (distance > maxDistance) {
+      return interpolateBetweenRows(
+          shotRows.get(shotRows.size() - 2), shotRows.get(shotRows.size() - 1), distance);
+    }
+    return shotMap.get(distance);
+  }
+
+  private static Distancer interpolateBetweenRows(
+      Distancer.Row start, Distancer.Row end, double distance) {
+    double t = (distance - start.d) / (end.d - start.d);
+    return Distancer.fromRow(start).interpolate(Distancer.fromRow(end), t);
   }
 }
