@@ -128,6 +128,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Retract Intake", Commands.runOnce(intake::retract, intake));
     NamedCommands.registerCommand("Start Intake", Commands.runOnce(intake::startIntake, intake));
     NamedCommands.registerCommand("Stop Intake", Commands.runOnce(intake::stopIntake, intake));
+    NamedCommands.registerCommand(
+        "Intake While Held", Commands.startEnd(intake::startIntake, intake::stopIntake, intake));
 
     NamedCommands.registerCommand("Start Hotdog", Commands.runOnce(indexer::startHotdog, indexer));
     NamedCommands.registerCommand("Stop Hotdog", Commands.runOnce(indexer::stopHotdog, indexer));

@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -80,6 +81,10 @@ public class Intake extends SubsystemBase {
 
   public Command onIntake() {
     return this.runOnce(this::startIntake);
+  }
+
+  public Command zeroIntake() {
+    return Commands.runOnce(() -> pivotMotor.setPosition(0), this);
   }
 
   public Command offIntake() {

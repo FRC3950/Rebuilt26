@@ -1,0 +1,70 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.7929684189618644,
+        "y": 7.387959205067091
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.812587384259259,
+        "y": 7.570751591435185
+      },
+      "isLocked": false,
+      "linkedName": "NorthTrench Start"
+    },
+    {
+      "anchor": {
+        "x": 7.803987299170199,
+        "y": 6.036178826800848
+      },
+      "prevControl": {
+        "x": 6.891364980579096,
+        "y": 7.266411712129237
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Neutral FirstSwipe"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5823946220930228,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 0.7443925079281193,
+      "rotationDegrees": -63.84270084166263
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake While Held",
+      "waypointRelativePos": 0.5774111675126902,
+      "endWaypointRelativePos": 1.0,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -69.8122193481865
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

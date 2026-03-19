@@ -52,24 +52,22 @@ public class Turret extends SubsystemBase {
 
   public void runAutoTarget(GetAdjustedShot.ShootingParameters params) {
     runSetpoints(
-        params.turretAngle(), params.turretVelocity(), params.hoodAngleDeg(), params.flywheelSpeed());
+        params.turretAngle(),
+        params.turretVelocity(),
+        params.hoodAngleDeg(),
+        params.flywheelSpeed());
   }
 
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
     double referenceSetpointDegrees =
-        MathUtil.clamp(
-            azimuth.getSetpointDeg(), minAzimuthControlAngle, maxAzimuthControlAngle);
+        MathUtil.clamp(azimuth.getSetpointDeg(), minAzimuthControlAngle, maxAzimuthControlAngle);
     double bestCandidateDegrees = Double.NaN;
     double bestErrorDegrees = Double.POSITIVE_INFINITY;
 
     int minWrapIndex =
-        (int)
-            Math.ceil(
-                (minAzimuthControlAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
+        (int) Math.ceil((minAzimuthControlAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
     int maxWrapIndex =
-        (int)
-            Math.floor(
-                (maxAzimuthControlAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
+        (int) Math.floor((maxAzimuthControlAngle - targetAzimuthDegrees) / ANGLE_WRAP_DEGREES);
 
     for (int wrapIndex = minWrapIndex; wrapIndex <= maxWrapIndex; wrapIndex++) {
       double candidateDegrees = targetAzimuthDegrees + ANGLE_WRAP_DEGREES * wrapIndex;
@@ -81,8 +79,7 @@ public class Turret extends SubsystemBase {
     }
 
     if (Double.isNaN(bestCandidateDegrees)) {
-      return MathUtil.clamp(
-          targetAzimuthDegrees, minAzimuthControlAngle, maxAzimuthControlAngle);
+      return MathUtil.clamp(targetAzimuthDegrees, minAzimuthControlAngle, maxAzimuthControlAngle);
     }
     return bestCandidateDegrees;
   }
