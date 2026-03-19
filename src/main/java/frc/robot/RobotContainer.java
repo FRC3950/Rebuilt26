@@ -165,7 +165,6 @@ public class RobotContainer {
             indexer));
 
     SmartDashboard.putData("Turret Subsystem", turret1);
-
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
     autoChooser.addOption(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -186,12 +185,6 @@ public class RobotContainer {
 
     configureButtonBindings();
     applyCompetitionDefaults();
-  }
-
-  public void periodic() {
-    double distanceToHubMeters = getRobotDistanceToHubMeters();
-
-    SmartDashboard.putNumber("Turret/Distance from Left Turret to Hub", distanceToHubMeters);
   }
 
   public Command getAutonomousCommand() {
@@ -306,9 +299,5 @@ public class RobotContainer {
         .getPose()
         .getTranslation()
         .plus(turretMidpointRobot.rotateBy(drive.getPose().getRotation()));
-  }
-
-  private double getRobotDistanceToHubMeters() {
-    return drive.getPose().getTranslation().getDistance(hubTranslation);
   }
 }

@@ -145,8 +145,8 @@ public final class Constants {
       public static final int pivotMotorID = 12;
 
       // Intake Positions - UPDATE ME!!!
-      public static final double downPos = 19;
-      public static final double upPos = -1;
+      public static final double downPos = -0.75;
+      public static final double upPos = -20;
 
       public static final double intakeSpeed = 40.0;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
