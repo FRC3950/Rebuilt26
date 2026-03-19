@@ -105,7 +105,7 @@ public class RobotContainer {
     turret1 =
         new Turret(
             azimuthID,
-            azimuthConfig,
+            leftAzimuthConfig,
             HOOD_SERVO_CHANNEL_1,
             flywheelID,
             flywheelConfig,
@@ -114,7 +114,7 @@ public class RobotContainer {
     turret2 =
         new Turret(
             azimuthID2,
-            azimuthConfig,
+            rightAzimuthConfig,
             HOOD_SERVO_CHANNEL_2,
             flywheelID2,
             flywheelConfig,

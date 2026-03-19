@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.servohub.ServoChannel;
@@ -64,7 +65,8 @@ public final class Constants {
       public static final int flywheelID2 = 16;
       public static final int flywheelFollowerID2 = 18;
 
-      public static final TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
+      public static final TalonFXConfiguration leftAzimuthConfig = new TalonFXConfiguration();
+      public static final TalonFXConfiguration rightAzimuthConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration flywheelConfig = new TalonFXConfiguration();
 
       public static final double azimuthGearRatio = 10;
@@ -111,24 +113,8 @@ public final class Constants {
       // where where t-square?
       static {
         // Azimuth Motor Config
-        azimuthConfig.Slot0.kP = azimuthKP;
-        azimuthConfig.Slot0.kV = azimuthKV;
-        azimuthConfig.Slot0.kS = azimuthKS;
-        azimuthConfig.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity;
-        azimuthConfig.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
-        azimuthConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        azimuthConfig.HardwareLimitSwitch.ForwardLimitAutosetPositionEnable = true;
-        azimuthConfig.HardwareLimitSwitch.ForwardLimitAutosetPositionValue = 0;
-        azimuthConfig.HardwareLimitSwitch.ForwardLimitRemoteSensorID = TURRET_CANDI_ID;
-        azimuthConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        azimuthConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-            Units.degreesToRotations(maxAzimuthSoftLimitAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG)
-                * azimuthGearRatio;
-        azimuthConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        azimuthConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-            Units.degreesToRotations(minAzimuthSoftLimitAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG)
-                * azimuthGearRatio;
+        applyAzimuthConfig(leftAzimuthConfig, ForwardLimitSourceValue.RemoteCANdiS1);
+        applyAzimuthConfig(rightAzimuthConfig, ForwardLimitSourceValue.RemoteCANdiS2);
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
@@ -136,6 +122,29 @@ public final class Constants {
         flywheelConfig.Slot0.kV = flywheelKV;
         flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         flywheelConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 1;
+      }
+
+      private static void applyAzimuthConfig(
+          TalonFXConfiguration config, ForwardLimitSourceValue forwardLimitSource) {
+        config.Slot0.kP = azimuthKP;
+        config.Slot0.kV = azimuthKV;
+        config.Slot0.kS = azimuthKS;
+        config.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity;
+        config.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        config.HardwareLimitSwitch.ForwardLimitAutosetPositionEnable = true;
+        config.HardwareLimitSwitch.ForwardLimitAutosetPositionValue = 0;
+        config.HardwareLimitSwitch.ForwardLimitRemoteSensorID = TURRET_CANDI_ID;
+        config.HardwareLimitSwitch.ForwardLimitSource = forwardLimitSource;
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+            Units.degreesToRotations(maxAzimuthSoftLimitAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG)
+                * azimuthGearRatio;
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+            Units.degreesToRotations(minAzimuthSoftLimitAngle - TURRET_LIMIT_SWITCH_ANGLE_DEG)
+                * azimuthGearRatio;
       }
     }
 
