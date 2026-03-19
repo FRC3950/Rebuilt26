@@ -188,7 +188,11 @@ public class RobotContainer {
     applyCompetitionDefaults();
   }
 
-  
+  public void periodic() {
+    double distanceToHubMeters = getRobotDistanceToHubMeters();
+
+    SmartDashboard.putNumber("Turret/Distance from Left Turret to Hub", distanceToHubMeters);
+  }
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
@@ -302,5 +306,8 @@ public class RobotContainer {
         .getPose()
         .getTranslation()
         .plus(turretMidpointRobot.rotateBy(drive.getPose().getRotation()));
+  }
+  private double getRobotDistanceToHubMeters() {
+    return drive.getPose().getTranslation().getDistance(hubTranslation);
   }
 }
