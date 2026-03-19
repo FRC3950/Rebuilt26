@@ -88,5 +88,4 @@ public class TurretTargeting extends Command {
     Pose2d turretPose = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
     return target.getDistance(turretPose.getTranslation());
   }
-  
 }

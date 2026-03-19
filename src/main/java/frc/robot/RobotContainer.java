@@ -307,6 +307,7 @@ public class RobotContainer {
         .getTranslation()
         .plus(turretMidpointRobot.rotateBy(drive.getPose().getRotation()));
   }
+
   private double getRobotDistanceToHubMeters() {
     return drive.getPose().getTranslation().getDistance(hubTranslation);
   }
