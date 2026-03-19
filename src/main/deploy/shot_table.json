@@ -9,74 +9,71 @@
     {
       "d": 1.3,
       "hoodDeg": 13.0,
-      "rps": 30,
-      "tof": 1
+      "rps": 40.4,
+      "tof": 0.76
     },
     {
       "d": 2,
-      "hoodDeg": 18.0,
-      "rps": 30,
-      "tof": 1
+      "hoodDeg": 13,
+      "rps": 43,
+      "tof": 0.89
     },
     {
       "d": 2.5,
-      "hoodDeg": 22,
-      "rps": 32,
-      "tof": 1
+      "hoodDeg": 13,
+      "rps": 47,
+      "tof": 1.11
     },
     {
       "d": 3,
-      "hoodDeg": 24,
-      "rps": 34,
-      "tof": 1
+      "hoodDeg": 13,
+      "rps": 50.5,
+      "tof": 1.15
     },
     {
       "d": 3.5,
-      "hoodDeg": 26,
-      "rps": 36,
-      "tof": 1
+      "hoodDeg": 18,
+      "rps": 51.5,
+      "tof": 1.17
     },
     {
       "d": 4,
-      "hoodDeg": 28,
-      "rps": 38,
-      "tof": 1
+      "hoodDeg": 20,
+      "rps": 53,
+      "tof": 1.13
+
+    },
+    {
+      "d": 4.25,
+      "hoodDeg": 20.25,
+      "rps": 53.5,
+      "tof": 1.21
+
     },
     {
       "d": 4.5,
-      "hoodDeg": 29,
-      "rps": 40,
-      "tof": 1
+      "hoodDeg": 23,
+      "rps": 54,
+      "tof": 1.13
+    },
+    {
+      "d": 4.75,
+      "hoodDeg": 23,
+      "rps": 56,
+      "tof": 1.24
+
     },
     {
       "d": 5,
-      "hoodDeg": 29,
-      "rps": 42,
-      "tof": 1
+      "hoodDeg": 23.5,
+      "rps": 58,
+      "tof": 1.21
     },
     {
       "d": 5.5,
-      "hoodDeg": 29,
-      "rps": 44,
-      "tof": 1
-    },
-    {
-      "d": 6,
-      "hoodDeg": 29,
-      "rps": 46,
-      "tof": 1
-    },
-    {
-      "d": 6.5,
-      "hoodDeg": 29,
-      "rps": 48,
-      "tof": 1
-    },
-    {
-      "d": 7,
-      "hoodDeg": 29,
-      "rps": 50,
-      "tof": 1
+      "hoodDeg": 24.5,
+      "rps": 60,
+      "tof": 1.28
     }
   ]
 }
