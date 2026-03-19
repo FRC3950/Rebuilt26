@@ -94,8 +94,8 @@ public final class Constants {
       public static final int HOOD_SERVO_MAX_PULSE_US = 2500;
 
       // PID / Motion Magic Gains
-      public static final double azimuthKP = 2;
-      public static final double azimuthKS = 0.25;
+      public static final double azimuthKP = 16;
+      public static final double azimuthKS = 0;
       public static final double azimuthKV = 0.12;
       public static final double azimuthMMVelocity = 24;
       public static final double azimuthMMAcceleration = 48;
@@ -131,6 +131,8 @@ public final class Constants {
         flywheelConfig.Slot0.kV = flywheelKV;
         flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         flywheelConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 1;
+        flywheelConfig.CurrentLimits.StatorCurrentLimit = 120;
+        flywheelConfig.CurrentLimits.SupplyCurrentLimit = 60;
       }
 
       private static void applyAzimuthConfig(
@@ -159,6 +161,8 @@ public final class Constants {
             Units.degreesToRotations(
                     minControlAngleDeg - azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
                 * azimuthGearRatio;
+        config.CurrentLimits.StatorCurrentLimit = 60;
+        config.CurrentLimits.SupplyCurrentLimit = 30;
       }
     }
 
@@ -167,8 +171,8 @@ public final class Constants {
       public static final int pivotMotorID = 12;
 
       // Intake Positions - UPDATE ME!!!
-      public static final double downPos = -0.75;
-      public static final double upPos = -20;
+      public static final double downPos = 19;
+      public static final double upPos = 0.2;
 
       public static final double intakeSpeed = 40.0;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
@@ -190,11 +194,15 @@ public final class Constants {
         pivotConfig.Slot0.kG = pivotKG;
         pivotConfig.MotionMagic.MotionMagicAcceleration = pivotMMAcceleration;
         pivotConfig.MotionMagic.MotionMagicCruiseVelocity = pivotMMVelocity;
+        pivotConfig.CurrentLimits.StatorCurrentLimit = 80;
+        pivotConfig.CurrentLimits.SupplyCurrentLimit = 40;
 
         // Intake Motor Config
         intakeConfig.Slot0.kP = intakeKP;
         intakeConfig.Slot0.kV = intakeKV;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        intakeConfig.CurrentLimits.StatorCurrentLimit = 80;
+        intakeConfig.CurrentLimits.SupplyCurrentLimit = 60;
       }
     }
 
@@ -218,10 +226,14 @@ public final class Constants {
         indexerConfig.Slot0.kP = indexerKP;
         indexerConfig.Slot0.kV = indexerKV;
         indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        indexerConfig.CurrentLimits.StatorCurrentLimit = 120;
+        indexerConfig.CurrentLimits.SupplyCurrentLimit = 60;
 
         hotdogConfig.Slot0.kP = hotdogKP;
         hotdogConfig.Slot0.kV = hotdogKV;
         hotdogConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        hotdogConfig.CurrentLimits.StatorCurrentLimit = 80;
+        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 40;
       }
     }
     // Josh wrote this part of the code, easter egg of 2026
