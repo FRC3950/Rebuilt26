@@ -4,6 +4,8 @@ import static frc.robot.Constants.FieldConstants.leftFerryTarget;
 import static frc.robot.Constants.FieldConstants.rightFerryTarget;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -80,4 +82,11 @@ public class TurretTargeting extends Command {
   public boolean isFinished() {
     return false;
   }
+
+  public static double getDistanceToTargetMeters(
+      Pose2d robotPose, Translation2d robotToTurret, Translation2d target) {
+    Pose2d turretPose = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
+    return target.getDistance(turretPose.getTranslation());
+  }
+  
 }

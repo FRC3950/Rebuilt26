@@ -7,7 +7,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.turret.turret_base.Azimuth;
 import frc.robot.subsystems.turret.turret_base.Flywheels;
 import frc.robot.subsystems.turret.turret_base.Hood;
@@ -31,10 +33,11 @@ public class Turret extends SubsystemBase {
       int flywheelID,
       TalonFXConfiguration flywheelConfig,
       int flywheelFollowerID,
-      CANBus canbus) {
+      CANBus canbus, Drive drive) {
     hood = new Hood(hoodChannelId);
     flywheels = new Flywheels(flywheelID, flywheelConfig, flywheelFollowerID, canbus);
     azimuth = new Azimuth(azimuthID, azimuthConfig, canbus);
+    this.drive = drive;
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
@@ -83,5 +86,11 @@ public class Turret extends SubsystemBase {
       return MathUtil.clamp(targetAzimuthDegrees, minAzimuthAngle, maxAzimuthAngle);
     }
     return bestCandidateDegrees;
+  }
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber(
+        "Turret/Left Turret to Hub/",
+        TurretTargeting.getDistanceToTargetMeters(drive.getPose(), robotToTurret1, hubTranslation));
   }
 }
