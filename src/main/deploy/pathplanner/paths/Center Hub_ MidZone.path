@@ -3,47 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.073309608540926,
-        "y": 7.3757295373665475
+        "x": 3.600510083036774,
+        "y": 4.0403795966785285
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.6668801897983405,
-        "y": 7.676986951364176
+        "x": 2.9756426609096778,
+        "y": 4.0403795966785285
       },
       "isLocked": false,
-      "linkedName": "NorthTrench Shoot"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.8073546856465015,
-        "y": 5.008706998813759
+        "x": 2.234092526690392,
+        "y": 4.0403795966785285
       },
       "prevControl": {
-        "x": 7.1833214709371305,
-        "y": 6.977639383155397
+        "x": 2.923436992219915,
+        "y": 4.0403795966785285
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Neutral SecondSwipe"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.09077598828696869,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Intake While Held",
-      "waypointRelativePos": 0.41412198604060907,
-      "endWaypointRelativePos": 1.0,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -54,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -62.83501494266807
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

@@ -3,32 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.878810558431954,
-        "y": 5.100144288553994
+        "x": 7.8073546856465015,
+        "y": 5.008706998813759
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.210151511649408,
-        "y": 7.406428265994823
+        "x": 7.8073546856465015,
+        "y": 7.7523013048635825
       },
       "isLocked": false,
       "linkedName": "Neutral SecondSwipe"
     },
     {
       "anchor": {
-        "x": 4.144013729659764,
-        "y": 7.383734398113905
+        "x": 3.073309608540926,
+        "y": 7.3757295373665475
       },
       "prevControl": {
-        "x": 5.763139966253698,
-        "y": 7.473671297152367
+        "x": 4.69243584513486,
+        "y": 7.46566643640501
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "NorthTrench Shoot"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.9546120058565178,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -42,7 +47,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -62.83501494266807
   },
   "reversed": false,
   "folder": null,

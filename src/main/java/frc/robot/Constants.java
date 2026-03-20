@@ -94,7 +94,7 @@ public final class Constants {
       public static final int HOOD_SERVO_MAX_PULSE_US = 2500;
 
       // PID / Motion Magic Gains
-      public static final double azimuthKP = 16;
+      public static final double azimuthKP = 50;
       public static final double azimuthKS = 0;
       public static final double azimuthKV = 0.12;
       public static final double azimuthMMVelocity = 24;
@@ -132,7 +132,7 @@ public final class Constants {
         flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         flywheelConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 1;
         flywheelConfig.CurrentLimits.StatorCurrentLimit = 120;
-        flywheelConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        flywheelConfig.CurrentLimits.SupplyCurrentLimit = 70;
       }
 
       private static void applyAzimuthConfig(
@@ -146,7 +146,7 @@ public final class Constants {
         config.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity;
         config.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.HardwareLimitSwitch.ForwardLimitAutosetPositionEnable = true;
         config.HardwareLimitSwitch.ForwardLimitAutosetPositionValue = 0;
         config.HardwareLimitSwitch.ForwardLimitRemoteSensorID = TURRET_CANDI_ID;
@@ -227,13 +227,13 @@ public final class Constants {
         indexerConfig.Slot0.kV = indexerKV;
         indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         indexerConfig.CurrentLimits.StatorCurrentLimit = 120;
-        indexerConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        indexerConfig.CurrentLimits.SupplyCurrentLimit = 70;
 
         hotdogConfig.Slot0.kP = hotdogKP;
         hotdogConfig.Slot0.kV = hotdogKV;
         hotdogConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        hotdogConfig.CurrentLimits.StatorCurrentLimit = 80;
-        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 40;
+        hotdogConfig.CurrentLimits.StatorCurrentLimit = 120;
+        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 70;
       }
     }
     // Josh wrote this part of the code, easter egg of 2026
