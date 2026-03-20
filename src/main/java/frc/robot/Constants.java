@@ -94,7 +94,7 @@ public final class Constants {
       public static final int HOOD_SERVO_MAX_PULSE_US = 2500;
 
       // PID / Motion Magic Gains
-      public static final double azimuthKP = 10;
+      public static final double azimuthKP = 50;
       public static final double azimuthKS = 0;
       public static final double azimuthKV = 0.12;
       public static final double azimuthMMVelocity = 24;

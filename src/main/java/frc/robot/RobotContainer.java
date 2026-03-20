@@ -41,6 +41,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Intake intake;
   private final Indexer indexer;
+  private boolean lockedIn = true;
 
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
@@ -250,11 +251,15 @@ public class RobotContainer {
                   indexer.stopHotdog();
                 },
                 indexer));
+    operator.povDown().onTrue(
+      Commands.runOnce(() ->toggleTurretMode(), null)
+    );
   }
 
   private void applyCompetitionDefaults() {
-    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1, true));
-    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2, true));
+    
+    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1, lockedIn));
+    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2, lockedIn));
     // Re-enable hub tracking by commenting out the two lock lines above and uncommenting the two
     // lines below.
     // turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
@@ -262,5 +267,16 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
+  }
+  private void toggleTurretMode(){
+    if(lockedIn){
+        lockedIn = false;
+        turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1, lockedIn));
+    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2, lockedIn));
+      }else{
+        lockedIn = true;
+        turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1, lockedIn));
+      turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2, lockedIn));
+      }
   }
 }
