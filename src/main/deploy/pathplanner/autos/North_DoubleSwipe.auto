@@ -48,12 +48,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Stop Intake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Neutral_NorthShoot"
@@ -68,7 +62,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 3.0
+            "waitTime": 4.0
           }
         },
         {
@@ -86,20 +80,8 @@
                 "data": {
                   "pathName": "NorthShoot_NeutralClose"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Start Intake"
-                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Intake"
           }
         },
         {

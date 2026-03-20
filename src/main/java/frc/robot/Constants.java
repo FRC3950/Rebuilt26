@@ -73,10 +73,10 @@ public final class Constants {
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
-      public static final double leftMinAzimuthControlAngle = -10;
-      public static final double leftMaxAzimuthControlAngle = 330;
-      public static final double rightMinAzimuthControlAngle = -10;
-      public static final double rightMaxAzimuthControlAngle = 330;
+      public static final double leftMinAzimuthControlAngle = -330;
+      public static final double leftMaxAzimuthControlAngle = 10;
+      public static final double rightMinAzimuthControlAngle = -330;
+      public static final double rightMaxAzimuthControlAngle = 10;
       public static final double azimuthSoftLimitMarginDeg = 10.0;
       public static final double minHoodAngle = 13;
       public static final double maxHoodAngle = 29.85;
@@ -94,7 +94,7 @@ public final class Constants {
       public static final int HOOD_SERVO_MAX_PULSE_US = 2500;
 
       // PID / Motion Magic Gains
-      public static final double azimuthKP = 50;
+      public static final double azimuthKP = 10;
       public static final double azimuthKS = 0;
       public static final double azimuthKV = 0.12;
       public static final double azimuthMMVelocity = 24;
@@ -105,10 +105,14 @@ public final class Constants {
       public static final double flywheelKV = 0.0925;
 
       // Turret position relative to the robot pose origin (meters).
+      // public static final Translation2d robotToTurret1 =
+      //     new Translation2d(Units.inchesToMeters(-7.75), Units.inchesToMeters(-7.25));
+      // public static final Translation2d robotToTurret2 =
+      //     new Translation2d(Units.inchesToMeters(7.75), Units.inchesToMeters(-7.25));
       public static final Translation2d robotToTurret1 =
-          new Translation2d(Units.inchesToMeters(-7.75), Units.inchesToMeters(-7.25));
+          new Translation2d(Units.inchesToMeters(-7.25), Units.inchesToMeters(-7.75));
       public static final Translation2d robotToTurret2 =
-          new Translation2d(Units.inchesToMeters(7.75), Units.inchesToMeters(-7.25));
+          new Translation2d(Units.inchesToMeters(-7.25), Units.inchesToMeters(7.75));
 
       // hi cj love you -ruby
       // where where t-square?
@@ -174,7 +178,7 @@ public final class Constants {
       public static final double downPos = 19;
       public static final double upPos = 0.2;
 
-      public static final double mintakeSpeed = 32.0;
+      public static final double mintakeSpeed = 40;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
       public static final double intakeKP = 0.1;
       public static final double intakeKV = 0.12;

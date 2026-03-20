@@ -57,7 +57,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void runZeroAzimuthTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(new Rotation2d(45), params.hoodAngleDeg(), params.flywheelSpeed());
+    runSetpoints(new Rotation2d(-135), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
