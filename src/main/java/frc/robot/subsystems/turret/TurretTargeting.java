@@ -18,18 +18,34 @@ public class TurretTargeting extends Command {
   private final Drive drive;
   private final Translation2d robotToTurret;
   private final Translation2d targetOverride;
+  private final boolean lockAzimuthToZero;
   private final GetAdjustedShot shotCalc = new GetAdjustedShot();
 
   public TurretTargeting(Turret turret, Drive drive, Translation2d robotToTurret) {
-    this(turret, drive, robotToTurret, null);
+    this(turret, drive, robotToTurret, null, false);
+  }
+
+  public TurretTargeting(
+      Turret turret, Drive drive, Translation2d robotToTurret, boolean lockAzimuthToZero) {
+    this(turret, drive, robotToTurret, null, lockAzimuthToZero);
   }
 
   public TurretTargeting(
       Turret turret, Drive drive, Translation2d robotToTurret, Translation2d targetOverride) {
+    this(turret, drive, robotToTurret, targetOverride, false);
+  }
+
+  private TurretTargeting(
+      Turret turret,
+      Drive drive,
+      Translation2d robotToTurret,
+      Translation2d targetOverride,
+      boolean lockAzimuthToZero) {
     this.turret = turret;
     this.drive = drive;
     this.robotToTurret = robotToTurret;
     this.targetOverride = targetOverride;
+    this.lockAzimuthToZero = lockAzimuthToZero;
     addRequirements(turret);
   }
 
@@ -42,7 +58,11 @@ public class TurretTargeting extends Command {
             : shotCalc.getParameters(robotPose, targetOverride, robotToTurret);
 
     if (params.isValid()) {
-      turret.runAutoTarget(params);
+      if (lockAzimuthToZero) {
+        turret.runZeroAzimuthTarget(params);
+      } else {
+        turret.runAutoTarget(params);
+      }
     }
   }
 

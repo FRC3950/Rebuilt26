@@ -56,6 +56,10 @@ public class Turret extends SubsystemBase {
     runSetpoints(params.turretAngle(), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 
+  public void runZeroAzimuthTarget(GetAdjustedShot.ShootingParameters params) {
+    runSetpoints(Rotation2d.kZero, params.hoodAngleDeg(), params.flywheelSpeed());
+  }
+
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
     double referenceSetpointDegrees =
         MathUtil.clamp(

@@ -185,18 +185,18 @@ public class RobotContainer {
                   var speeds = drive.getRobotRelativeSpeeds();
                   return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
                 }));
-    operator
-        .povLeft()
-        .whileTrue(
-            Commands.parallel(
-                new TurretTargeting(turret1, drive, robotToTurret1, leftFerryTarget),
-                new TurretTargeting(turret2, drive, robotToTurret2, leftFerryTarget)));
-    operator
-        .povRight()
-        .whileTrue(
-            Commands.parallel(
-                new TurretTargeting(turret1, drive, robotToTurret1, rightFerryTarget),
-                new TurretTargeting(turret2, drive, robotToTurret2, rightFerryTarget)));
+    // operator
+    //     .povLeft()
+    //     .whileTrue(
+    //         Commands.parallel(
+    //             new TurretTargeting(turret1, drive, robotToTurret1, leftFerryTarget),
+    //             new TurretTargeting(turret2, drive, robotToTurret2, leftFerryTarget)));
+    // operator
+    //     .povRight()
+    //     .whileTrue(
+    //         Commands.parallel(
+    //             new TurretTargeting(turret1, drive, robotToTurret1, rightFerryTarget),
+    //             new TurretTargeting(turret2, drive, robotToTurret2, rightFerryTarget)));
 
     operator.rightBumper().onTrue(intake.retractCommand());
 
@@ -252,8 +252,12 @@ public class RobotContainer {
   }
 
   private void applyCompetitionDefaults() {
-    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
-    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
+    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1, true));
+    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2, true));
+    // Re-enable hub tracking by commenting out the two lock lines above and uncommenting the two
+    // lines below.
+    // turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
+    // turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
