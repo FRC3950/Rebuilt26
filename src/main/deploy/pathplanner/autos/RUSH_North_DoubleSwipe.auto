@@ -5,9 +5,34 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "EXTEND_NorthStart_Neutral"
+            "name": "Extend Intake"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "NorthStart_Neutral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Intake"
           }
         },
         {
@@ -25,7 +50,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 3.5
+            "waitTime": 3.0
           }
         },
         {
@@ -35,9 +60,28 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "NorthShoot_NeutralClose"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "NorthShoot_NeutralClose"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Start Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Intake"
           }
         },
         {
@@ -59,7 +103,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 8.0
+                  "waitTime": 6.0
                 }
               }
             ]
