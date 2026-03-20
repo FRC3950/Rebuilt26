@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
 
   public void startIntake() {
     isIntaking = true;
-    setIntakeSpeed(intakeSpeed);
+    setIntakeSpeed(mintakeSpeed + 8);
   }
 
   public void stopIntake() {
@@ -73,6 +73,10 @@ public class Intake extends SubsystemBase {
   @AutoLogOutput(key = "Intake/Pivot Position")
   public double getPivotPosition() {
     return pivotMotor.getPosition().getValueAsDouble();
+  }
+
+  public Command extendCommand() {
+    return this.runOnce(this::extend);
   }
 
   public Command retractCommand() {

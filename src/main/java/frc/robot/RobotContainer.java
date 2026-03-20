@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -122,10 +123,9 @@ public class RobotContainer {
     intake = new Intake();
     indexer = new Indexer();
 
-    NamedCommands.registerCommand("Extend Intake", Commands.runOnce(intake::extend, intake));
-    NamedCommands.registerCommand("Retract Intake", Commands.runOnce(intake::retract, intake));
-    NamedCommands.registerCommand("Start Intake", Commands.runOnce(intake::startIntake, intake));
-    NamedCommands.registerCommand("Stop Intake", Commands.runOnce(intake::stopIntake, intake));
+    NamedCommands.registerCommand("Extend Intake", intake.extendCommand());
+    NamedCommands.registerCommand("Start Intake", intake.onIntake());
+    NamedCommands.registerCommand("Stop Intake", intake.offIntake());
     NamedCommands.registerCommand(
         "Intake While Held", Commands.startEnd(intake::startIntake, intake::stopIntake, intake));
 
@@ -235,11 +235,7 @@ public class RobotContainer {
     operator
         .b()
         .and(operator.start().negate())
-        .whileTrue(
-            Commands.startEnd(
-                () -> intake.setIntakeSpeed(-Constants.SubsystemConstants.Intake.intakeSpeed),
-                intake::stopIntake,
-                intake));
+        .whileTrue(Commands.startEnd(() -> intake.setIntakeSpeed(-45), intake::stopIntake, intake));
     operator
         .start()
         .and(operator.b())
@@ -254,7 +250,7 @@ public class RobotContainer {
                   indexer.stopHotdog();
                 },
                 indexer));
-    }
+  }
 
   private void applyCompetitionDefaults() {
     turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
