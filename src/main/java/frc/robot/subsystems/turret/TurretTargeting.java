@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 import java.util.function.Supplier;
@@ -15,8 +14,8 @@ import java.util.function.Supplier;
 /**
  * Default turret targeting command.
  *
- * <p>Calculates compensated shot parameters (shoot-on-the-move) and feeds the turret/hood/flywheel
- * controllers each loop.
+ * <p>Calculates turret setpoints from the robot's current pose and feeds the
+ * turret/hood/flywheel controllers each loop.
  */
 public class TurretTargeting extends Command {
   public enum TargetingMode {
@@ -56,16 +55,15 @@ public class TurretTargeting extends Command {
   @Override
   public void execute() {
     Pose2d robotPose = drive.getPose();
-    ChassisSpeeds fieldSpeeds = drive.getFieldRelativeSpeeds();
     var params =
         switch (modeSupplier.get()) {
           case FERRY_AUTO -> {
             double distLeft = robotPose.getTranslation().getDistance(leftFerryTarget);
             double distRight = robotPose.getTranslation().getDistance(rightFerryTarget);
             Translation2d target = (distLeft < distRight) ? leftFerryTarget : rightFerryTarget;
-            yield shotCalc.getParameters(robotPose, fieldSpeeds, target, robotToTurret);
+            yield shotCalc.getParameters(robotPose, target, robotToTurret);
           }
-          case HUB_AUTO -> shotCalc.getParameters(robotPose, fieldSpeeds, robotToTurret);
+          case HUB_AUTO -> shotCalc.getParameters(robotPose, robotToTurret);
         };
 
     if (params.isValid()) {

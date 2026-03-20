@@ -4,7 +4,6 @@ import static frc.robot.Constants.FieldConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 
@@ -43,8 +42,7 @@ public class FerryMode extends Command {
       target = (distLeft < distRight) ? leftFerryTarget : rightFerryTarget;
     }
 
-    ChassisSpeeds fieldVelocity = drive.getFieldRelativeSpeeds();
-    var params = calculator.getParameters(robotPose, fieldVelocity, target, robotToTurret);
+    var params = calculator.getParameters(robotPose, target, robotToTurret);
 
     if (params.isValid()) {
       turret.runAutoTarget(params);

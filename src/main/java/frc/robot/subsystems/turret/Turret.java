@@ -43,25 +43,18 @@ public class Turret extends SubsystemBase {
   }
 
   public void runSetpoints(
-      Rotation2d turretAngleRobot,
-      double turretVelocityRadPerSec,
-      double hoodAngleDeg,
-      double flywheelSpeed) {
+      Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
     double targetAzimuthDegrees = turretAngleRobot.getDegrees();
     double setpointDegrees = selectSafeSetpointDegrees(targetAzimuthDegrees);
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
 
-    azimuth.setTargetAngleDeg(setpointDegrees, turretVelocityRadPerSec);
+    azimuth.setTargetAngleDeg(setpointDegrees);
     hood.setAngleDeg(clampedHoodAngleDeg);
     flywheels.setTargetRps(flywheelSpeed);
   }
 
   public void runAutoTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(
-        params.turretAngle(),
-        params.turretVelocity(),
-        params.hoodAngleDeg(),
-        params.flywheelSpeed());
+    runSetpoints(params.turretAngle(), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {

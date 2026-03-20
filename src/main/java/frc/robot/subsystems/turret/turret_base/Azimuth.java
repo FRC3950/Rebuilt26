@@ -7,7 +7,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants;
 
 public class Azimuth {
 
@@ -21,12 +20,9 @@ public class Azimuth {
     azimuth.getConfigurator().apply(azimuthConfig);
   }
 
-  public void setTargetAngleDeg(double targetAngleDeg, double targetVelocityRadPerSec) {
+  public void setTargetAngleDeg(double targetAngleDeg) {
     lastSetpointDeg = targetAngleDeg;
-    double predictiveLeadDeg =
-        Units.radiansToDegrees(targetVelocityRadPerSec) * Constants.loopPeriodSecs;
-    double motorRotations =
-        Units.degreesToRotations(targetAngleDeg + predictiveLeadDeg) * azimuthGearRatio;
+    double motorRotations = Units.degreesToRotations(targetAngleDeg) * azimuthGearRatio;
     azimuth.setControl(azimuthControl.withPosition(motorRotations));
   }
 
