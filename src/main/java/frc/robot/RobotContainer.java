@@ -8,8 +8,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,15 +26,11 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
-import frc.robot.subsystems.turret.TurretTargeting.TargetingMode;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.Zones;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -184,6 +178,18 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     driver.leftTrigger(0.5).whileTrue(new IntakeCommand(intake));
+    driver
+        .povLeft()
+        .whileTrue(
+            Commands.parallel(
+                new TurretTargeting(turret1, drive, robotToTurret1, leftFerryTarget),
+                new TurretTargeting(turret2, drive, robotToTurret2, leftFerryTarget)));
+    driver
+        .povRight()
+        .whileTrue(
+            Commands.parallel(
+                new TurretTargeting(turret1, drive, robotToTurret1, rightFerryTarget),
+                new TurretTargeting(turret2, drive, robotToTurret2, rightFerryTarget)));
 
     driver.rightBumper().onTrue(intake.retractCommand());
 
@@ -239,37 +245,10 @@ public class RobotContainer {
   }
 
   private void applyCompetitionDefaults() {
-    BooleanSupplier trenchDangerSupplier = this::isTrenchDanger;
-    Supplier<TargetingMode> autoTargetingModeSupplier =
-        () -> {
-          if (DriverStation.isAutonomousEnabled()) {
-            return TargetingMode.HUB_AUTO;
-          }
-          return TurretTargeting.selectTargetingMode(
-              true,
-              trenchDangerSupplier.getAsBoolean(),
-              Zones.NEUTRAL_ZONE.contains(drive.getPose().getTranslation()));
-        };
-
-    turret1.setDefaultCommand(
-        new TurretTargeting(turret1, drive, robotToTurret1, autoTargetingModeSupplier));
-    turret2.setDefaultCommand(
-        new TurretTargeting(turret2, drive, robotToTurret2, autoTargetingModeSupplier));
+    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
+    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
-  }
-
-  private boolean isTrenchDanger() {
-    return Zones.TRENCH_ZONES.willContain(
-        getTurretMidpointField(), drive.getFieldRelativeSpeeds(), TRENCH_ALIGN_TIME_SEC);
-  }
-
-  private Translation2d getTurretMidpointField() {
-    Translation2d turretMidpointRobot = robotToTurret1.plus(robotToTurret2).times(0.5);
-    return drive
-        .getPose()
-        .getTranslation()
-        .plus(turretMidpointRobot.rotateBy(drive.getPose().getRotation()));
   }
 }

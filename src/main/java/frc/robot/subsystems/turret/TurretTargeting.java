@@ -1,15 +1,11 @@
 package frc.robot.subsystems.turret;
 
-import static frc.robot.Constants.FieldConstants.leftFerryTarget;
-import static frc.robot.Constants.FieldConstants.rightFerryTarget;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
-import java.util.function.Supplier;
 
 /**
  * Default turret targeting command.
@@ -18,53 +14,32 @@ import java.util.function.Supplier;
  * turret/hood/flywheel controllers each loop.
  */
 public class TurretTargeting extends Command {
-  public enum TargetingMode {
-    HUB_AUTO,
-    FERRY_AUTO
-  }
-
   private final Turret turret;
   private final Drive drive;
   private final Translation2d robotToTurret;
-  private final Supplier<TargetingMode> modeSupplier;
+  private final Translation2d targetOverride;
   private final GetAdjustedShot shotCalc = new GetAdjustedShot();
 
+  public TurretTargeting(Turret turret, Drive drive, Translation2d robotToTurret) {
+    this(turret, drive, robotToTurret, null);
+  }
+
   public TurretTargeting(
-      Turret turret,
-      Drive drive,
-      Translation2d robotToTurret,
-      Supplier<TargetingMode> modeSupplier) {
+      Turret turret, Drive drive, Translation2d robotToTurret, Translation2d targetOverride) {
     this.turret = turret;
     this.drive = drive;
     this.robotToTurret = robotToTurret;
-    this.modeSupplier = modeSupplier;
+    this.targetOverride = targetOverride;
     addRequirements(turret);
-  }
-
-  public static TargetingMode selectTargetingMode(
-      boolean trenchSafetyEnabled, boolean trenchDanger, boolean inNeutralZone) {
-    if (trenchSafetyEnabled && trenchDanger) {
-      return TargetingMode.HUB_AUTO;
-    }
-    if (inNeutralZone) {
-      return TargetingMode.FERRY_AUTO;
-    }
-    return TargetingMode.HUB_AUTO;
   }
 
   @Override
   public void execute() {
     Pose2d robotPose = drive.getPose();
     var params =
-        switch (modeSupplier.get()) {
-          case FERRY_AUTO -> {
-            double distLeft = robotPose.getTranslation().getDistance(leftFerryTarget);
-            double distRight = robotPose.getTranslation().getDistance(rightFerryTarget);
-            Translation2d target = (distLeft < distRight) ? leftFerryTarget : rightFerryTarget;
-            yield shotCalc.getParameters(robotPose, target, robotToTurret);
-          }
-          case HUB_AUTO -> shotCalc.getParameters(robotPose, robotToTurret);
-        };
+        targetOverride == null
+            ? shotCalc.getParameters(robotPose, robotToTurret)
+            : shotCalc.getParameters(robotPose, targetOverride, robotToTurret);
 
     if (params.isValid()) {
       turret.runAutoTarget(params);
