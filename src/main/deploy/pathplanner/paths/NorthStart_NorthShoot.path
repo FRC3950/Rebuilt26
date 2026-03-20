@@ -3,43 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.0993651620370373,
-        "y": 7.266974826388889
+        "x": 4.004200014467592,
+        "y": 7.391634837962963
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.6071309317129625,
-        "y": 7.359223234953705
+        "x": 3.4261712239583333,
+        "y": 7.352334129050925
       },
       "isLocked": false,
-      "linkedName": "NorthTrench Shoot"
+      "linkedName": "NorthTrench Start"
     },
     {
       "anchor": {
-        "x": 7.803987299170199,
-        "y": 6.036178826800848
+        "x": 3.0993651620370373,
+        "y": 7.266974826388889
       },
       "prevControl": {
-        "x": 7.944702980324074,
-        "y": 7.6957396556712965
+        "x": 3.592887586805556,
+        "y": 7.335341001157408
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "NorthTrench Shoot"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.06539884868421057,
+      "waypointRelativePos": 0.5,
       "rotationDegrees": 180.0
-    },
-    {
-      "waypointRelativePos": 0.46332236842105295,
-      "rotationDegrees": 180.0
-    },
-    {
-      "waypointRelativePos": 0.5247430098684212,
-      "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [],
@@ -55,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -87.31023414914512
+    "rotation": 116.49375046652003
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 116.49375046652003
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
