@@ -177,23 +177,23 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    driver.leftTrigger(0.5).whileTrue(new IntakeCommand(intake));
-    driver
+    operator.leftTrigger(0.5).whileTrue(new IntakeCommand(intake));
+    operator
         .povLeft()
         .whileTrue(
             Commands.parallel(
                 new TurretTargeting(turret1, drive, robotToTurret1, leftFerryTarget),
                 new TurretTargeting(turret2, drive, robotToTurret2, leftFerryTarget)));
-    driver
+    operator
         .povRight()
         .whileTrue(
             Commands.parallel(
                 new TurretTargeting(turret1, drive, robotToTurret1, rightFerryTarget),
                 new TurretTargeting(turret2, drive, robotToTurret2, rightFerryTarget)));
 
-    driver.rightBumper().onTrue(intake.retractCommand());
+    operator.rightBumper().onTrue(intake.retractCommand());
 
-    driver
+    operator
         .rightTrigger(0.5)
         .whileTrue(
             Commands.startEnd(
@@ -207,17 +207,12 @@ public class RobotContainer {
                 },
                 indexer));
 
-    operator
-        .rightTrigger(0.5)
-        .whileTrue(Commands.startEnd(indexer::startIndexer, indexer::stopIndexer, indexer));
-    operator.x().whileTrue(Commands.startEnd(indexer::startHotdog, indexer::stopHotdog, indexer));
-    operator
+    driver
         .y()
         .onTrue(
             Commands.runOnce(
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                 drive));
-    operator.a().whileTrue(Commands.startEnd(intake::startIntake, intake::stopIntake, intake));
     operator
         .b()
         .and(operator.start().negate())
@@ -240,9 +235,7 @@ public class RobotContainer {
                   indexer.stopHotdog();
                 },
                 indexer));
-    operator.leftBumper().onTrue(intake.retractCommand());
-    operator.rightBumper().onTrue(Commands.runOnce(intake::extend, intake));
-  }
+    }
 
   private void applyCompetitionDefaults() {
     turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));

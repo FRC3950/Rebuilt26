@@ -42,8 +42,7 @@ public class Turret extends SubsystemBase {
     azimuth = new Azimuth(azimuthID, azimuthConfig, canbus);
   }
 
-  public void runSetpoints(
-      Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
+  public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
     double targetAzimuthDegrees = turretAngleRobot.getDegrees();
     double setpointDegrees = selectSafeSetpointDegrees(targetAzimuthDegrees);
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);

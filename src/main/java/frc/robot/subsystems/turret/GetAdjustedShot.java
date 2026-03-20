@@ -28,6 +28,7 @@ public class GetAdjustedShot {
       return isValid;
     }
   }
+
   private static double minDistance;
   private static double maxDistance;
   private static final List<Distancer.Row> shotRows;
@@ -56,8 +57,7 @@ public class GetAdjustedShot {
 
   public ShootingParameters getParameters(
       Pose2d robotPose, Translation2d target, Translation2d robotToTurret) {
-    Pose2d turretPosition =
-        robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
+    Pose2d turretPosition = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
 
     Distancer interpolatedShot = getShotForDistance(turretToTargetDistance);

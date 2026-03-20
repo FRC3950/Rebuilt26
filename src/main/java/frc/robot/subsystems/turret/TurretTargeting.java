@@ -10,8 +10,8 @@ import frc.robot.subsystems.drive.Drive;
 /**
  * Default turret targeting command.
  *
- * <p>Calculates turret setpoints from the robot's current pose and feeds the
- * turret/hood/flywheel controllers each loop.
+ * <p>Calculates turret setpoints from the robot's current pose and feeds the turret/hood/flywheel
+ * controllers each loop.
  */
 public class TurretTargeting extends Command {
   private final Turret turret;
