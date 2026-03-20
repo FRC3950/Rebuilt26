@@ -7,13 +7,19 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.Intake;
 
+import static frc.robot.Constants.SubsystemConstants.Intake.mintakeSpeed;
+
+import java.util.function.DoubleSupplier;
+
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class IntakeCommand extends Command {
   private final Intake intake;
+  private final DoubleSupplier driveSpeedMetersPerSecond;
 
   /** Creates a new IntakeCommand. */
-  public IntakeCommand(Intake intake) {
+  public IntakeCommand(Intake intake, DoubleSupplier driveSpeedMetersPerSecond) {
     this.intake = intake;
+    this.driveSpeedMetersPerSecond = driveSpeedMetersPerSecond;
     addRequirements(intake);
   }
 
@@ -21,7 +27,7 @@ public class IntakeCommand extends Command {
   @Override
   public void initialize() {
     intake.extend();
-    intake.startIntake();
+    intake.setIntakeSpeed(mintakeSpeed + 3 * driveSpeedMetersPerSecond.getAsDouble());
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -177,7 +177,15 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    operator.leftTrigger(0.5).whileTrue(new IntakeCommand(intake));
+    operator
+        .leftTrigger(0.5)
+        .whileTrue(
+            new IntakeCommand(
+                intake,
+                () -> {
+                  var speeds = drive.getRobotRelativeSpeeds();
+                  return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+                }));
     operator
         .povLeft()
         .whileTrue(
@@ -213,6 +221,17 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                 drive));
+    driver
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -driver.getLeftY(),
+                () -> -driver.getLeftX(),
+                () -> {
+                  Translation2d robotToHub = hubTranslation.minus(drive.getPose().getTranslation());
+                  return new Rotation2d(robotToHub.getX(), robotToHub.getY());
+                }));
     operator
         .b()
         .and(operator.start().negate())

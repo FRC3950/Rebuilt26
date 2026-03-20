@@ -174,7 +174,7 @@ public final class Constants {
       public static final double downPos = 19;
       public static final double upPos = 0.2;
 
-      public static final double intakeSpeed = 40.0;
+      public static final double mintakeSpeed = 32.0;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
       public static final double intakeKP = 0.1;
       public static final double intakeKV = 0.12;
