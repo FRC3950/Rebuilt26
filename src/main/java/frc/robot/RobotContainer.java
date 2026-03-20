@@ -229,7 +229,8 @@ public class RobotContainer {
                 () -> -driver.getLeftX(),
                 () -> {
                   Translation2d robotToHub = hubTranslation.minus(drive.getPose().getTranslation());
-                  return new Rotation2d(robotToHub.getX(), robotToHub.getY()).rotateBy(new Rotation2d(Math.PI));
+                  return new Rotation2d(robotToHub.getX(), robotToHub.getY())
+                      .rotateBy(new Rotation2d(Math.PI));
                 }));
     operator
         .b()
