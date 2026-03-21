@@ -2,6 +2,8 @@ package frc.robot.subsystems.turret;
 
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
 
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.revrobotics.servohub.ServoChannel;
@@ -20,6 +22,8 @@ public class Turret extends SubsystemBase {
   private final Azimuth azimuth;
   private final double minAzimuthControlAngleDeg;
   private final double maxAzimuthControlAngleDeg;
+
+  private static boolean lockedIn = true;
 
   // private final Mechanism2d mechanism;
   // private final MechanismRoot2d mechRoot;
@@ -58,6 +62,17 @@ public class Turret extends SubsystemBase {
 
   public void runZeroAzimuthTarget(GetAdjustedShot.ShootingParameters params) {
     runSetpoints(new Rotation2d(-135), params.hoodAngleDeg(), params.flywheelSpeed());
+  }
+
+  public static void toggleTurretMode(){
+    if(lockedIn){
+        lockedIn = false;
+    }else{
+        lockedIn = true;
+    }
+  }
+  public static boolean getTargetingMode(){
+    return lockedIn;
   }
 
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
