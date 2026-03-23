@@ -78,6 +78,7 @@ public class TurretTargeting extends Command {
   public static double getDistanceToTargetMeters(
       Pose2d robotPose, Translation2d robotToTurret, Translation2d target) {
     Pose2d turretPose = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
+
     return target.getDistance(turretPose.getTranslation());
   }
 }

@@ -186,18 +186,18 @@ public class RobotContainer {
                   var speeds = drive.getRobotRelativeSpeeds();
                   return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
                 }));
-    // operator
-    //     .povLeft()
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             new TurretTargeting(turret1, drive, robotToTurret1, leftFerryTarget),
-    //             new TurretTargeting(turret2, drive, robotToTurret2, leftFerryTarget)));
-    // operator
-    //     .povRight()
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             new TurretTargeting(turret1, drive, robotToTurret1, rightFerryTarget),
-    //             new TurretTargeting(turret2, drive, robotToTurret2, rightFerryTarget)));
+    operator
+        .povLeft()
+        .whileTrue(
+            Commands.parallel(
+                new TurretTargeting(turret1, drive, robotToTurret1, leftFerryTarget),
+                new TurretTargeting(turret2, drive, robotToTurret2, leftFerryTarget)));
+    operator
+        .povRight()
+        .whileTrue(
+            Commands.parallel(
+                new TurretTargeting(turret1, drive, robotToTurret1, rightFerryTarget),
+                new TurretTargeting(turret2, drive, robotToTurret2, rightFerryTarget)));
 
     operator.rightBumper().onTrue(intake.retractCommand());
 

@@ -80,8 +80,7 @@ public class GetAdjustedShot {
       ChassisSpeeds fieldVelocity,
       Translation2d target,
       Translation2d robotToTurret) {
-    Pose2d turretPosition =
-        robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
+    Pose2d turretPosition = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
 
     Distancer initialShot = getShotForDistance(turretToTargetDistance);

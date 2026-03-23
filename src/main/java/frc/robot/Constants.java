@@ -104,11 +104,6 @@ public final class Constants {
       public static final double flywheelKD = 0.25;
       public static final double flywheelKV = 0.0925;
 
-      // Turret position relative to the robot pose origin (meters).
-      // public static final Translation2d robotToTurret1 =
-      //     new Translation2d(Units.inchesToMeters(-7.75), Units.inchesToMeters(-7.25));
-      // public static final Translation2d robotToTurret2 =
-      //     new Translation2d(Units.inchesToMeters(7.75), Units.inchesToMeters(-7.25));
       public static final Translation2d robotToTurret1 =
           new Translation2d(Units.inchesToMeters(-7.25), Units.inchesToMeters(7.75));
       public static final Translation2d robotToTurret2 =
@@ -206,7 +201,6 @@ public final class Constants {
         intakeConfig.Slot0.kV = intakeKV;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         intakeConfig.CurrentLimits.StatorCurrentLimit = 80;
-        intakeConfig.CurrentLimits.SupplyCurrentLimit = 60;
       }
     }
 
@@ -236,8 +230,7 @@ public final class Constants {
         hotdogConfig.Slot0.kP = hotdogKP;
         hotdogConfig.Slot0.kV = hotdogKV;
         hotdogConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        hotdogConfig.CurrentLimits.StatorCurrentLimit = 120;
-        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 70;
+        hotdogConfig.CurrentLimits.StatorCurrentLimit = 80;
       }
     }
     // Josh wrote this part of the code, easter egg of 2026
@@ -247,19 +240,20 @@ public final class Constants {
 
   public static final class FieldConstants {
     // position of Hub
-    public static final Translation2d hubTranslation =
-        AllianceFlipUtil.apply(new Translation2d(4.6256194, 4.0346376));
+    public static final Translation2d hubGuy = new Translation2d(4.6256194, 4.0346376);
+
+    public static final Translation2d hubTranslation = AllianceFlipUtil.apply(hubGuy);
     // Field dimensions in meters (blue-origin WPILib frame).
     public static final double fieldWidth = 8.0756125;
     public static final double fieldLength = 16.5411785;
     // positions of ferry shot targets
     // 1 foot = 0.3048 meters
+
+    //
     public static final Translation2d leftFerryTarget =
-        AllianceFlipUtil.apply(
-            new Translation2d(hubTranslation.getX() - 1.34, hubTranslation.getY() - 0.59));
+        AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 1.5, hubGuy.getY() + 2));
     public static final Translation2d rightFerryTarget =
-        AllianceFlipUtil.apply(
-            new Translation2d(hubTranslation.getX() + 1.34, hubTranslation.getY() - 0.59));
+        AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 1.5, hubGuy.getY() - 2));
 
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;
