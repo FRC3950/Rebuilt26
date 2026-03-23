@@ -1,20 +1,43 @@
 package frc.robot;
 
-import static frc.robot.Constants.FieldConstants.*;
+import static frc.robot.Constants.FieldConstants.hubTranslation;
+import static frc.robot.Constants.FieldConstants.leftFerryTarget;
+import static frc.robot.Constants.FieldConstants.rightFerryTarget;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
-import static frc.robot.Constants.SubsystemConstants.Turret.*;
+import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_1;
+import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_2;
+import static frc.robot.Constants.SubsystemConstants.Turret.azimuthID;
+import static frc.robot.Constants.SubsystemConstants.Turret.azimuthID2;
+import static frc.robot.Constants.SubsystemConstants.Turret.flywheelConfig;
+import static frc.robot.Constants.SubsystemConstants.Turret.flywheelFollowerID;
+import static frc.robot.Constants.SubsystemConstants.Turret.flywheelFollowerID2;
+import static frc.robot.Constants.SubsystemConstants.Turret.flywheelID;
+import static frc.robot.Constants.SubsystemConstants.Turret.flywheelID2;
+import static frc.robot.Constants.SubsystemConstants.Turret.leftAzimuthConfig;
+import static frc.robot.Constants.SubsystemConstants.Turret.leftMaxAzimuthControlAngle;
+import static frc.robot.Constants.SubsystemConstants.Turret.leftMinAzimuthControlAngle;
+import static frc.robot.Constants.SubsystemConstants.Turret.rightAzimuthConfig;
+import static frc.robot.Constants.SubsystemConstants.Turret.rightMaxAzimuthControlAngle;
+import static frc.robot.Constants.SubsystemConstants.Turret.rightMinAzimuthControlAngle;
+import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1;
+import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.controls.CrazyModeBindings;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -31,9 +54,14 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
+  public enum BindingMode {
+    COMPETITION,
+    CRAZY
+  }
 
   private final Drive drive;
   private final Turret turret1;
@@ -41,12 +69,17 @@ public class RobotContainer {
   private final Vision vision;
   private final Intake intake;
   private final Indexer indexer;
-  private boolean lockedIn = true;
 
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
 
+  private final EventLoop competitionButtonLoop = new EventLoop();
+  private final EventLoop crazyButtonLoop = new EventLoop();
+
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
+
+  private BindingMode appliedBindingMode = BindingMode.COMPETITION;
 
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -151,34 +184,41 @@ public class RobotContainer {
 
     SmartDashboard.putData("Turret Subsystem", turret1);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
-    // autoChooser.addOption(
-    //     "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    // autoChooser.addOption(
-    //     "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Forward)",
-    //     drive.sysIdTranslationQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Reverse)",
-    //     drive.sysIdTranslationQuasistatic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Forward)",
-    //     drive.sysIdTranslationDynamic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Reverse)",
-    //     drive.sysIdTranslationDynamic(SysIdRoutine.Direction.kReverse));
 
-    configureButtonBindings();
+    bindingModeChooser = new LoggedDashboardChooser<>("Code Mode");
+    bindingModeChooser.addDefaultOption("Competition", BindingMode.COMPETITION);
+    bindingModeChooser.addOption("CRAZY", BindingMode.CRAZY);
+
+    configureCompetitionBindings();
+    configureCrazyBindings();
     applyCompetitionDefaults();
+    applyBindingMode(BindingMode.COMPETITION);
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
 
-  private void configureButtonBindings() {
+  public void checkMode() {
+    BindingMode selectedBindingMode = getSelectedBindingMode();
+    SmartDashboard.putString("Code Mode/Selected", selectedBindingMode.name());
+    Logger.recordOutput("Controls/BindingModeSelected", selectedBindingMode.name());
+
+    if (!shouldApplyBindingMode(selectedBindingMode, appliedBindingMode, DriverStation.isDisabled())) {
+      return;
+    }
+
+    applyBindingMode(selectedBindingMode);
+  }
+
+  static boolean shouldApplyBindingMode(
+      BindingMode selectedBindingMode, BindingMode currentBindingMode, boolean isDisabled) {
+    return isDisabled && selectedBindingMode != currentBindingMode;
+  }
+
+  private void configureCompetitionBindings() {
     operator
-        .leftTrigger(0.5)
+        .leftTrigger(0.5, competitionButtonLoop)
         .whileTrue(
             new IntakeCommand(
                 intake,
@@ -186,23 +226,21 @@ public class RobotContainer {
                   var speeds = drive.getRobotRelativeSpeeds();
                   return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
                 }));
-    operator
-        .povLeft()
+    new Trigger(competitionButtonLoop, () -> operator.getHID().getPOV() == 270)
         .whileTrue(
             Commands.parallel(
                 new TurretTargeting(turret1, drive, robotToTurret1, leftFerryTarget),
                 new TurretTargeting(turret2, drive, robotToTurret2, leftFerryTarget)));
-    operator
-        .povRight()
+    new Trigger(competitionButtonLoop, () -> operator.getHID().getPOV() == 90)
         .whileTrue(
             Commands.parallel(
                 new TurretTargeting(turret1, drive, robotToTurret1, rightFerryTarget),
                 new TurretTargeting(turret2, drive, robotToTurret2, rightFerryTarget)));
 
-    operator.rightBumper().onTrue(intake.retractCommand());
+    operator.rightBumper(competitionButtonLoop).onTrue(intake.retractCommand());
 
     operator
-        .rightTrigger(0.5)
+        .rightTrigger(0.5, competitionButtonLoop)
         .whileTrue(
             Commands.startEnd(
                 () -> {
@@ -216,13 +254,13 @@ public class RobotContainer {
                 indexer));
 
     driver
-        .y()
+        .y(competitionButtonLoop)
         .onTrue(
             Commands.runOnce(
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                 drive));
     driver
-        .a()
+        .a(competitionButtonLoop)
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
@@ -234,12 +272,12 @@ public class RobotContainer {
                       .rotateBy(new Rotation2d(Math.PI));
                 }));
     operator
-        .b()
-        .and(operator.start().negate())
+        .b(competitionButtonLoop)
+        .and(operator.start(competitionButtonLoop).negate())
         .whileTrue(Commands.startEnd(() -> intake.setIntakeSpeed(-45), intake::stopIntake, intake));
     operator
-        .start()
-        .and(operator.b())
+        .start(competitionButtonLoop)
+        .and(operator.b(competitionButtonLoop))
         .whileTrue(
             Commands.startEnd(
                 () -> {
@@ -251,7 +289,32 @@ public class RobotContainer {
                   indexer.stopHotdog();
                 },
                 indexer));
-    operator.a().onTrue(Commands.runOnce(Turret::toggleTurretMode)).debounce(0.25);
+    operator
+        .a(competitionButtonLoop)
+        .onTrue(Commands.runOnce(Turret::toggleTurretMode))
+        .debounce(0.25);
+  }
+
+  private void configureCrazyBindings() {
+    CrazyModeBindings.configure(crazyButtonLoop, driver, drive, intake, indexer, turret1, turret2);
+  }
+
+  private void applyBindingMode(BindingMode bindingMode) {
+    CommandScheduler.getInstance()
+        .setActiveButtonLoop(
+            switch (bindingMode) {
+              case COMPETITION -> competitionButtonLoop;
+              case CRAZY -> crazyButtonLoop;
+            });
+
+    appliedBindingMode = bindingMode;
+    SmartDashboard.putString("Code Mode/Applied", appliedBindingMode.name());
+    Logger.recordOutput("Controls/BindingModeApplied", appliedBindingMode.name());
+  }
+
+  private BindingMode getSelectedBindingMode() {
+    BindingMode selectedBindingMode = bindingModeChooser.get();
+    return selectedBindingMode != null ? selectedBindingMode : BindingMode.COMPETITION;
   }
 
   private void applyCompetitionDefaults() {
