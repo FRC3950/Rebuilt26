@@ -204,7 +204,8 @@ public class RobotContainer {
     SmartDashboard.putString("Code Mode/Selected", selectedBindingMode.name());
     Logger.recordOutput("Controls/BindingModeSelected", selectedBindingMode.name());
 
-    if (!shouldApplyBindingMode(selectedBindingMode, appliedBindingMode, DriverStation.isDisabled())) {
+    if (!shouldApplyBindingMode(
+        selectedBindingMode, appliedBindingMode, DriverStation.isDisabled())) {
       return;
     }
 

@@ -24,8 +24,6 @@ public class RobotContainerBindingModeTest {
   void doesNotApplyWhenAlreadyActive() {
     assertFalse(
         RobotContainer.shouldApplyBindingMode(
-            RobotContainer.BindingMode.COMPETITION,
-            RobotContainer.BindingMode.COMPETITION,
-            true));
+            RobotContainer.BindingMode.COMPETITION, RobotContainer.BindingMode.COMPETITION, true));
   }
 }

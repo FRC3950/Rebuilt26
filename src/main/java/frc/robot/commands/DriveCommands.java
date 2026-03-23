@@ -58,7 +58,8 @@ public class DriveCommands {
         .getTranslation();
   }
 
-  private static double limitAccelerationOnly(double currentValue, double targetValue, double maxDelta) {
+  private static double limitAccelerationOnly(
+      double currentValue, double targetValue, double maxDelta) {
     if (Math.abs(targetValue) <= Math.abs(currentValue)) {
       return targetValue;
     }
@@ -113,28 +114,28 @@ public class DriveCommands {
     AccelOnlyLimiter limiter = new AccelOnlyLimiter();
 
     return Commands.run(
-        () -> {
-          // Get linear velocity
-          Translation2d linearVelocity =
-              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+            () -> {
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-          // Apply rotation deadband
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+              // Apply rotation deadband
+              double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
-          // Square rotation value for more precise control
-          omega = Math.copySign(omega * omega, omega);
+              // Square rotation value for more precise control
+              omega = Math.copySign(omega * omega, omega);
 
-          ChassisSpeeds speeds =
-              limiter.calculate(
-                  linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec()),
-                  omega * drive.getMaxAngularSpeedRadPerSec(),
-                  LINEAR_ACCEL_LIMIT_METERS_PER_SEC_SQ * 0.02,
-                  ANGULAR_ACCEL_LIMIT_RAD_PER_SEC_SQ * 0.02);
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds, AllianceFlipUtil.apply(drive.getRotation())));
-        },
-        drive)
+              ChassisSpeeds speeds =
+                  limiter.calculate(
+                      linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec()),
+                      omega * drive.getMaxAngularSpeedRadPerSec(),
+                      LINEAR_ACCEL_LIMIT_METERS_PER_SEC_SQ * 0.02,
+                      ANGULAR_ACCEL_LIMIT_RAD_PER_SEC_SQ * 0.02);
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds, AllianceFlipUtil.apply(drive.getRotation())));
+            },
+            drive)
         .beforeStarting(limiter::reset);
   }
 
