@@ -52,10 +52,11 @@ public class TurretTargeting extends Command {
   @Override
   public void execute() {
     Pose2d robotPose = drive.getPose();
+    var fieldVelocity = drive.getFieldRelativeSpeeds();
     var params =
         targetOverride == null
-            ? shotCalc.getParameters(robotPose, robotToTurret)
-            : shotCalc.getParameters(robotPose, targetOverride, robotToTurret);
+            ? shotCalc.getParameters(robotPose, fieldVelocity, robotToTurret)
+            : shotCalc.getParameters(robotPose, fieldVelocity, targetOverride, robotToTurret);
 
     if (params.isValid()) {
       if (Turret.getTargetingMode()) {
