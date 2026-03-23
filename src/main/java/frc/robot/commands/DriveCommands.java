@@ -31,6 +31,8 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
+  private static final double LINEAR_ACCEL_LIMIT_METERS_PER_SEC_SQ = 3.0;
+  private static final double ANGULAR_ACCEL_LIMIT_RAD_PER_SEC_SQ = 8.0;
   private static final double ANGLE_KP = 5.0;
   private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
@@ -56,6 +58,50 @@ public class DriveCommands {
         .getTranslation();
   }
 
+  private static double limitAccelerationOnly(double currentValue, double targetValue, double maxDelta) {
+    if (Math.abs(targetValue) <= Math.abs(currentValue)) {
+      return targetValue;
+    }
+
+    if (Math.signum(currentValue) != 0.0 && Math.signum(currentValue) != Math.signum(targetValue)) {
+      return 0.0;
+    }
+
+    return currentValue + MathUtil.clamp(targetValue - currentValue, -maxDelta, maxDelta);
+  }
+
+  private static class AccelOnlyLimiter {
+    private Translation2d currentLinearVelocity = Translation2d.kZero;
+    private double currentOmega = 0.0;
+
+    public ChassisSpeeds calculate(
+        Translation2d targetLinearVelocity,
+        double targetOmega,
+        double maxLinearDelta,
+        double maxOmegaDelta) {
+      double currentMagnitude = currentLinearVelocity.getNorm();
+      double targetMagnitude = targetLinearVelocity.getNorm();
+
+      double limitedMagnitude =
+          limitAccelerationOnly(currentMagnitude, targetMagnitude, maxLinearDelta);
+      Translation2d limitedLinearVelocity =
+          targetMagnitude > 1e-6
+              ? new Translation2d(limitedMagnitude, targetLinearVelocity.getAngle())
+              : Translation2d.kZero;
+
+      currentLinearVelocity = limitedLinearVelocity;
+      currentOmega = limitAccelerationOnly(currentOmega, targetOmega, maxOmegaDelta);
+
+      return new ChassisSpeeds(
+          currentLinearVelocity.getX(), currentLinearVelocity.getY(), currentOmega);
+    }
+
+    public void reset() {
+      currentLinearVelocity = Translation2d.kZero;
+      currentOmega = 0.0;
+    }
+  }
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
@@ -64,6 +110,7 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier) {
+    AccelOnlyLimiter limiter = new AccelOnlyLimiter();
 
     return Commands.run(
         () -> {
@@ -77,17 +124,18 @@ public class DriveCommands {
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
 
-          // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
-              new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+              limiter.calculate(
+                  linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec()),
+                  omega * drive.getMaxAngularSpeedRadPerSec(),
+                  LINEAR_ACCEL_LIMIT_METERS_PER_SEC_SQ * 0.02,
+                  ANGULAR_ACCEL_LIMIT_RAD_PER_SEC_SQ * 0.02);
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds, AllianceFlipUtil.apply(drive.getRotation())));
         },
-        drive);
+        drive)
+        .beforeStarting(limiter::reset);
   }
 
   /**
