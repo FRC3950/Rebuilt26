@@ -3,41 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.839632265717675,
-        "y": 5.729572953736655
+        "x": 0.6955278766310802,
+        "y": 5.966275207591934
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.65386993761229,
-        "y": 7.614309129829326
+        "x": 2.1695373665426634,
+        "y": 5.98779359430605
       },
       "isLocked": false,
-      "linkedName": "Neutral FirstSwipe"
+      "linkedName": "Depot"
     },
     {
       "anchor": {
-        "x": 3.0993651620370373,
-        "y": 7.266974826388889
+        "x": 2.1802965598997206,
+        "y": 4.029620403321471
       },
       "prevControl": {
-        "x": 5.391073347090419,
-        "y": 7.331529986531239
+        "x": 2.1695373665426634,
+        "y": 5.977034400948992
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NorthTrench Shoot"
+      "linkedName": "Center_Back"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 180.0
-    },
-    {
-      "waypointRelativePos": 0.95,
-      "rotationDegrees": 180.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -51,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 116.49375046652003
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
-    "velocity": 0.0,
-    "rotation": -87.42280443607729
+    "velocity": 0,
+    "rotation": -179.45948981286938
   },
   "useDefaultConstraints": true
 }

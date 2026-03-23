@@ -2,8 +2,6 @@ package frc.robot.subsystems.turret;
 
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
 
-import java.util.function.BooleanSupplier;
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.revrobotics.servohub.ServoChannel;
@@ -64,14 +62,15 @@ public class Turret extends SubsystemBase {
     runSetpoints(new Rotation2d(-135), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 
-  public static void toggleTurretMode(){
-    if(lockedIn){
-        lockedIn = false;
-    }else{
-        lockedIn = true;
+  public static void toggleTurretMode() {
+    if (lockedIn) {
+      lockedIn = false;
+    } else {
+      lockedIn = true;
     }
   }
-  public static boolean getTargetingMode(){
+
+  public static boolean getTargetingMode() {
     return lockedIn;
   }
 

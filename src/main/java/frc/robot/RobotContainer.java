@@ -251,22 +251,21 @@ public class RobotContainer {
                   indexer.stopHotdog();
                 },
                 indexer));
-    operator.povDown().onTrue(
-      Commands.runOnce(() ->Turret.toggleTurretMode(), null)
-    );
+    operator.a().onTrue(Commands.runOnce(Turret::toggleTurretMode)).debounce(0.25);
   }
 
   private void applyCompetitionDefaults() {
-    
-    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1, Turret.getTargetingMode()));
-    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2, Turret.getTargetingMode()));
+
+    // turret1.setDefaultCommand(
+    //     new TurretTargeting(turret1, drive, robotToTurret1, Turret.getTargetingMode()));
+    // turret2.setDefaultCommand(
+    //     new TurretTargeting(turret2, drive, robotToTurret2, Turret.getTargetingMode()));
     // Re-enable hub tracking by commenting out the two lock lines above and uncommenting the two
     // lines below.
-    // turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
-    // turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
+    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
+    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
   }
-  
 }

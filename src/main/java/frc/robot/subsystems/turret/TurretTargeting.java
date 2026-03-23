@@ -58,7 +58,7 @@ public class TurretTargeting extends Command {
             : shotCalc.getParameters(robotPose, targetOverride, robotToTurret);
 
     if (params.isValid()) {
-      if (lockAzimuthToZero) {
+      if (Turret.getTargetingMode()) {
         turret.runZeroAzimuthTarget(params);
       } else {
         turret.runAutoTarget(params);

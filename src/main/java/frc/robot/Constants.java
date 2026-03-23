@@ -110,9 +110,9 @@ public final class Constants {
       // public static final Translation2d robotToTurret2 =
       //     new Translation2d(Units.inchesToMeters(7.75), Units.inchesToMeters(-7.25));
       public static final Translation2d robotToTurret1 =
-          new Translation2d(Units.inchesToMeters(-7.25), Units.inchesToMeters(-7.75));
-      public static final Translation2d robotToTurret2 =
           new Translation2d(Units.inchesToMeters(-7.25), Units.inchesToMeters(7.75));
+      public static final Translation2d robotToTurret2 =
+          new Translation2d(Units.inchesToMeters(-7.25), Units.inchesToMeters(-7.75));
 
       // hi cj love you -ruby
       // where where t-square?
@@ -134,9 +134,9 @@ public final class Constants {
         flywheelConfig.Slot0.kD = flywheelKD;
         flywheelConfig.Slot0.kV = flywheelKV;
         flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        flywheelConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 1;
+        flywheelConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = .1;
         flywheelConfig.CurrentLimits.StatorCurrentLimit = 120;
-        flywheelConfig.CurrentLimits.SupplyCurrentLimit = 70;
+        flywheelConfig.CurrentLimits.SupplyCurrentLimit = 80;
       }
 
       private static void applyAzimuthConfig(
