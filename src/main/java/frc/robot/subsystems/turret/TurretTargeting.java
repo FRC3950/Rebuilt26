@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import java.util.function.Supplier;
 
 /**
  * Default turret targeting command.
@@ -17,7 +18,7 @@ public class TurretTargeting extends Command {
   private final Turret turret;
   private final Drive drive;
   private final Translation2d robotToTurret;
-  private final Translation2d targetOverride;
+  private final Supplier<Translation2d> targetOverrideSupplier;
   private final boolean lockAzimuthToZero;
   private final GetAdjustedShot shotCalc = new GetAdjustedShot();
 
@@ -32,19 +33,27 @@ public class TurretTargeting extends Command {
 
   public TurretTargeting(
       Turret turret, Drive drive, Translation2d robotToTurret, Translation2d targetOverride) {
-    this(turret, drive, robotToTurret, targetOverride, false);
+    this(turret, drive, robotToTurret, () -> targetOverride, false);
+  }
+
+  public TurretTargeting(
+      Turret turret,
+      Drive drive,
+      Translation2d robotToTurret,
+      Supplier<Translation2d> targetOverrideSupplier) {
+    this(turret, drive, robotToTurret, targetOverrideSupplier, false);
   }
 
   private TurretTargeting(
       Turret turret,
       Drive drive,
       Translation2d robotToTurret,
-      Translation2d targetOverride,
+      Supplier<Translation2d> targetOverrideSupplier,
       boolean lockAzimuthToZero) {
     this.turret = turret;
     this.drive = drive;
     this.robotToTurret = robotToTurret;
-    this.targetOverride = targetOverride;
+    this.targetOverrideSupplier = targetOverrideSupplier;
     this.lockAzimuthToZero = lockAzimuthToZero;
     addRequirements(turret);
   }
@@ -53,6 +62,8 @@ public class TurretTargeting extends Command {
   public void execute() {
     Pose2d robotPose = drive.getPose();
     var fieldVelocity = drive.getFieldRelativeSpeeds();
+    Translation2d targetOverride =
+        targetOverrideSupplier != null ? targetOverrideSupplier.get() : null;
     var params =
         targetOverride == null
             ? shotCalc.getParameters(robotPose, fieldVelocity, robotToTurret)

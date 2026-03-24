@@ -261,5 +261,16 @@ public final class Constants {
     public static final double TRENCH_DEBOUNCE_SEC = 0.10;
 
     public static final double scoreTime = 0.25;
+
+    public static boolean isRobotInNeutralZone(double robotXMeters) {
+      return robotXMeters >= neutralZoneMinX && robotXMeters <= neutralZoneMaxX;
+    }
+
+    public static Translation2d getCloserFerryTarget(Translation2d robotTranslation) {
+      return robotTranslation.getDistance(leftFerryTarget)
+              <= robotTranslation.getDistance(rightFerryTarget)
+          ? leftFerryTarget
+          : rightFerryTarget;
+    }
   }
 }
