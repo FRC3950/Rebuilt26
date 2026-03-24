@@ -1,8 +1,8 @@
 package frc.robot;
 
 import static frc.robot.Constants.FieldConstants.hubTranslation;
-import static frc.robot.Constants.FieldConstants.leftFerryTarget;
-import static frc.robot.Constants.FieldConstants.rightFerryTarget;
+import static frc.robot.Constants.FieldConstants.getCloserFerryTarget;
+import static frc.robot.Constants.FieldConstants.isRobotInNeutralZone;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_1;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_2;
@@ -227,16 +227,18 @@ public class RobotContainer {
                   var speeds = drive.getRobotRelativeSpeeds();
                   return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
                 }));
-    new Trigger(competitionButtonLoop, () -> operator.getHID().getPOV() == 270)
+    Trigger neutralZoneFerryTrigger =
+        new Trigger(competitionButtonLoop, () -> isRobotInNeutralZone(drive.getPose().getX()));
+    neutralZoneFerryTrigger
         .whileTrue(
             Commands.parallel(
-                new TurretTargeting(turret1, drive, robotToTurret1, leftFerryTarget),
-                new TurretTargeting(turret2, drive, robotToTurret2, leftFerryTarget)));
-    new Trigger(competitionButtonLoop, () -> operator.getHID().getPOV() == 90)
-        .whileTrue(
-            Commands.parallel(
-                new TurretTargeting(turret1, drive, robotToTurret1, rightFerryTarget),
-                new TurretTargeting(turret2, drive, robotToTurret2, rightFerryTarget)));
+                new TurretTargeting(
+                    turret1, drive, robotToTurret1, () -> getCloserFerryTarget(drive.getPose().getTranslation())),
+                new TurretTargeting(
+                    turret2,
+                    drive,
+                    robotToTurret2,
+                    () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
 
     operator.rightBumper(competitionButtonLoop).onTrue(intake.retractCommand());
 
