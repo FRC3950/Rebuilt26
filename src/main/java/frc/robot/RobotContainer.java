@@ -242,6 +242,26 @@ public class RobotContainer {
                 drive));
 
     driver.a().whileTrue(DriveCommands.alignRobotToHubLine(drive, robotToTurret1));
+    driver
+        .povUp()
+        .whileTrue(
+            DriveCommands.robotRelativeNudge(
+                drive, DriveCommands.getDpadNudgeSpeedMetersPerSecond(), 0.0));
+    driver
+        .povDown()
+        .whileTrue(
+            DriveCommands.robotRelativeNudge(
+                drive, -DriveCommands.getDpadNudgeSpeedMetersPerSecond(), 0.0));
+    driver
+        .povLeft()
+        .whileTrue(
+            DriveCommands.robotRelativeNudge(
+                drive, 0.0, DriveCommands.getDpadNudgeSpeedMetersPerSecond()));
+    driver
+        .povRight()
+        .whileTrue(
+            DriveCommands.robotRelativeNudge(
+                drive, 0.0, -DriveCommands.getDpadNudgeSpeedMetersPerSecond()));
 
     operator
         .b()

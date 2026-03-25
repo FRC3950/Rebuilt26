@@ -48,6 +48,7 @@ public class DriveCommands {
   private static final double DISTANCE_MAX_VELOCITY = 2.0;
   private static final double DISTANCE_MAX_ACCELERATION = 4.0;
   private static final double DISTANCE_TOLERANCE_METERS = 0.05;
+  private static final double DPAD_NUDGE_SPEED_METERS_PER_SECOND = 0.2;
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -282,6 +283,19 @@ public class DriveCommands {
                     getTurretDistanceToHubMeters(drive.getPose(), robotToTurret),
                     targetDistanceMeters))
         .finallyDo(drive::stop);
+  }
+
+  /** Drives the robot at a small constant robot-relative speed while held. */
+  public static Command robotRelativeNudge(
+      Drive drive, double vxMetersPerSecond, double vyMetersPerSecond) {
+    return Commands.run(
+            () -> drive.runVelocity(new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, 0.0)),
+            drive)
+        .finallyDo(drive::stop);
+  }
+
+  public static double getDpadNudgeSpeedMetersPerSecond() {
+    return DPAD_NUDGE_SPEED_METERS_PER_SECOND;
   }
 
   /**
