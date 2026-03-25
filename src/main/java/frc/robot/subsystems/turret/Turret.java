@@ -21,8 +21,6 @@ public class Turret extends SubsystemBase {
   private final double minAzimuthControlAngleDeg;
   private final double maxAzimuthControlAngleDeg;
 
-  private static boolean lockedIn = true;
-
   // private final Mechanism2d mechanism;
   // private final MechanismRoot2d mechRoot;
   // private final MechanismLigament2d turretLigament;
@@ -44,34 +42,21 @@ public class Turret extends SubsystemBase {
     azimuth = new Azimuth(azimuthID, azimuthConfig, canbus);
   }
 
-  public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
+  public void aimAzimuth(Rotation2d turretAngleRobot) {
     double targetAzimuthDegrees = turretAngleRobot.getDegrees();
     double setpointDegrees = selectSafeSetpointDegrees(targetAzimuthDegrees);
-    double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
 
     azimuth.setTargetAngleDeg(setpointDegrees);
+  }
+
+  public void applyManualSetpoints(double hoodAngleDeg, double flywheelSpeed) {
+    double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
     hood.setAngleDeg(clampedHoodAngleDeg);
     flywheels.setTargetRps(flywheelSpeed);
   }
 
-  public void runAutoTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(params.turretAngle(), params.hoodAngleDeg(), params.flywheelSpeed());
-  }
-
-  public void runZeroAzimuthTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(new Rotation2d(-135), params.hoodAngleDeg(), params.flywheelSpeed());
-  }
-
-  public static void toggleTurretMode() {
-    if (lockedIn) {
-      lockedIn = false;
-    } else {
-      lockedIn = true;
-    }
-  }
-
-  public static boolean getTargetingMode() {
-    return lockedIn;
+  public void stopFlywheels() {
+    flywheels.stop();
   }
 
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {

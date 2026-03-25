@@ -7,6 +7,8 @@
 
 package frc.robot.commands;
 
+import static frc.robot.Constants.FieldConstants.hubTranslation;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -37,6 +39,10 @@ public class DriveCommands {
   private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
+  private static final double ALIGN_Y_KP = 2.0;
+  private static final double ALIGN_Y_KD = 0.0;
+  private static final double ALIGN_Y_MAX_VELOCITY = 2.0;
+  private static final double ALIGN_Y_MAX_ACCELERATION = 4.0;
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -187,6 +193,51 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
+  /** Aligns the robot so its Y position matches the hub and the back of the robot faces the hub. */
+  public static Command alignRobotToHubLine(Drive drive) {
+    ProfiledPIDController yController =
+        new ProfiledPIDController(
+            ALIGN_Y_KP,
+            0.0,
+            ALIGN_Y_KD,
+            new TrapezoidProfile.Constraints(ALIGN_Y_MAX_VELOCITY, ALIGN_Y_MAX_ACCELERATION));
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    return Commands.run(
+            () -> {
+              Pose2d currentPose = drive.getPose();
+              Pose2d targetPose = getHubLineTargetPose(currentPose);
+
+              double yVelocity =
+                  yController.calculate(
+                      currentPose.getY(), targetPose.getTranslation().getY());
+              double omega =
+                  angleController.calculate(
+                      currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+              ChassisSpeeds speeds = new ChassisSpeeds(0.0, yVelocity, omega);
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds, AllianceFlipUtil.apply(drive.getRotation())));
+            },
+            drive)
+        .beforeStarting(
+            () -> {
+              Pose2d currentPose = drive.getPose();
+              Pose2d targetPose = getHubLineTargetPose(currentPose);
+              yController.reset(currentPose.getY());
+              angleController.reset(currentPose.getRotation().getRadians());
+              yController.setGoal(targetPose.getY());
+              angleController.setGoal(targetPose.getRotation().getRadians());
+            });
+  }
+
   /**
    * Measures the velocity feedforward constants for the drive motors.
    *
@@ -323,5 +374,20 @@ public class DriveCommands {
     double[] positions = new double[4];
     Rotation2d lastAngle = Rotation2d.kZero;
     double gyroDelta = 0.0;
+  }
+
+  public static Pose2d getHubLineTargetPose(Pose2d currentPose) {
+    Translation2d targetTranslation =
+        new Translation2d(currentPose.getX(), hubTranslation.getY());
+    return new Pose2d(targetTranslation, getBackFacingHeading(targetTranslation, currentPose));
+  }
+
+  public static Rotation2d getBackFacingHeading(
+      Translation2d robotTranslation, Pose2d fallbackPoseForHeading) {
+    Translation2d robotToHub = hubTranslation.minus(robotTranslation);
+    if (robotToHub.getNorm() < 1e-6) {
+      return fallbackPoseForHeading.getRotation();
+    }
+    return robotToHub.getAngle().rotateBy(new Rotation2d(Math.PI));
   }
 }

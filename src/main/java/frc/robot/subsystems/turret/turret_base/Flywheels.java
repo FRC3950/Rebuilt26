@@ -33,6 +33,10 @@ public class Flywheels {
         velocityVoltage.withVelocity(MathUtil.clamp(targetVel, minFlywheelRps, maxFlywheelRps)));
   }
 
+  public void stop() {
+    setTargetRps(0.0);
+  }
+
   public double getVelocityRps() {
     return flywheel.getVelocity().getValueAsDouble();
   }
