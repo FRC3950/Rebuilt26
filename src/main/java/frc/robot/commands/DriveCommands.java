@@ -221,15 +221,14 @@ public class DriveCommands {
               Pose2d targetPose = getHubLineTargetPose(currentPose, robotToTurret);
 
               double yVelocity =
-                  yController.calculate(
-                      currentPose.getY(), targetPose.getTranslation().getY());
+                  yController.calculate(currentPose.getY(), targetPose.getTranslation().getY());
               double omega =
                   angleController.calculate(
-                      currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+                      currentPose.getRotation().getRadians(),
+                      targetPose.getRotation().getRadians());
 
               ChassisSpeeds speeds = new ChassisSpeeds(0.0, yVelocity, omega);
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+              drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
             },
             drive)
         .beforeStarting(
@@ -251,8 +250,7 @@ public class DriveCommands {
             DISTANCE_KP,
             0.0,
             DISTANCE_KD,
-            new TrapezoidProfile.Constraints(
-                DISTANCE_MAX_VELOCITY, DISTANCE_MAX_ACCELERATION));
+            new TrapezoidProfile.Constraints(DISTANCE_MAX_VELOCITY, DISTANCE_MAX_ACCELERATION));
 
     return Commands.run(
             () -> {
@@ -266,8 +264,7 @@ public class DriveCommands {
               Translation2d fieldVelocity = translationDirection.times(speedMetersPerSecond);
               ChassisSpeeds speeds =
                   new ChassisSpeeds(fieldVelocity.getX(), fieldVelocity.getY(), 0.0);
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+              drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
             },
             drive)
         .beforeStarting(
@@ -437,7 +434,8 @@ public class DriveCommands {
   }
 
   public static Pose2d getHubLineTargetPose(Pose2d currentPose, Translation2d robotToTurret) {
-    Translation2d provisionalTranslation = new Translation2d(currentPose.getX(), hubTranslation.getY());
+    Translation2d provisionalTranslation =
+        new Translation2d(currentPose.getX(), hubTranslation.getY());
     Rotation2d targetHeading = getBackFacingHeading(provisionalTranslation, currentPose);
     double targetRobotY = hubTranslation.getY() - robotToTurret.rotateBy(targetHeading).getY();
     Translation2d targetTranslation = new Translation2d(currentPose.getX(), targetRobotY);
@@ -453,8 +451,7 @@ public class DriveCommands {
     return robotToHub.getAngle().rotateBy(new Rotation2d(Math.PI));
   }
 
-  public static double getTurretDistanceToHubMeters(
-      Pose2d robotPose, Translation2d robotToTurret) {
+  public static double getTurretDistanceToHubMeters(Pose2d robotPose, Translation2d robotToTurret) {
     return robotPose
         .transformBy(new Transform2d(robotToTurret, Rotation2d.kZero))
         .getTranslation()

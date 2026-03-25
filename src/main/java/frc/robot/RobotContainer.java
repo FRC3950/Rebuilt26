@@ -26,9 +26,9 @@ import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -60,7 +60,8 @@ public class RobotContainer {
   static final String LEFT_TURRET_FLYWHEEL_RPS_KEY = "Left Turret Flywheel RPS";
   static final String RUN_LEFT_TURRET_KEY = "Run Left Turret";
   static final String LEFT_TURRET_DISTANCE_TO_HUB_KEY = "Left Turret Distance To Hub M";
-  static final String TARGET_LEFT_TURRET_DISTANCE_TO_HUB_KEY = "Target Left Turret Distance To Hub M";
+  static final String TARGET_LEFT_TURRET_DISTANCE_TO_HUB_KEY =
+      "Target Left Turret Distance To Hub M";
   static final String SET_LEFT_TURRET_DISTANCE_KEY = "Set Left Turret Distance";
 
   private final Drive drive;
@@ -181,8 +182,7 @@ public class RobotContainer {
     SmartDashboard.putNumber(LEFT_TURRET_HOOD_ANGLE_KEY, minHoodAngle);
     SmartDashboard.putNumber(LEFT_TURRET_FLYWHEEL_RPS_KEY, minFlywheelRps);
     SmartDashboard.putBoolean(RUN_LEFT_TURRET_KEY, false);
-    SmartDashboard.putNumber(
-        LEFT_TURRET_DISTANCE_TO_HUB_KEY, getLeftTurretDistanceToHubMeters());
+    SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_TO_HUB_KEY, getLeftTurretDistanceToHubMeters());
     SmartDashboard.putNumber(
         TARGET_LEFT_TURRET_DISTANCE_TO_HUB_KEY, getLeftTurretDistanceToHubMeters());
     SmartDashboard.putBoolean(SET_LEFT_TURRET_DISTANCE_KEY, false);
@@ -319,7 +319,8 @@ public class RobotContainer {
   }
 
   private double getLeftTurretDistanceToHubMeters() {
-    return TurretTargeting.getDistanceToTargetMeters(drive.getPose(), robotToTurret1, hubTranslation);
+    return TurretTargeting.getDistanceToTargetMeters(
+        drive.getPose(), robotToTurret1, hubTranslation);
   }
 
   private double getTargetLeftTurretDistanceToHubMeters() {

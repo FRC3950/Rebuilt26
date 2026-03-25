@@ -106,7 +106,8 @@ class DriveCommandsTest {
   void zeroHubVectorFallsBackSafely() {
     Translation2d robotToTurret = Constants.SubsystemConstants.Turret.robotToTurret1;
     Pose2d robotPose =
-        new Pose2d(hubTranslation.minus(robotToTurret.rotateBy(Rotation2d.kZero)), Rotation2d.kZero);
+        new Pose2d(
+            hubTranslation.minus(robotToTurret.rotateBy(Rotation2d.kZero)), Rotation2d.kZero);
 
     Translation2d direction =
         DriveCommands.getHubDistanceTranslationDirection(robotPose, robotToTurret);

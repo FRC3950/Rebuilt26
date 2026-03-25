@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 class TurretTargetingTest {
   @Test
   void manualSetpointsOnlyRunWhenEnabledInManualMode() {
-    assertTrue(TurretTargeting.shouldRunManualSetpoints(OutputMode.MANUAL_SETPOINTS_WHEN_ENABLED, true));
+    assertTrue(
+        TurretTargeting.shouldRunManualSetpoints(OutputMode.MANUAL_SETPOINTS_WHEN_ENABLED, true));
     assertFalse(
-        TurretTargeting.shouldRunManualSetpoints(
-            OutputMode.MANUAL_SETPOINTS_WHEN_ENABLED, false));
+        TurretTargeting.shouldRunManualSetpoints(OutputMode.MANUAL_SETPOINTS_WHEN_ENABLED, false));
     assertFalse(TurretTargeting.shouldRunManualSetpoints(OutputMode.AZIMUTH_ONLY, true));
   }
 }
