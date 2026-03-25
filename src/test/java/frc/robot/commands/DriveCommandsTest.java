@@ -16,10 +16,18 @@ class DriveCommandsTest {
   void hubLineTargetPosePreservesXAndSnapsYToHub() {
     Pose2d currentPose = new Pose2d(3.2, 1.4, Rotation2d.fromDegrees(20.0));
 
-    Pose2d targetPose = DriveCommands.getHubLineTargetPose(currentPose);
+    Pose2d targetPose =
+        DriveCommands.getHubLineTargetPose(
+            currentPose, Constants.SubsystemConstants.Turret.robotToTurret1);
 
     assertEquals(currentPose.getX(), targetPose.getX(), 1e-9);
-    assertEquals(hubTranslation.getY(), targetPose.getY(), 1e-9);
+    Translation2d turretTranslation =
+        targetPose
+            .transformBy(
+                new edu.wpi.first.math.geometry.Transform2d(
+                    Constants.SubsystemConstants.Turret.robotToTurret1, Rotation2d.kZero))
+            .getTranslation();
+    assertEquals(hubTranslation.getY(), turretTranslation.getY(), 1e-9);
   }
 
   @Test

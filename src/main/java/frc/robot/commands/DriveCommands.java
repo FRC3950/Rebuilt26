@@ -199,7 +199,7 @@ public class DriveCommands {
   }
 
   /** Aligns the robot so its Y position matches the hub and the back of the robot faces the hub. */
-  public static Command alignRobotToHubLine(Drive drive) {
+  public static Command alignRobotToHubLine(Drive drive, Translation2d robotToTurret) {
     ProfiledPIDController yController =
         new ProfiledPIDController(
             ALIGN_Y_KP,
@@ -217,7 +217,7 @@ public class DriveCommands {
     return Commands.run(
             () -> {
               Pose2d currentPose = drive.getPose();
-              Pose2d targetPose = getHubLineTargetPose(currentPose);
+              Pose2d targetPose = getHubLineTargetPose(currentPose, robotToTurret);
 
               double yVelocity =
                   yController.calculate(
@@ -234,7 +234,7 @@ public class DriveCommands {
         .beforeStarting(
             () -> {
               Pose2d currentPose = drive.getPose();
-              Pose2d targetPose = getHubLineTargetPose(currentPose);
+              Pose2d targetPose = getHubLineTargetPose(currentPose, robotToTurret);
               yController.reset(currentPose.getY());
               angleController.reset(currentPose.getRotation().getRadians());
               yController.setGoal(targetPose.getY());
@@ -422,10 +422,12 @@ public class DriveCommands {
     double gyroDelta = 0.0;
   }
 
-  public static Pose2d getHubLineTargetPose(Pose2d currentPose) {
-    Translation2d targetTranslation =
-        new Translation2d(currentPose.getX(), hubTranslation.getY());
-    return new Pose2d(targetTranslation, getBackFacingHeading(targetTranslation, currentPose));
+  public static Pose2d getHubLineTargetPose(Pose2d currentPose, Translation2d robotToTurret) {
+    Translation2d provisionalTranslation = new Translation2d(currentPose.getX(), hubTranslation.getY());
+    Rotation2d targetHeading = getBackFacingHeading(provisionalTranslation, currentPose);
+    double targetRobotY = hubTranslation.getY() - robotToTurret.rotateBy(targetHeading).getY();
+    Translation2d targetTranslation = new Translation2d(currentPose.getX(), targetRobotY);
+    return new Pose2d(targetTranslation, targetHeading);
   }
 
   public static Rotation2d getBackFacingHeading(

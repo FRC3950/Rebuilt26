@@ -241,7 +241,7 @@ public class RobotContainer {
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                 drive));
 
-    driver.a().whileTrue(DriveCommands.alignRobotToHubLine(drive));
+    driver.a().whileTrue(DriveCommands.alignRobotToHubLine(drive, robotToTurret1));
 
     operator
         .b()
