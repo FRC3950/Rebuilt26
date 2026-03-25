@@ -31,6 +31,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
@@ -58,6 +59,9 @@ public class RobotContainer {
   static final String LEFT_TURRET_HOOD_ANGLE_KEY = "Left Turret Hood Angle Deg";
   static final String LEFT_TURRET_FLYWHEEL_RPS_KEY = "Left Turret Flywheel RPS";
   static final String RUN_LEFT_TURRET_KEY = "Run Left Turret";
+  static final String LEFT_TURRET_DISTANCE_TO_HUB_KEY = "Left Turret Distance To Hub M";
+  static final String TARGET_LEFT_TURRET_DISTANCE_TO_HUB_KEY = "Target Left Turret Distance To Hub M";
+  static final String SET_LEFT_TURRET_DISTANCE_KEY = "Set Left Turret Distance";
 
   private final Drive drive;
   private final Turret turret1;
@@ -70,6 +74,7 @@ public class RobotContainer {
   private final CommandXboxController operator = new CommandXboxController(1);
 
   private final LoggedDashboardChooser<Command> autoChooser;
+  private boolean previousSetLeftTurretDistance = false;
 
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -176,6 +181,11 @@ public class RobotContainer {
     SmartDashboard.putNumber(LEFT_TURRET_HOOD_ANGLE_KEY, minHoodAngle);
     SmartDashboard.putNumber(LEFT_TURRET_FLYWHEEL_RPS_KEY, minFlywheelRps);
     SmartDashboard.putBoolean(RUN_LEFT_TURRET_KEY, false);
+    SmartDashboard.putNumber(
+        LEFT_TURRET_DISTANCE_TO_HUB_KEY, getLeftTurretDistanceToHubMeters());
+    SmartDashboard.putNumber(
+        TARGET_LEFT_TURRET_DISTANCE_TO_HUB_KEY, getLeftTurretDistanceToHubMeters());
+    SmartDashboard.putBoolean(SET_LEFT_TURRET_DISTANCE_KEY, false);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
 
@@ -185,6 +195,16 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public void periodic() {
+    SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_TO_HUB_KEY, getLeftTurretDistanceToHubMeters());
+
+    boolean setLeftTurretDistance = getSetLeftTurretDistance();
+    if (shouldStartDistanceCommand(previousSetLeftTurretDistance, setLeftTurretDistance)) {
+      scheduleLeftTurretDistanceCommand();
+    }
+    previousSetLeftTurretDistance = setLeftTurretDistance;
   }
 
   private void configureBindings() {
@@ -276,5 +296,36 @@ public class RobotContainer {
 
   private boolean getRunLeftTurret() {
     return SmartDashboard.getBoolean(RUN_LEFT_TURRET_KEY, false);
+  }
+
+  private double getLeftTurretDistanceToHubMeters() {
+    return TurretTargeting.getDistanceToTargetMeters(drive.getPose(), robotToTurret1, hubTranslation);
+  }
+
+  private double getTargetLeftTurretDistanceToHubMeters() {
+    return Math.max(
+        0.0,
+        SmartDashboard.getNumber(
+            TARGET_LEFT_TURRET_DISTANCE_TO_HUB_KEY, getLeftTurretDistanceToHubMeters()));
+  }
+
+  private boolean getSetLeftTurretDistance() {
+    return SmartDashboard.getBoolean(SET_LEFT_TURRET_DISTANCE_KEY, false);
+  }
+
+  private void scheduleLeftTurretDistanceCommand() {
+    Command distanceCommand =
+        DriveCommands.driveLeftTurretToHubDistance(
+                drive, robotToTurret1, getTargetLeftTurretDistanceToHubMeters())
+            .finallyDo(
+                () -> {
+                  SmartDashboard.putBoolean(SET_LEFT_TURRET_DISTANCE_KEY, false);
+                  previousSetLeftTurretDistance = false;
+                });
+    CommandScheduler.getInstance().schedule(distanceCommand);
+  }
+
+  static boolean shouldStartDistanceCommand(boolean previousToggle, boolean currentToggle) {
+    return !previousToggle && currentToggle;
   }
 }

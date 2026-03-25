@@ -43,6 +43,11 @@ public class DriveCommands {
   private static final double ALIGN_Y_KD = 0.0;
   private static final double ALIGN_Y_MAX_VELOCITY = 2.0;
   private static final double ALIGN_Y_MAX_ACCELERATION = 4.0;
+  private static final double DISTANCE_KP = 2.0;
+  private static final double DISTANCE_KD = 0.0;
+  private static final double DISTANCE_MAX_VELOCITY = 2.0;
+  private static final double DISTANCE_MAX_ACCELERATION = 4.0;
+  private static final double DISTANCE_TOLERANCE_METERS = 0.05;
   private static final double FF_START_DELAY = 2.0; // Secs
   private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
@@ -223,8 +228,7 @@ public class DriveCommands {
 
               ChassisSpeeds speeds = new ChassisSpeeds(0.0, yVelocity, omega);
               drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds, AllianceFlipUtil.apply(drive.getRotation())));
+                  ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
             },
             drive)
         .beforeStarting(
@@ -236,6 +240,48 @@ public class DriveCommands {
               yController.setGoal(targetPose.getY());
               angleController.setGoal(targetPose.getRotation().getRadians());
             });
+  }
+
+  /** Drives the robot until turret 1 reaches the requested distance from the hub. */
+  public static Command driveLeftTurretToHubDistance(
+      Drive drive, Translation2d robotToTurret, double targetDistanceMeters) {
+    ProfiledPIDController distanceController =
+        new ProfiledPIDController(
+            DISTANCE_KP,
+            0.0,
+            DISTANCE_KD,
+            new TrapezoidProfile.Constraints(
+                DISTANCE_MAX_VELOCITY, DISTANCE_MAX_ACCELERATION));
+
+    return Commands.run(
+            () -> {
+              Pose2d currentPose = drive.getPose();
+              double currentDistance = getTurretDistanceToHubMeters(currentPose, robotToTurret);
+              Translation2d translationDirection =
+                  getHubDistanceTranslationDirection(currentPose, robotToTurret);
+              double speedMetersPerSecond =
+                  distanceController.calculate(currentDistance, targetDistanceMeters);
+
+              Translation2d fieldVelocity = translationDirection.times(speedMetersPerSecond);
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(fieldVelocity.getX(), fieldVelocity.getY(), 0.0);
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+            },
+            drive)
+        .beforeStarting(
+            () -> {
+              double currentDistance = getTurretDistanceToHubMeters(drive.getPose(), robotToTurret);
+              distanceController.reset(currentDistance);
+              distanceController.setGoal(targetDistanceMeters);
+              distanceController.setTolerance(DISTANCE_TOLERANCE_METERS);
+            })
+        .until(
+            () ->
+                isWithinDistanceTolerance(
+                    getTurretDistanceToHubMeters(drive.getPose(), robotToTurret),
+                    targetDistanceMeters))
+        .finallyDo(drive::stop);
   }
 
   /**
@@ -389,5 +435,39 @@ public class DriveCommands {
       return fallbackPoseForHeading.getRotation();
     }
     return robotToHub.getAngle().rotateBy(new Rotation2d(Math.PI));
+  }
+
+  public static double getTurretDistanceToHubMeters(
+      Pose2d robotPose, Translation2d robotToTurret) {
+    return robotPose
+        .transformBy(new Transform2d(robotToTurret, Rotation2d.kZero))
+        .getTranslation()
+        .getDistance(hubTranslation);
+  }
+
+  public static Translation2d getHubDistanceTranslationDirection(
+      Pose2d robotPose, Translation2d robotToTurret) {
+    Translation2d turretTranslation =
+        robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero)).getTranslation();
+    Translation2d hubToTurret = turretTranslation.minus(hubTranslation);
+    if (hubToTurret.getNorm() < 1e-6) {
+      return new Translation2d(1.0, 0.0);
+    }
+    return hubToTurret.div(hubToTurret.getNorm());
+  }
+
+  public static Pose2d getLeftTurretHubDistanceTargetPose(
+      Pose2d robotPose, Translation2d robotToTurret, double targetDistanceMeters) {
+    Translation2d direction = getHubDistanceTranslationDirection(robotPose, robotToTurret);
+    Translation2d targetTurretTranslation =
+        hubTranslation.plus(direction.times(targetDistanceMeters));
+    Translation2d robotToTurretField = robotToTurret.rotateBy(robotPose.getRotation());
+    Translation2d targetRobotTranslation = targetTurretTranslation.minus(robotToTurretField);
+    return new Pose2d(targetRobotTranslation, robotPose.getRotation());
+  }
+
+  public static boolean isWithinDistanceTolerance(
+      double currentDistanceMeters, double targetDistanceMeters) {
+    return Math.abs(currentDistanceMeters - targetDistanceMeters) <= DISTANCE_TOLERANCE_METERS;
   }
 }
