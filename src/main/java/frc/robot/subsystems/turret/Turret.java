@@ -21,7 +21,7 @@ public class Turret extends SubsystemBase {
   private final double minAzimuthControlAngleDeg;
   private final double maxAzimuthControlAngleDeg;
 
-  private static boolean lockedIn = true;
+  private static boolean lockedIn = false;
 
   // private final Mechanism2d mechanism;
   // private final MechanismRoot2d mechRoot;
