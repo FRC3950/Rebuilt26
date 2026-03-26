@@ -1,7 +1,7 @@
 package frc.robot;
 
-import static frc.robot.Constants.FieldConstants.hubTranslation;
 import static frc.robot.Constants.FieldConstants.getCloserFerryTarget;
+import static frc.robot.Constants.FieldConstants.hubTranslation;
 import static frc.robot.Constants.FieldConstants.isRobotInNeutralZone;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_1;
@@ -229,16 +229,18 @@ public class RobotContainer {
                 }));
     Trigger neutralZoneFerryTrigger =
         new Trigger(competitionButtonLoop, () -> isRobotInNeutralZone(drive.getPose().getX()));
-    neutralZoneFerryTrigger
-        .whileTrue(
-            Commands.parallel(
-                new TurretTargeting(
-                    turret1, drive, robotToTurret1, () -> getCloserFerryTarget(drive.getPose().getTranslation())),
-                new TurretTargeting(
-                    turret2,
-                    drive,
-                    robotToTurret2,
-                    () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
+    neutralZoneFerryTrigger.whileTrue(
+        Commands.parallel(
+            new TurretTargeting(
+                turret1,
+                drive,
+                robotToTurret1,
+                () -> getCloserFerryTarget(drive.getPose().getTranslation())),
+            new TurretTargeting(
+                turret2,
+                drive,
+                robotToTurret2,
+                () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
 
     operator.rightBumper(competitionButtonLoop).onTrue(intake.retractCommand());
 

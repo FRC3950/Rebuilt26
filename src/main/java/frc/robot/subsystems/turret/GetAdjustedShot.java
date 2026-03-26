@@ -16,7 +16,7 @@ import java.util.List;
 
 public class GetAdjustedShot {
   private static final int LOOKAHEAD_ITERATIONS = 10;
-  private static final double SHOT_EXTRA_LATENCY_SECS = 0.0;
+  private static final double SHOT_EXTRA_LATENCY_SECS = 0.05;
 
   private final LinearFilter turretAngleFilter =
       LinearFilter.movingAverage((int) Math.max(1, Math.round(0.1 / Constants.loopPeriodSecs)));

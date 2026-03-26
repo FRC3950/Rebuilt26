@@ -1,7 +1,7 @@
 package frc.robot.controls;
 
-import static frc.robot.Constants.FieldConstants.hubTranslation;
 import static frc.robot.Constants.FieldConstants.getCloserFerryTarget;
+import static frc.robot.Constants.FieldConstants.hubTranslation;
 import static frc.robot.Constants.FieldConstants.isRobotInNeutralZone;
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1;
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
@@ -45,19 +45,18 @@ public final class CrazyModeBindings {
 
     Trigger neutralZoneFerryTrigger =
         new Trigger(buttonLoop, () -> isRobotInNeutralZone(drive.getPose().getX()));
-    neutralZoneFerryTrigger
-        .whileTrue(
-            Commands.parallel(
-                new TurretTargeting(
-                    turret1,
-                    drive,
-                    robotToTurret1,
-                    () -> getCloserFerryTarget(drive.getPose().getTranslation())),
-                new TurretTargeting(
-                    turret2,
-                    drive,
-                    robotToTurret2,
-                    () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
+    neutralZoneFerryTrigger.whileTrue(
+        Commands.parallel(
+            new TurretTargeting(
+                turret1,
+                drive,
+                robotToTurret1,
+                () -> getCloserFerryTarget(drive.getPose().getTranslation())),
+            new TurretTargeting(
+                turret2,
+                drive,
+                robotToTurret2,
+                () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
 
     driver.rightBumper(buttonLoop).onTrue(intake.retractCommand());
 
