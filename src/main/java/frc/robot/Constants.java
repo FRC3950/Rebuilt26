@@ -130,8 +130,8 @@ public final class Constants {
         flywheelConfig.Slot0.kV = flywheelKV;
         flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         flywheelConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = .1;
-        flywheelConfig.CurrentLimits.StatorCurrentLimit = 120;
-        flywheelConfig.CurrentLimits.SupplyCurrentLimit = 80;
+        flywheelConfig.CurrentLimits.StatorCurrentLimit = 80;
+        flywheelConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       }
 
       private static void applyAzimuthConfig(
@@ -162,6 +162,8 @@ public final class Constants {
                 * azimuthGearRatio;
         config.CurrentLimits.StatorCurrentLimit = 60;
         config.CurrentLimits.SupplyCurrentLimit = 30;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
       }
     }
 
@@ -195,12 +197,15 @@ public final class Constants {
         pivotConfig.MotionMagic.MotionMagicCruiseVelocity = pivotMMVelocity;
         pivotConfig.CurrentLimits.StatorCurrentLimit = 80;
         pivotConfig.CurrentLimits.SupplyCurrentLimit = 40;
+        pivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         // Intake Motor Config
         intakeConfig.Slot0.kP = intakeKP;
         intakeConfig.Slot0.kV = intakeKV;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         intakeConfig.CurrentLimits.StatorCurrentLimit = 80;
+        intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       }
     }
 
@@ -224,13 +229,18 @@ public final class Constants {
         indexerConfig.Slot0.kP = indexerKP;
         indexerConfig.Slot0.kV = indexerKV;
         indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        indexerConfig.CurrentLimits.StatorCurrentLimit = 120;
-        indexerConfig.CurrentLimits.SupplyCurrentLimit = 70;
+        indexerConfig.CurrentLimits.StatorCurrentLimit = 80;
+        indexerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        indexerConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        indexerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         hotdogConfig.Slot0.kP = hotdogKP;
         hotdogConfig.Slot0.kV = hotdogKV;
         hotdogConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         hotdogConfig.CurrentLimits.StatorCurrentLimit = 80;
+        hotdogConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        hotdogConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
       }
     }
     // Josh wrote this part of the code, easter egg of 2026

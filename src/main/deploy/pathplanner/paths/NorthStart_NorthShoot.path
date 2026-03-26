@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.004200014467592,
-        "y": 7.391634837962963
+        "x": 3.8264531435349944,
+        "y": 7.41876631079478
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4261712239583333,
-        "y": 7.352334129050925
+        "x": 3.2484243530257353,
+        "y": 7.3794656018827425
       },
       "isLocked": false,
       "linkedName": "NorthTrench Start"
@@ -53,7 +53,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
