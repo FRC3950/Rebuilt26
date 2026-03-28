@@ -10,6 +10,10 @@
     {
       "axis": "z",
       "degrees": 90
+    },
+    {
+      "axis": "y",
+      "degrees": -90
     }
   ],
   "position": [
@@ -54,9 +58,9 @@
         }
       ],
       "position": [
-        0.3491738,
+        0.3396488,
         -0.073025,
-        0.1890522
+        0.189992
       ],
       "resolution": [
         1280,
@@ -75,6 +79,10 @@
         {
           "axis": "z",
           "degrees": 90
+        },
+        {
+          "axis": "y",
+          "degrees": -90
         }
       ],
       "zeroedPosition": [
@@ -92,6 +100,10 @@
         {
           "axis": "z",
           "degrees": 90
+        },
+        {
+          "axis": "y",
+          "degrees": -90
         }
       ],
       "zeroedPosition": [
