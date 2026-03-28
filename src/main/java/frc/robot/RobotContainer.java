@@ -49,6 +49,7 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
+import frc.robot.subsystems.turret.TurretVisualization;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -66,6 +67,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Turret turret1;
   private final Turret turret2;
+  private final TurretVisualization turretVisualization;
   private final Vision vision;
   private final Intake intake;
   private final Indexer indexer;
@@ -152,6 +154,7 @@ public class RobotContainer {
             flywheelConfig,
             flywheelFollowerID2,
             CANivore);
+    turretVisualization = new TurretVisualization(turret1, turret2);
 
     intake = new Intake();
     indexer = new Indexer();

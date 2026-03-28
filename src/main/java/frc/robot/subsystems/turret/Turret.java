@@ -6,7 +6,11 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.turret.turret_base.Azimuth;
 import frc.robot.subsystems.turret.turret_base.Flywheels;
@@ -42,6 +46,15 @@ public class Turret extends SubsystemBase {
     hood = new Hood(hoodChannelId);
     flywheels = new Flywheels(flywheelID, flywheelConfig, flywheelFollowerID, canbus);
     azimuth = new Azimuth(azimuthID, azimuthConfig, canbus);
+  }
+
+  /** Returns the live turret pose with robot-relative translation and measured azimuth. */
+  public Pose3d getRobotPose3d(Translation2d robotToTurret) {
+    return new Pose3d(
+        robotToTurret.getX(),
+        robotToTurret.getY(),
+        0.325,
+        new Rotation3d(0.0, 0.0, Units.degreesToRadians(azimuth.getMotorAngleDeg())));
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
