@@ -117,16 +117,25 @@ public class FuelSimulationController {
 
   public void initializeSimulation() {
     fuelSim.stop();
-    fuelSim.clearFuel();
-    if (spawnStartingFuelOnInitialize) {
-      fuelSim.spawnStartingFuel();
-    }
-    FuelSim.Hub.BLUE_HUB.resetScore();
-    FuelSim.Hub.RED_HUB.resetScore();
+    resetFieldFuel(spawnStartingFuelOnInitialize);
     currentFuelCapacity = 0;
     outtakeAccumulator = 0.0;
     Arrays.fill(shotAccumulators, 0.0);
     fuelSim.start();
+    logState();
+  }
+
+  public void resetFieldFuelToStartingConfiguration() {
+    resetFieldFuel(true);
+  }
+
+  private void resetFieldFuel(boolean spawnStartingFuel) {
+    fuelSim.clearFuel();
+    if (spawnStartingFuel) {
+      fuelSim.spawnStartingFuel();
+    }
+    FuelSim.Hub.BLUE_HUB.resetScore();
+    FuelSim.Hub.RED_HUB.resetScore();
     logState();
   }
 

@@ -103,6 +103,27 @@ class FuelSimulationControllerTest {
   }
 
   @Test
+  void resetFieldFuelRestoresStartingLayoutAndHubScoresWithoutClearingStorage() {
+    TestContext context = new TestContext(() -> 1);
+    context.controller.initializeSimulation();
+    context.intakeDown.value = true;
+    context.intakeRollerSpeed.value = 40.0;
+
+    spawnFuelInIntake(context, 0.0);
+    context.controller.stepSimulation();
+    context.fuelSim.clearFuel();
+    FuelSim.Hub.BLUE_HUB.score = 4;
+    FuelSim.Hub.RED_HUB.score = 2;
+
+    context.controller.resetFieldFuelToStartingConfiguration();
+
+    assertEquals(1, context.controller.getCurrentFuelCapacity());
+    assertTrue(context.fuelSim.fuels.size() > 0);
+    assertEquals(0, FuelSim.Hub.BLUE_HUB.getScore());
+    assertEquals(0, FuelSim.Hub.RED_HUB.getScore());
+  }
+
+  @Test
   void outtakeWaveCanSpawnThreeBallsAtOnce() {
     TestContext context = new TestContext(() -> 3);
     context.controller.initializeSimulation();

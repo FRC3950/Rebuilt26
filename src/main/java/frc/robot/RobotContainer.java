@@ -181,6 +181,10 @@ public class RobotContainer {
                   turret2::getCommandedHoodAngleDeg,
                   turret2::getCommandedFlywheelRps));
       simulationCommand = new FuelSimCommand(fuelSimulationController);
+      SmartDashboard.putData(
+          "Fuel Sim/Reset Field Fuel",
+          Commands.runOnce(fuelSimulationController::resetFieldFuelToStartingConfiguration)
+              .ignoringDisable(true));
     } else {
       simulationCommand = null;
     }
