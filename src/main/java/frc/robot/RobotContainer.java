@@ -1,7 +1,7 @@
 package frc.robot;
 
 import static frc.robot.Constants.FieldConstants.getCloserFerryTarget;
-import static frc.robot.Constants.FieldConstants.hubTranslation;
+import static frc.robot.Constants.FieldConstants.getHubTranslation;
 import static frc.robot.Constants.FieldConstants.isRobotInNeutralZone;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_1;
@@ -275,7 +275,8 @@ public class RobotContainer {
                 () -> -driver.getLeftY(),
                 () -> -driver.getLeftX(),
                 () -> {
-                  Translation2d robotToHub = hubTranslation.minus(drive.getPose().getTranslation());
+                  Translation2d robotToHub =
+                      getHubTranslation().minus(drive.getPose().getTranslation());
                   return new Rotation2d(robotToHub.getX(), robotToHub.getY())
                       .rotateBy(new Rotation2d(Math.PI));
                 }));

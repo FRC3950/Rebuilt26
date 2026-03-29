@@ -62,7 +62,7 @@ public class GetAdjustedShot {
   }
 
   public ShootingParameters getParameters(Pose2d robotPose, Translation2d robotToTurret) {
-    return getParameters(robotPose, new ChassisSpeeds(), hubTranslation, robotToTurret);
+    return getParameters(robotPose, new ChassisSpeeds(), getHubTranslation(), robotToTurret);
   }
 
   public ShootingParameters getParameters(
@@ -72,7 +72,7 @@ public class GetAdjustedShot {
 
   public ShootingParameters getParameters(
       Pose2d robotPose, ChassisSpeeds fieldVelocity, Translation2d robotToTurret) {
-    return getParameters(robotPose, fieldVelocity, hubTranslation, robotToTurret);
+    return getParameters(robotPose, fieldVelocity, getHubTranslation(), robotToTurret);
   }
 
   public ShootingParameters getParameters(

@@ -252,18 +252,11 @@ public final class Constants {
     // position of Hub
     public static final Translation2d hubGuy = new Translation2d(4.6256194, 4.0346376);
 
-    public static final Translation2d hubTranslation = AllianceFlipUtil.apply(hubGuy);
     // Field dimensions in meters (blue-origin WPILib frame).
     public static final double fieldWidth = 8.0756125;
     public static final double fieldLength = 16.5411785;
     // positions of ferry shot targets
     // 1 foot = 0.3048 meters
-
-    //
-    public static final Translation2d leftFerryTarget =
-        AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 1.5, hubGuy.getY() + 2));
-    public static final Translation2d rightFerryTarget =
-        AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 1.5, hubGuy.getY() - 2));
 
     public static final double neutralZoneMinX = 5.1816;
     public static final double neutralZoneMaxX = 11.303;
@@ -272,11 +265,25 @@ public final class Constants {
 
     public static final double scoreTime = 0.25;
 
+    public static Translation2d getHubTranslation() {
+      return AllianceFlipUtil.apply(hubGuy);
+    }
+
+    public static Translation2d getLeftFerryTarget() {
+      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 1.5, hubGuy.getY() + 2));
+    }
+
+    public static Translation2d getRightFerryTarget() {
+      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 1.5, hubGuy.getY() - 2));
+    }
+
     public static boolean isRobotInNeutralZone(double robotXMeters) {
       return robotXMeters >= neutralZoneMinX && robotXMeters <= neutralZoneMaxX;
     }
 
     public static Translation2d getCloserFerryTarget(Translation2d robotTranslation) {
+      Translation2d leftFerryTarget = getLeftFerryTarget();
+      Translation2d rightFerryTarget = getRightFerryTarget();
       return robotTranslation.getDistance(leftFerryTarget)
               <= robotTranslation.getDistance(rightFerryTarget)
           ? leftFerryTarget

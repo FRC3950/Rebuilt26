@@ -1,7 +1,7 @@
 package frc.robot.controls;
 
 import static frc.robot.Constants.FieldConstants.getCloserFerryTarget;
-import static frc.robot.Constants.FieldConstants.hubTranslation;
+import static frc.robot.Constants.FieldConstants.getHubTranslation;
 import static frc.robot.Constants.FieldConstants.isRobotInNeutralZone;
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1;
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
@@ -88,7 +88,8 @@ public final class CrazyModeBindings {
                 () -> -driver.getLeftY(),
                 () -> -driver.getLeftX(),
                 () -> {
-                  Translation2d robotToHub = hubTranslation.minus(drive.getPose().getTranslation());
+                  Translation2d robotToHub =
+                      getHubTranslation().minus(drive.getPose().getTranslation());
                   return new Rotation2d(robotToHub.getX(), robotToHub.getY())
                       .rotateBy(new Rotation2d(Math.PI));
                 }));
