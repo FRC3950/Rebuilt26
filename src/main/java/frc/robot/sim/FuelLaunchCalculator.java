@@ -46,7 +46,8 @@ public class FuelLaunchCalculator {
 
         double horizontalSpeedMetersPerSecond = row.d / row.tof;
         double verticalSpeedMetersPerSecond =
-            (FuelSim.Hub.ENTRY_HEIGHT - TURRET_LAUNCH_HEIGHT_METERS
+            (FuelSim.Hub.ENTRY_HEIGHT
+                    - TURRET_LAUNCH_HEIGHT_METERS
                     + 0.5 * 9.81 * row.tof * row.tof)
                 / row.tof;
         double launchAngleDeg =
@@ -73,14 +74,11 @@ public class FuelLaunchCalculator {
 
     static LaunchCalibration identity() {
       return new LaunchCalibration(
-          List.of(
-              new CalibrationPoint(0.0, 0.0),
-              new CalibrationPoint(90.0, 90.0)),
+          List.of(new CalibrationPoint(0.0, 0.0), new CalibrationPoint(90.0, 90.0)),
           List.of(
               new CalibrationPoint(0.0, 0.0),
               new CalibrationPoint(
-                  100.0,
-                  2.0 * Math.PI * EFFECTIVE_FLYWHEEL_RADIUS_METERS * 100.0)));
+                  100.0, 2.0 * Math.PI * EFFECTIVE_FLYWHEEL_RADIUS_METERS * 100.0)));
     }
 
     double launchAngleForHoodDeg(double hoodAngleDeg) {
@@ -180,7 +178,9 @@ public class FuelLaunchCalculator {
       double outtakeSpeedMetersPerSecond,
       double lateralOffsetMeters) {
     Translation2d fieldOffset =
-        INTAKE_CENTER.plus(new Translation2d(0.0, lateralOffsetMeters)).rotateBy(robotPose.getRotation());
+        INTAKE_CENTER
+            .plus(new Translation2d(0.0, lateralOffsetMeters))
+            .rotateBy(robotPose.getRotation());
     Translation2d fieldPosition = robotPose.getTranslation().plus(fieldOffset);
     double fieldYawRadians = robotPose.getRotation().getRadians();
 

@@ -149,9 +149,7 @@ class FuelSimulationControllerTest {
   private static void spawnFuelInIntake(TestContext context, double yOffsetMeters) {
     context.fuelSim.spawnFuel(
         new Translation3d(
-            INTAKE_CENTER.getX() + 0.05,
-            INTAKE_CENTER.getY() + yOffsetMeters,
-            FuelSim.FUEL_RADIUS),
+            INTAKE_CENTER.getX() + 0.05, INTAKE_CENTER.getY() + yOffsetMeters, FuelSim.FUEL_RADIUS),
         new Translation3d());
   }
 

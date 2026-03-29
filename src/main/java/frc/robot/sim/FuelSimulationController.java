@@ -7,10 +7,10 @@ import static frc.robot.Constants.SimConstants.Fuel.INTAKE_Y_MAX_METERS;
 import static frc.robot.Constants.SimConstants.Fuel.INTAKE_Y_MIN_METERS;
 import static frc.robot.Constants.SimConstants.Fuel.MAX_FUEL_CAPACITY;
 import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_BALLS_PER_SECOND;
+import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_SPEED_METERS_PER_SECOND;
 import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_WAVE_MAX_BALLS;
 import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_WAVE_MIN_BALLS;
 import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_WAVE_SPACING_METERS;
-import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_SPEED_METERS_PER_SECOND;
 import static frc.robot.Constants.SimConstants.Fuel.ROBOT_LENGTH_METERS;
 import static frc.robot.Constants.SimConstants.Fuel.ROBOT_WIDTH_METERS;
 import static frc.robot.Constants.SimConstants.Fuel.SHOOT_BALLS_PER_SECOND_PER_TURRET;
@@ -21,11 +21,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
-import java.util.concurrent.ThreadLocalRandom;
 import org.littletonrobotics.junction.Logger;
 
 public class FuelSimulationController {
@@ -66,8 +66,7 @@ public class FuelSimulationController {
         intakeDownSupplier,
         shootingSupplier,
         () ->
-            ThreadLocalRandom.current()
-                .nextInt(OUTTAKE_WAVE_MIN_BALLS, OUTTAKE_WAVE_MAX_BALLS + 1),
+            ThreadLocalRandom.current().nextInt(OUTTAKE_WAVE_MIN_BALLS, OUTTAKE_WAVE_MAX_BALLS + 1),
         true,
         turretSources);
   }
