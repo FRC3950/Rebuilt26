@@ -7,6 +7,9 @@ import static frc.robot.Constants.SimConstants.Fuel.INTAKE_Y_MAX_METERS;
 import static frc.robot.Constants.SimConstants.Fuel.INTAKE_Y_MIN_METERS;
 import static frc.robot.Constants.SimConstants.Fuel.MAX_FUEL_CAPACITY;
 import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_BALLS_PER_SECOND;
+import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_WAVE_MAX_BALLS;
+import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_WAVE_MIN_BALLS;
+import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_WAVE_SPACING_METERS;
 import static frc.robot.Constants.SimConstants.Fuel.OUTTAKE_SPEED_METERS_PER_SECOND;
 import static frc.robot.Constants.SimConstants.Fuel.ROBOT_LENGTH_METERS;
 import static frc.robot.Constants.SimConstants.Fuel.ROBOT_WIDTH_METERS;
@@ -20,7 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
+import java.util.concurrent.ThreadLocalRandom;
 import org.littletonrobotics.junction.Logger;
 
 public class FuelSimulationController {
@@ -37,6 +42,7 @@ public class FuelSimulationController {
   private final DoubleSupplier intakeRollerSpeedSupplier;
   private final BooleanSupplier intakeDownSupplier;
   private final BooleanSupplier shootingSupplier;
+  private final IntSupplier outtakeWaveSizeSupplier;
   private final List<TurretSimSource> turretSources;
   private final boolean spawnStartingFuelOnInitialize;
 
@@ -59,6 +65,9 @@ public class FuelSimulationController {
         intakeRollerSpeedSupplier,
         intakeDownSupplier,
         shootingSupplier,
+        () ->
+            ThreadLocalRandom.current()
+                .nextInt(OUTTAKE_WAVE_MIN_BALLS, OUTTAKE_WAVE_MAX_BALLS + 1),
         true,
         turretSources);
   }
@@ -71,6 +80,7 @@ public class FuelSimulationController {
       DoubleSupplier intakeRollerSpeedSupplier,
       BooleanSupplier intakeDownSupplier,
       BooleanSupplier shootingSupplier,
+      IntSupplier outtakeWaveSizeSupplier,
       boolean spawnStartingFuelOnInitialize,
       TurretSimSource... turretSources) {
     this.fuelSim = fuelSim;
@@ -80,6 +90,7 @@ public class FuelSimulationController {
     this.intakeRollerSpeedSupplier = intakeRollerSpeedSupplier;
     this.intakeDownSupplier = intakeDownSupplier;
     this.shootingSupplier = shootingSupplier;
+    this.outtakeWaveSizeSupplier = outtakeWaveSizeSupplier;
     this.turretSources = List.of(turretSources);
     this.spawnStartingFuelOnInitialize = spawnStartingFuelOnInitialize;
     this.shotAccumulators = new double[turretSources.length];
@@ -188,11 +199,24 @@ public class FuelSimulationController {
 
     outtakeAccumulator += OUTTAKE_BALLS_PER_SECOND * Constants.loopPeriodSecs;
     while (outtakeAccumulator >= 1.0 && currentFuelCapacity > 0) {
-      var launch =
-          launchCalculator.calculateOuttakeLaunch(
-              robotPose, fieldSpeeds, FuelSim.FUEL_RADIUS, OUTTAKE_SPEED_METERS_PER_SECOND);
-      fuelSim.spawnFuel(launch.position(), launch.velocity());
-      currentFuelCapacity--;
+      int waveBallCount =
+          Math.min(
+              currentFuelCapacity,
+              Math.max(
+                  OUTTAKE_WAVE_MIN_BALLS,
+                  Math.min(OUTTAKE_WAVE_MAX_BALLS, outtakeWaveSizeSupplier.getAsInt())));
+      for (int i = 0; i < waveBallCount; i++) {
+        double lateralOffsetMeters = (i - (waveBallCount - 1) / 2.0) * OUTTAKE_WAVE_SPACING_METERS;
+        var launch =
+            launchCalculator.calculateOuttakeLaunch(
+                robotPose,
+                fieldSpeeds,
+                FuelSim.FUEL_RADIUS,
+                OUTTAKE_SPEED_METERS_PER_SECOND,
+                lateralOffsetMeters);
+        fuelSim.spawnFuel(launch.position(), launch.velocity());
+        currentFuelCapacity--;
+      }
       outtakeAccumulator -= 1.0;
     }
 

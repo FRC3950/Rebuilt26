@@ -15,7 +15,8 @@ class FuelLaunchCalculatorTest {
 
   @Test
   void turretLaunchUsesOffsetAndAddsRobotVelocity() {
-    FuelLaunchCalculator calculator = new FuelLaunchCalculator();
+    FuelLaunchCalculator calculator =
+        new FuelLaunchCalculator(FuelLaunchCalculator.LaunchCalibration.identity());
     Pose2d robotPose = new Pose2d(1.0, 2.0, Rotation2d.kCCW_90deg);
     ChassisSpeeds fieldSpeeds = new ChassisSpeeds(1.0, 0.5, 0.0);
     Translation2d robotToTurret = new Translation2d(0.2, -0.1);

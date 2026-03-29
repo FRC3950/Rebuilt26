@@ -297,9 +297,15 @@ public final class Constants {
       public static final double SHOOT_BALLS_PER_SECOND_PER_TURRET = 4.0;
       public static final double OUTTAKE_BALLS_PER_SECOND = SHOOT_BALLS_PER_SECOND_PER_TURRET;
       public static final double OUTTAKE_SPEED_METERS_PER_SECOND = 2.0;
+      public static final int OUTTAKE_WAVE_MIN_BALLS = 1;
+      public static final int OUTTAKE_WAVE_MAX_BALLS = 3;
+      public static final double OUTTAKE_WAVE_SPACING_METERS = 0.17;
       public static final double EFFECTIVE_FLYWHEEL_RADIUS_METERS = Units.inchesToMeters(2.0);
       public static final double EXIT_VELOCITY_SCALE = 1.0;
-      public static final double TURRET_LAUNCH_HEIGHT_METERS = 0.325;
+      // From AScope Assets/Robot_Chuck Norris/config.json component zeroedPosition z = -0.325.
+      public static final double TURRET_COMPONENT_Z_OFFSET_METERS = 0.325;
+      public static final double TURRET_LAUNCH_HEIGHT_METERS =
+          TURRET_COMPONENT_Z_OFFSET_METERS + 0.12;
       public static final double BUMPER_HEIGHT_METERS = Units.inchesToMeters(5.0);
       public static final double ROBOT_WIDTH_METERS = 0.889;
       public static final double ROBOT_LENGTH_METERS = 0.864;

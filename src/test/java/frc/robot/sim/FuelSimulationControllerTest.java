@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
@@ -22,15 +23,18 @@ class FuelSimulationControllerTest {
 
   @Test
   void intakeStopsAtMaxCapacityAndLeavesExtraFuelOnField() {
-    TestContext context = new TestContext();
+    TestContext context = new TestContext(() -> 1);
     context.controller.initializeSimulation();
     context.intakeDown.value = true;
     context.intakeRollerSpeed.value = 40.0;
 
-    for (int i = 0; i < MAX_FUEL_CAPACITY + 1; i++) {
-      spawnFuelInIntake(context, -0.12 + 0.05 * i);
+    for (int i = 0; i < MAX_FUEL_CAPACITY - 1; i++) {
+      spawnFuelInIntake(context, 0.0);
+      context.controller.stepSimulation();
     }
 
+    spawnFuelInIntake(context, -0.05);
+    spawnFuelInIntake(context, 0.05);
     context.controller.stepSimulation();
 
     assertEquals(MAX_FUEL_CAPACITY, context.controller.getCurrentFuelCapacity());
@@ -39,7 +43,7 @@ class FuelSimulationControllerTest {
 
   @Test
   void dualTurretShootingDrainsSharedCapacityAtDoubleRate() {
-    TestContext context = new TestContext();
+    TestContext context = new TestContext(() -> 1);
     context.controller.initializeSimulation();
     context.intakeDown.value = true;
     context.intakeRollerSpeed.value = 40.0;
@@ -62,7 +66,7 @@ class FuelSimulationControllerTest {
 
   @Test
   void outtakeSpawnsFuelFromIntakeAndDrainsStoredCapacity() {
-    TestContext context = new TestContext();
+    TestContext context = new TestContext(() -> 1);
     context.controller.initializeSimulation();
     context.intakeDown.value = true;
     context.intakeRollerSpeed.value = 40.0;
@@ -85,7 +89,7 @@ class FuelSimulationControllerTest {
 
   @Test
   void commandInitializesStepsAndStopsController() {
-    TestContext context = new TestContext();
+    TestContext context = new TestContext(() -> 1);
     FuelSimCommand command = new FuelSimCommand(context.controller);
 
     command.initialize();
@@ -98,10 +102,35 @@ class FuelSimulationControllerTest {
     assertEquals(stopCallsAfterInitialize + 1, context.fuelSim.stopCalls);
   }
 
+  @Test
+  void outtakeWaveCanSpawnThreeBallsAtOnce() {
+    TestContext context = new TestContext(() -> 3);
+    context.controller.initializeSimulation();
+    context.intakeDown.value = true;
+    context.intakeRollerSpeed.value = 40.0;
+
+    spawnFuelInIntake(context, -0.05);
+    spawnFuelInIntake(context, 0.0);
+    spawnFuelInIntake(context, 0.05);
+    context.controller.stepSimulation();
+    assertEquals(3, context.controller.getCurrentFuelCapacity());
+
+    context.intakeRollerSpeed.value = -45.0;
+    int spawnCountBeforeOuttake = context.fuelSim.spawnCount;
+    for (int i = 0; i < 13; i++) {
+      context.controller.stepSimulation();
+    }
+
+    assertEquals(0, context.controller.getCurrentFuelCapacity());
+    assertEquals(3, context.fuelSim.spawnCount - spawnCountBeforeOuttake);
+  }
+
   private static void spawnFuelInIntake(TestContext context, double yOffsetMeters) {
     context.fuelSim.spawnFuel(
         new Translation3d(
-            INTAKE_CENTER.getX(), INTAKE_CENTER.getY() + yOffsetMeters, FuelSim.FUEL_RADIUS),
+            INTAKE_CENTER.getX() + 0.05,
+            INTAKE_CENTER.getY() + yOffsetMeters,
+            FuelSim.FUEL_RADIUS),
         new Translation3d());
   }
 
@@ -112,22 +141,24 @@ class FuelSimulationControllerTest {
     final MutableBooleanSupplier intakeDown = new MutableBooleanSupplier();
     final MutableBooleanSupplier shooting = new MutableBooleanSupplier();
     final TestFuelSim fuelSim = new TestFuelSim();
-    final FuelSimulationController controller =
-        new FuelSimulationController(
-            fuelSim,
-            new FuelLaunchCalculator(),
-            pose,
-            speeds,
-            intakeRollerSpeed,
-            intakeDown,
-            shooting,
-            false,
-            new FuelSimulationController.TurretSimSource(
-                robotToTurret1, () -> 0.0, () -> 20.0, () -> 30.0),
-            new FuelSimulationController.TurretSimSource(
-                robotToTurret2, () -> 0.0, () -> 20.0, () -> 30.0));
+    final FuelSimulationController controller;
 
-    TestContext() {
+    TestContext(IntSupplier outtakeWaveSizeSupplier) {
+      controller =
+          new FuelSimulationController(
+              fuelSim,
+              new FuelLaunchCalculator(FuelLaunchCalculator.LaunchCalibration.identity()),
+              pose,
+              speeds,
+              intakeRollerSpeed,
+              intakeDown,
+              shooting,
+              outtakeWaveSizeSupplier,
+              false,
+              new FuelSimulationController.TurretSimSource(
+                  robotToTurret1, () -> 0.0, () -> 20.0, () -> 30.0),
+              new FuelSimulationController.TurretSimSource(
+                  robotToTurret2, () -> 0.0, () -> 20.0, () -> 30.0));
       pose.value = new Pose2d(0.0, 0.0, Rotation2d.kZero);
       speeds.value = new ChassisSpeeds();
     }
