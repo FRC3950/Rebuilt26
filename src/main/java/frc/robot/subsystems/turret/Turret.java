@@ -94,6 +94,18 @@ public class Turret extends SubsystemBase {
     return lockedIn;
   }
 
+  public double getCommandedAzimuthDeg() {
+    return azimuth.getSetpointDeg();
+  }
+
+  public double getCommandedHoodAngleDeg() {
+    return hood.getSetpointDeg();
+  }
+
+  public double getCommandedFlywheelRps() {
+    return flywheels.getTargetRps();
+  }
+
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
     double referenceSetpointDegrees =
         MathUtil.clamp(

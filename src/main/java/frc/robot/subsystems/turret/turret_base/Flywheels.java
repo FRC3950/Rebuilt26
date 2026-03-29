@@ -17,6 +17,7 @@ public class Flywheels {
   private final TalonFX flywheelFollower;
 
   private final VelocityVoltage velocityVoltage = new VelocityVoltage(0);
+  private double targetRps = 0.0;
 
   public Flywheels(
       int flywheelID, TalonFXConfiguration flywheelConfig, int flywheelFollowerID, CANBus canbus) {
@@ -28,9 +29,14 @@ public class Flywheels {
   }
 
   public void setTargetRps(double flywheelSpeedRps) {
-    double targetVel = flywheelSpeedRps * flywheelGearRatio;
+    targetRps = MathUtil.clamp(flywheelSpeedRps, minFlywheelRps, maxFlywheelRps);
+    double targetVel = targetRps * flywheelGearRatio;
     flywheel.setControl(
-        velocityVoltage.withVelocity(MathUtil.clamp(targetVel, minFlywheelRps, maxFlywheelRps)));
+        velocityVoltage.withVelocity(
+            MathUtil.clamp(
+                targetVel,
+                minFlywheelRps * flywheelGearRatio,
+                maxFlywheelRps * flywheelGearRatio)));
   }
 
   public double getVelocityRps() {
@@ -39,5 +45,9 @@ public class Flywheels {
 
   public double getFollowerVelocityRps() {
     return flywheelFollower.getVelocity().getValueAsDouble();
+  }
+
+  public double getTargetRps() {
+    return targetRps;
   }
 }

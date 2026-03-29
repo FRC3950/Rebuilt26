@@ -20,6 +20,8 @@ public class Intake extends SubsystemBase {
   private final TalonFX pivotMotor;
   private final MotionMagicVoltage mmRequest = new MotionMagicVoltage(0);
   private final VelocityVoltage intakeControlRequest = new VelocityVoltage(0);
+  private double commandedRollerSpeed = 0.0;
+  private double pivotSetpoint = upPos;
   private boolean isIntaking = false;
 
   /** Creates a new intake. */
@@ -32,6 +34,8 @@ public class Intake extends SubsystemBase {
   }
 
   public void setIntakeSpeed(double speed) {
+    commandedRollerSpeed = speed;
+    isIntaking = speed > 0.0;
     intakeMotor.setControl(intakeControlRequest.withVelocity(speed));
   }
 
@@ -55,15 +59,16 @@ public class Intake extends SubsystemBase {
   }
 
   public void setPivotPosition(double position) {
+    pivotSetpoint = position;
     pivotMotor.setControl(mmRequest.withPosition(position));
   }
 
   public void extend() {
-    pivotMotor.setControl(mmRequest.withPosition(downPos));
+    setPivotPosition(downPos);
   }
 
   public void retract() {
-    pivotMotor.setControl(mmRequest.withPosition(upPos));
+    setPivotPosition(upPos);
   }
 
   public boolean isAcceptablePosition(double targetPos) {
@@ -73,6 +78,18 @@ public class Intake extends SubsystemBase {
   @AutoLogOutput(key = "Intake/Pivot Position")
   public double getPivotPosition() {
     return pivotMotor.getPosition().getValueAsDouble();
+  }
+
+  public double getCommandedRollerSpeed() {
+    return commandedRollerSpeed;
+  }
+
+  public double getPivotSetpoint() {
+    return pivotSetpoint;
+  }
+
+  public boolean isPivotCommandedDown() {
+    return Math.abs(pivotSetpoint - downPos) < 1e-9;
   }
 
   public Command extendCommand() {

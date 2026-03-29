@@ -24,6 +24,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  */
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
+  private Command simulationCommand;
   private RobotContainer robotContainer;
 
   public Robot() {
@@ -144,7 +145,12 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    simulationCommand = robotContainer.getSimulationCommand();
+    if (simulationCommand != null) {
+      CommandScheduler.getInstance().schedule(simulationCommand);
+    }
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override

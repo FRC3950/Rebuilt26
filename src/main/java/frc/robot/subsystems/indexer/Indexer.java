@@ -20,6 +20,8 @@ public class Indexer extends SubsystemBase {
 
   private final VelocityVoltage indexerControl = new VelocityVoltage(0);
   private final VelocityVoltage hotdogControl = new VelocityVoltage(0);
+  private double commandedIndexerSpeed = 0.0;
+  private double commandedHotdogSpeed = 0.0;
 
   public Indexer() {
     hotdogMotor = new TalonFX(hotdogMotorID, CANivore);
@@ -30,6 +32,7 @@ public class Indexer extends SubsystemBase {
   }
 
   public void setIndexerSpeed(double speed) {
+    commandedIndexerSpeed = speed;
     indexerMotor.setControl(indexerControl.withVelocity(speed));
   }
 
@@ -47,6 +50,7 @@ public class Indexer extends SubsystemBase {
   }
 
   public void setHotdogSpeed(double speed) {
+    commandedHotdogSpeed = speed;
     hotdogMotor.setControl(hotdogControl.withVelocity(speed));
   }
 
@@ -61,6 +65,18 @@ public class Indexer extends SubsystemBase {
   @AutoLogOutput(key = "Indexer/Hotdog Speed")
   public double getHotdogCurrentSpeed() {
     return hotdogMotor.getVelocity().getValueAsDouble();
+  }
+
+  public double getCommandedIndexerSpeed() {
+    return commandedIndexerSpeed;
+  }
+
+  public double getCommandedHotdogSpeed() {
+    return commandedHotdogSpeed;
+  }
+
+  public boolean isFeedingForward() {
+    return commandedIndexerSpeed > 0.0 && commandedHotdogSpeed > 0.0;
   }
 
   public Command feedCommand() {

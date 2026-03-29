@@ -39,6 +39,8 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.controls.CrazyModeBindings;
 import frc.robot.generated.TunerConstants;
+import frc.robot.sim.FuelSimCommand;
+import frc.robot.sim.FuelSimulationController;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -71,6 +73,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Intake intake;
   private final Indexer indexer;
+  private final Command simulationCommand;
 
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
@@ -159,6 +162,29 @@ public class RobotContainer {
     intake = new Intake();
     indexer = new Indexer();
 
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      FuelSimulationController fuelSimulationController =
+          new FuelSimulationController(
+              drive::getPose,
+              drive::getFieldRelativeSpeeds,
+              intake::getCommandedRollerSpeed,
+              intake::isPivotCommandedDown,
+              indexer::isFeedingForward,
+              new FuelSimulationController.TurretSimSource(
+                  robotToTurret1,
+                  turret1::getCommandedAzimuthDeg,
+                  turret1::getCommandedHoodAngleDeg,
+                  turret1::getCommandedFlywheelRps),
+              new FuelSimulationController.TurretSimSource(
+                  robotToTurret2,
+                  turret2::getCommandedAzimuthDeg,
+                  turret2::getCommandedHoodAngleDeg,
+                  turret2::getCommandedFlywheelRps));
+      simulationCommand = new FuelSimCommand(fuelSimulationController);
+    } else {
+      simulationCommand = null;
+    }
+
     NamedCommands.registerCommand("Extend Intake", intake.extendCommand());
     NamedCommands.registerCommand("Start Intake", intake.onIntake());
     NamedCommands.registerCommand("Stop Intake", intake.offIntake());
@@ -200,6 +226,10 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public Command getSimulationCommand() {
+    return simulationCommand;
   }
 
   public void checkMode() {

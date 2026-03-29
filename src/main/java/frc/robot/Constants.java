@@ -290,4 +290,29 @@ public final class Constants {
           : rightFerryTarget;
     }
   }
+
+  public static final class SimConstants {
+    public static final class Fuel {
+      public static final int MAX_FUEL_CAPACITY = 40;
+      public static final double SHOOT_BALLS_PER_SECOND_PER_TURRET = 4.0;
+      public static final double OUTTAKE_BALLS_PER_SECOND = SHOOT_BALLS_PER_SECOND_PER_TURRET;
+      public static final double OUTTAKE_SPEED_METERS_PER_SECOND = 2.0;
+      public static final double EFFECTIVE_FLYWHEEL_RADIUS_METERS = Units.inchesToMeters(2.0);
+      public static final double EXIT_VELOCITY_SCALE = 1.0;
+      public static final double TURRET_LAUNCH_HEIGHT_METERS = 0.325;
+      public static final double BUMPER_HEIGHT_METERS = Units.inchesToMeters(5.0);
+      public static final double ROBOT_WIDTH_METERS = 0.889;
+      public static final double ROBOT_LENGTH_METERS = 0.864;
+      public static final Translation2d INTAKE_CENTER = new Translation2d(0.528, 0.0);
+      public static final double INTAKE_LENGTH_METERS = 0.193;
+      public static final double INTAKE_WIDTH_METERS = 0.700;
+
+      public static final double INTAKE_X_MIN_METERS =
+          INTAKE_CENTER.getX() - INTAKE_LENGTH_METERS / 2.0;
+      public static final double INTAKE_X_MAX_METERS =
+          INTAKE_CENTER.getX() + INTAKE_LENGTH_METERS / 2.0;
+      public static final double INTAKE_Y_MIN_METERS = -INTAKE_WIDTH_METERS / 2.0;
+      public static final double INTAKE_Y_MAX_METERS = INTAKE_WIDTH_METERS / 2.0;
+    }
+  }
 }
