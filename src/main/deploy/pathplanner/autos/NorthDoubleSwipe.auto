@@ -13,7 +13,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Center_CenterBack"
+            "pathName": "NorthStoot_NeutralOne"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralOne_NorthStoot"
           }
         },
         {
@@ -25,7 +31,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 4.0
           }
         },
         {
@@ -35,21 +41,15 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Start Intake"
+            "pathName": "NorthStoot_NeutralTwo"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenterBack_Depot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Depot_CenterBack"
+            "pathName": "NeutralTwo_NorthStoot"
           }
         },
         {

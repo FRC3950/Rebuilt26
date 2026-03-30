@@ -3,52 +3,59 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.6955278766310802,
-        "y": 5.966275207591934
+        "x": 7.81811387900356,
+        "y": 4.815041518386713
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1695373665426634,
-        "y": 5.98779359430605
+        "x": 7.81811387900356,
+        "y": 7.558635824436537
       },
       "isLocked": false,
-      "linkedName": "Depot"
+      "linkedName": "NorthNeutralSecondSwipe"
     },
     {
       "anchor": {
-        "x": 2.1802965598997206,
-        "y": 4.029620403321471
+        "x": 3.8264531435349944,
+        "y": 7.41876631079478
       },
       "prevControl": {
-        "x": 2.1695373665426634,
-        "y": 5.977034400948992
+        "x": 6.214994068801899,
+        "y": 7.41876631079478
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Center_Back"
+      "linkedName": "NorthStoot"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Stop Intake",
+      "waypointRelativePos": 0.5491585473870666,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
-    "nominalVoltage": 12.0,
+    "nominalVoltage": 11.25,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -179.45948981286938
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }
