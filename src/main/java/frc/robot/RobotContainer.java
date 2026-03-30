@@ -236,6 +236,12 @@ public class RobotContainer {
     return simulationCommand;
   }
 
+  public void stopAutonomousActions() {
+    intake.stopIntake();
+    indexer.stopIndexer();
+    indexer.stopHotdog();
+  }
+
   public void checkMode() {
     BindingMode selectedBindingMode = getSelectedBindingMode();
     SmartDashboard.putString("Code Mode/Selected", selectedBindingMode.name());

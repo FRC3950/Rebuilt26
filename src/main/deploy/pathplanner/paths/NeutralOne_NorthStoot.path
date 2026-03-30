@@ -41,7 +41,12 @@
       "name": "Stop Intake",
       "waypointRelativePos": 0.3,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Stop Intake"
+        }
+      }
     }
   ],
   "globalConstraints": {
