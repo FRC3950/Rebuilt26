@@ -120,7 +120,7 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     // Clear any autonomous/pathplanner work before teleop defaults and bindings take over.
     robotContainer.stopAutonomousActions();
-    
+
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }

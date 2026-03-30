@@ -26,8 +26,12 @@ class PathPlannerEventMarkerConfigTest {
           JSONObject markerJson = (JSONObject) markerObject;
           assertNotNull(
               markerJson.get("command"),
-              () -> "Event marker '" + markerJson.get("name") + "' in " + pathFile
-                  + " is missing its command payload.");
+              () ->
+                  "Event marker '"
+                      + markerJson.get("name")
+                      + "' in "
+                      + pathFile
+                      + " is missing its command payload.");
         }
       }
     }
