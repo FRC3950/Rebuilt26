@@ -72,15 +72,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Start Intake",
-      "waypointRelativePos": 0.5,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Start Intake"
-        }
-      }
+      "name": "Intake Zone",
+      "waypointRelativePos": 0.7475642161204679,
+      "endWaypointRelativePos": 2.0,
+      "command": null
     }
   ],
   "globalConstraints": {
