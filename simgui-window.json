@@ -19,22 +19,22 @@
     "###/SmartDashboard/Auto Choices: ": {
       "Collapsed": "0",
       "Pos": "172,54",
-      "Size": "366,66"
+      "Size": "259,54"
     },
     "###/SmartDashboard/Turret Subsystem": {
       "Collapsed": "0",
-      "Pos": "60,60",
-      "Size": "385,110"
+      "Pos": "1,362",
+      "Size": "271,86"
     },
     "###FMS": {
       "Collapsed": "0",
       "Pos": "9,525",
-      "Size": "244,244"
+      "Size": "283,140"
     },
     "###Joysticks": {
       "Collapsed": "0",
       "Pos": "239,458",
-      "Size": "1156,310"
+      "Size": "796,155"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
@@ -69,7 +69,7 @@
     "###Timing": {
       "Collapsed": "0",
       "Pos": "5,150",
-      "Size": "197,186"
+      "Size": "141,150"
     },
     "Debug##Default": {
       "Collapsed": "0",
