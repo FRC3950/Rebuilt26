@@ -9,6 +9,7 @@
       "/SmartDashboard/Auto Choices: ": "String Chooser",
       "/SmartDashboard/Auto Winner Override": "String Chooser",
       "/SmartDashboard/Code Mode": "String Chooser",
+      "/SmartDashboard/Fuel Sim/Reset Field Fuel": "Command",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/PhotonAlerts": "Alerts",
       "/SmartDashboard/Turret Mechanism": "Mechanism2d",

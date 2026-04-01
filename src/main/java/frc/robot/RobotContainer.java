@@ -24,8 +24,6 @@ import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -196,7 +194,6 @@ public class RobotContainer {
     NamedCommands.registerCommand("Stop Intake", intake.offIntake());
     NamedCommands.registerCommand(
         "Intake While Held", Commands.startEnd(intake::startIntake, intake::stopIntake, intake));
-    new EventTrigger("Intake Zone").whileTrue(NamedCommands.getCommand("Intake While Held"));
     NamedCommands.registerCommand("Start Hotdog", Commands.runOnce(indexer::startHotdog, indexer));
     NamedCommands.registerCommand("Stop Hotdog", Commands.runOnce(indexer::stopHotdog, indexer));
 
