@@ -32,3 +32,6 @@ out/
 
 #SIM
 *.dat
+
+#Random
+.log
