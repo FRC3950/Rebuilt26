@@ -321,22 +321,19 @@ public class RobotContainer {
                 }));
     operator
         .b(competitionButtonLoop)
-        .and(operator.start(competitionButtonLoop).negate())
-        .whileTrue(Commands.startEnd(() -> intake.setIntakeSpeed(-45), intake::stopIntake, intake));
-    operator
-        .start(competitionButtonLoop)
-        .and(operator.b(competitionButtonLoop))
         .whileTrue(
             Commands.startEnd(
                 () -> {
-                  indexer.setIndexerSpeed(-Constants.SubsystemConstants.Indexer.indexerSpeed);
-                  indexer.setHotdogSpeed(-Constants.SubsystemConstants.Indexer.hotdogSpeed);
+                  intake.reverseIntake();
+                  indexer.reverseHotdog();
                 },
                 () -> {
-                  indexer.stopIndexer();
+                  intake.stopIntake();
                   indexer.stopHotdog();
                 },
+                intake,
                 indexer));
+
     operator
         .a(competitionButtonLoop)
         .onTrue(Commands.runOnce(Turret::toggleTurretMode))

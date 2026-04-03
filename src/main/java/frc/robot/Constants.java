@@ -176,6 +176,7 @@ public final class Constants {
       public static final double upPos = 0;
 
       public static final double mintakeSpeed = 40;
+      public static final double unjamSpeed = -50;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
       public static final double intakeKP = 0.1;
       public static final double intakeKV = 0.12;
@@ -215,6 +216,7 @@ public final class Constants {
 
       public static final double indexerSpeed = 50.0; // RPS
       public static final double hotdogSpeed = 40.0; // RPS
+      public static final double unjamHotdog = -50;
 
       public static final TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration hotdogConfig = new TalonFXConfiguration();
