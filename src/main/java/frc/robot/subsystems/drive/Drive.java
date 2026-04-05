@@ -41,8 +41,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.SubsystemConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
+import java.util.function.BooleanSupplier;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -84,6 +86,8 @@ public class Drive extends SubsystemBase {
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine translationSysId;
   private final SysIdRoutine rotationSysId;
+  private final BooleanSupplier intakeActiveSupplier;
+  private final BooleanSupplier feedActiveSupplier;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
@@ -101,11 +105,15 @@ public class Drive extends SubsystemBase {
 
   public Drive(
       GyroIO gyroIO,
+      BooleanSupplier intakeActiveSupplier,
+      BooleanSupplier feedActiveSupplier,
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO) {
     this.gyroIO = gyroIO;
+    this.intakeActiveSupplier = intakeActiveSupplier;
+    this.feedActiveSupplier = feedActiveSupplier;
     modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
     modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
     modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
@@ -394,6 +402,10 @@ public class Drive extends SubsystemBase {
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
+    if (DriverStation.isTeleopEnabled()
+        && (intakeActiveSupplier.getAsBoolean() || feedActiveSupplier.getAsBoolean())) {
+      return SubsystemConstants.Drive.reducedSpeed;
+    }
     return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
   }
 

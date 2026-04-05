@@ -53,6 +53,7 @@ public final class Constants {
       public static final int bRightEncoderID = 42;
 
       public static final int pigeonID = 46;
+      public static final double reducedSpeed = 2.5;
     }
 
     public static final class Turret {

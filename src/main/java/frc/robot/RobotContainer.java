@@ -87,11 +87,16 @@ public class RobotContainer {
   private BindingMode appliedBindingMode = BindingMode.COMPETITION;
 
   public RobotContainer() {
+    intake = new Intake();
+    indexer = new Indexer();
+
     switch (Constants.currentMode) {
       case REAL:
         drive =
             new Drive(
                 new GyroIOPigeon2(),
+                intake::isIntaking,
+                indexer::isFeedingForward,
                 new ModuleIOTalonFX(TunerConstants.FrontLeft),
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
@@ -108,6 +113,8 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
+                intake::isIntaking,
+                indexer::isFeedingForward,
                 new ModuleIOSim(TunerConstants.FrontLeft),
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
@@ -126,6 +133,8 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
+                intake::isIntaking,
+                indexer::isFeedingForward,
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
@@ -158,9 +167,6 @@ public class RobotContainer {
             flywheelFollowerID2,
             CANivore);
     turretVisualization = new TurretVisualization(turret1, turret2);
-
-    intake = new Intake();
-    indexer = new Indexer();
 
     if (Constants.currentMode == Constants.Mode.SIM) {
       FuelSimulationController fuelSimulationController =
