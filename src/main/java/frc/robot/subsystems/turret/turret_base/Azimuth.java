@@ -31,6 +31,10 @@ public class Azimuth {
     return Units.rotationsToDegrees(azimuthRotations / azimuthGearRatio);
   }
 
+  public double getMeasuredAngleDeg() {
+    return getMotorAngleDeg();
+  }
+
   public double getSetpointDeg() {
     return lastSetpointDeg;
   }

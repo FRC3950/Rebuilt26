@@ -43,6 +43,10 @@ public class Flywheels {
     return flywheel.getVelocity().getValueAsDouble();
   }
 
+  public double getMeasuredVelocityRps() {
+    return getVelocityRps();
+  }
+
   public double getFollowerVelocityRps() {
     return flywheelFollower.getVelocity().getValueAsDouble();
   }

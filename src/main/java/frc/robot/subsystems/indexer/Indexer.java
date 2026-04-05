@@ -75,10 +75,17 @@ public class Indexer extends SubsystemBase {
     return commandedIndexerSpeed;
   }
 
+  @AutoLogOutput(key = "Indexer/Commanded Hotdog Speed")
   public double getCommandedHotdogSpeed() {
     return commandedHotdogSpeed;
   }
 
+  @AutoLogOutput(key = "Indexer/Commanded Indexer Speed")
+  public double getLoggedCommandedIndexerSpeed() {
+    return getCommandedIndexerSpeed();
+  }
+
+  @AutoLogOutput(key = "Indexer/Feeding Forward")
   public boolean isFeedingForward() {
     return commandedIndexerSpeed > 0.0 && commandedHotdogSpeed > 0.0;
   }

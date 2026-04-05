@@ -88,8 +88,14 @@ public class Intake extends SubsystemBase {
     return commandedRollerSpeed;
   }
 
+  @AutoLogOutput(key = "Intake/Pivot Setpoint")
   public double getPivotSetpoint() {
     return pivotSetpoint;
+  }
+
+  @AutoLogOutput(key = "Intake/Commanded Roller Speed")
+  public double getLoggedCommandedRollerSpeed() {
+    return getCommandedRollerSpeed();
   }
 
   public boolean isPivotCommandedDown() {

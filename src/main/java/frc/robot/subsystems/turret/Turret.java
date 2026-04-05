@@ -16,6 +16,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.turret.turret_base.Azimuth;
 import frc.robot.subsystems.turret.turret_base.Flywheels;
 import frc.robot.subsystems.turret.turret_base.Hood;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Turret extends SubsystemBase {
   private static final double ANGLE_WRAP_DEGREES = 360.0;
@@ -42,6 +43,7 @@ public class Turret extends SubsystemBase {
       TalonFXConfiguration flywheelConfig,
       int flywheelFollowerID,
       CANBus canbus) {
+    setName("Turret" + azimuthID);
     this.minAzimuthControlAngleDeg = minAzimuthControlAngleDeg;
     this.maxAzimuthControlAngleDeg = maxAzimuthControlAngleDeg;
     hood = new Hood(hoodChannelId);
@@ -94,16 +96,39 @@ public class Turret extends SubsystemBase {
     return lockedIn;
   }
 
+  @AutoLogOutput
   public double getCommandedAzimuthDeg() {
     return azimuth.getSetpointDeg();
   }
 
+  @AutoLogOutput
   public double getCommandedHoodAngleDeg() {
     return hood.getSetpointDeg();
   }
 
+  @AutoLogOutput
   public double getCommandedFlywheelRps() {
     return flywheels.getTargetRps();
+  }
+
+  @AutoLogOutput
+  public double getMeasuredAzimuthDeg() {
+    return azimuth.getMeasuredAngleDeg();
+  }
+
+  @AutoLogOutput
+  public double getMeasuredFlywheelRps() {
+    return flywheels.getMeasuredVelocityRps();
+  }
+
+  @AutoLogOutput
+  public double getMeasuredFlywheelFollowerRps() {
+    return flywheels.getFollowerVelocityRps();
+  }
+
+  @AutoLogOutput
+  public boolean isTargetingLocked() {
+    return getTargetingMode();
   }
 
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
