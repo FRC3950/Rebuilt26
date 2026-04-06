@@ -39,6 +39,10 @@ public class Intake extends SubsystemBase {
     intakeMotor.setControl(intakeControlRequest.withVelocity(speed));
   }
 
+  public void reverseIntake(){
+    intakeMotor.setControl(intakeControlRequest.withVelocity(unjamSpeed));
+  }
+
   public void startIntake() {
     isIntaking = true;
     setIntakeSpeed(mintakeSpeed + 8);
@@ -84,8 +88,14 @@ public class Intake extends SubsystemBase {
     return commandedRollerSpeed;
   }
 
+  @AutoLogOutput(key = "Intake/Pivot Setpoint")
   public double getPivotSetpoint() {
     return pivotSetpoint;
+  }
+
+  @AutoLogOutput(key = "Intake/Commanded Roller Speed")
+  public double getLoggedCommandedRollerSpeed() {
+    return getCommandedRollerSpeed();
   }
 
   public boolean isPivotCommandedDown() {

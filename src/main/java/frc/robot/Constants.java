@@ -53,6 +53,7 @@ public final class Constants {
       public static final int bRightEncoderID = 42;
 
       public static final int pigeonID = 46;
+      public static final double reducedSpeed = 2.5;
     }
 
     public static final class Turret {
@@ -176,6 +177,7 @@ public final class Constants {
       public static final double upPos = 0;
 
       public static final double mintakeSpeed = 60;
+      public static final double unjamSpeed = -50;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
       public static final double intakeKP = 0.35;
       public static final double intakeKV = 0.105;
@@ -221,6 +223,7 @@ public final class Constants {
 
       public static final double indexerSpeed = 50.0; // RPS
       public static final double hotdogSpeed = 65; // RPS
+      public static final double unjamHotdog = -50;
 
       public static final TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration hotdogConfig = new TalonFXConfiguration();

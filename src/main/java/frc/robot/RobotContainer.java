@@ -87,11 +87,16 @@ public class RobotContainer {
   private BindingMode appliedBindingMode = BindingMode.COMPETITION;
 
   public RobotContainer() {
+    intake = new Intake();
+    indexer = new Indexer();
+
     switch (Constants.currentMode) {
       case REAL:
         drive =
             new Drive(
                 new GyroIOPigeon2(),
+                intake::isIntaking,
+                indexer::isFeedingForward,
                 new ModuleIOTalonFX(TunerConstants.FrontLeft),
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
@@ -108,6 +113,8 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
+                intake::isIntaking,
+                indexer::isFeedingForward,
                 new ModuleIOSim(TunerConstants.FrontLeft),
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
@@ -126,6 +133,8 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIO() {},
+                intake::isIntaking,
+                indexer::isFeedingForward,
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
@@ -158,9 +167,6 @@ public class RobotContainer {
             flywheelFollowerID2,
             CANivore);
     turretVisualization = new TurretVisualization(turret1, turret2);
-
-    intake = new Intake();
-    indexer = new Indexer();
 
     if (Constants.currentMode == Constants.Mode.SIM) {
       FuelSimulationController fuelSimulationController =
@@ -325,22 +331,19 @@ public class RobotContainer {
                 }));
     operator
         .b(competitionButtonLoop)
-        .and(operator.start(competitionButtonLoop).negate())
-        .whileTrue(Commands.startEnd(() -> intake.setIntakeSpeed(-45), intake::stopIntake, intake));
-    operator
-        .start(competitionButtonLoop)
-        .and(operator.b(competitionButtonLoop))
         .whileTrue(
             Commands.startEnd(
                 () -> {
-                  indexer.setIndexerSpeed(-Constants.SubsystemConstants.Indexer.indexerSpeed);
-                  indexer.setHotdogSpeed(-Constants.SubsystemConstants.Indexer.hotdogSpeed);
+                  intake.reverseIntake();
+                  indexer.reverseHotdog();
                 },
                 () -> {
-                  indexer.stopIndexer();
+                  intake.stopIntake();
                   indexer.stopHotdog();
                 },
+                intake,
                 indexer));
+
     operator
         .a(competitionButtonLoop)
         .onTrue(Commands.runOnce(Turret::toggleTurretMode))

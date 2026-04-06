@@ -3,47 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.065486111111112,
-        "y": 7.41876631079478
+        "x": 2.5,
+        "y": 4.025
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.815486111111112,
-        "y": 7.41876631079478
+        "x": 2.250412192091224,
+        "y": 4.01064987305659
       },
       "isLocked": false,
-      "linkedName": "NorthNeutralSecondSwipe"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.8264531435349944,
-        "y": 7.41876631079478
+        "x": 2.5,
+        "y": 4.025
       },
       "prevControl": {
-        "x": 4.534980817522322,
-        "y": 7.414510957792207
+        "x": 2.7802768091365904,
+        "y": 4.041090872379396
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NorthStoot"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Shoot Early",
-      "waypointRelativePos": 0.9193976970770629,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Start Shoot"
-        }
-      }
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -57,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "NORTH",
+  "folder": "SEED",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
