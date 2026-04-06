@@ -58,7 +58,7 @@ public class Indexer extends SubsystemBase {
     setHotdogSpeed(hotdogSpeed);
   }
 
-  public void reverseHotdog(){
+  public void reverseHotdog() {
     setHotdogSpeed(unjamHotdog);
   }
 

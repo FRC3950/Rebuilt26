@@ -39,7 +39,7 @@ public class Intake extends SubsystemBase {
     intakeMotor.setControl(intakeControlRequest.withVelocity(speed));
   }
 
-  public void reverseIntake(){
+  public void reverseIntake() {
     intakeMotor.setControl(intakeControlRequest.withVelocity(unjamSpeed));
   }
 

@@ -71,7 +71,12 @@
       "name": "Intake Zone",
       "waypointRelativePos": 0.7417742927429282,
       "endWaypointRelativePos": 2.0,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake While Held"
+        }
+      }
     }
   ],
   "globalConstraints": {
