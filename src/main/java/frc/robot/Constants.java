@@ -112,6 +112,8 @@ public final class Constants {
 
       // hi cj love you -ruby
       // where where t-square?
+
+      // 18 rps after reduction
       static {
         // Azimuth Motor Config
         applyAzimuthConfig(
@@ -131,7 +133,7 @@ public final class Constants {
         flywheelConfig.Slot0.kV = flywheelKV;
         flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         flywheelConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = .1;
-        flywheelConfig.CurrentLimits.StatorCurrentLimit = 80;
+        flywheelConfig.CurrentLimits.StatorCurrentLimit = 60;
         flywheelConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       }
 
@@ -176,7 +178,7 @@ public final class Constants {
       public static final double downPos = 12.75;
       public static final double upPos = 0;
 
-      public static final double mintakeSpeed = 60;
+      public static final double mintakeSpeed = 70;
       public static final double unjamSpeed = -50;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
       public static final double intakeKP = 0.35;
@@ -221,8 +223,8 @@ public final class Constants {
       public static final int hotdogMotorID = 4;
       public static final int indexerMotorID = 14;
 
-      public static final double indexerSpeed = 50.0; // RPS
-      public static final double hotdogSpeed = 65; // RPS
+      public static final double indexerSpeed = 55.0; // RPS
+      public static final double hotdogSpeed = 70; // RPS
       public static final double unjamHotdog = -50;
 
       public static final TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
@@ -281,11 +283,11 @@ public final class Constants {
     }
 
     public static Translation2d getLeftFerryTarget() {
-      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 1.5, hubGuy.getY() + 2));
+      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 3, hubGuy.getY() + 2));
     }
 
     public static Translation2d getRightFerryTarget() {
-      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 1.5, hubGuy.getY() - 2));
+      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 3, hubGuy.getY() - 2));
     }
 
     public static boolean isRobotInNeutralZone(double robotXMeters) {
