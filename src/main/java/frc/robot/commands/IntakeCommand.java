@@ -26,7 +26,7 @@ public class IntakeCommand extends Command {
   @Override
   public void initialize() {
     intake.extend();
-    intake.setIntakeSpeed(mintakeSpeed + 3 * driveSpeedMetersPerSecond.getAsDouble());
+    intake.setIntakeSpeed(mintakeSpeed + (3 * driveSpeedMetersPerSecond.getAsDouble()));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
