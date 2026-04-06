@@ -175,10 +175,10 @@ public final class Constants {
       public static final double downPos = 12.75;
       public static final double upPos = 0;
 
-      public static final double mintakeSpeed = 40;
+      public static final double mintakeSpeed = 60;
       public static final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
-      public static final double intakeKP = 0.1;
-      public static final double intakeKV = 0.12;
+      public static final double intakeKP = 0.35;
+      public static final double intakeKV = 0.105;
 
       public static final TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
       public static final double pivotKP = 15;
@@ -195,17 +195,23 @@ public final class Constants {
         pivotConfig.Slot0.kG = pivotKG;
         pivotConfig.MotionMagic.MotionMagicAcceleration = pivotMMAcceleration;
         pivotConfig.MotionMagic.MotionMagicCruiseVelocity = pivotMMVelocity;
-        pivotConfig.CurrentLimits.StatorCurrentLimit = 80;
-        pivotConfig.CurrentLimits.SupplyCurrentLimit = 40;
+        pivotConfig.CurrentLimits.StatorCurrentLimit = 40;
+        pivotConfig.CurrentLimits.SupplyCurrentLimit = 20;
         pivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        pivotConfig.CurrentLimits.SupplyCurrentLowerLimit = 60;
+        pivotConfig.CurrentLimits.SupplyCurrentLowerTime = 1;
 
         // Intake Motor Config
         intakeConfig.Slot0.kP = intakeKP;
         intakeConfig.Slot0.kV = intakeKV;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        intakeConfig.CurrentLimits.StatorCurrentLimit = 80;
+        intakeConfig.CurrentLimits.StatorCurrentLimit = 60;
         intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        intakeConfig.CurrentLimits.SupplyCurrentLimit = 30;
+        intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        intakeConfig.CurrentLimits.SupplyCurrentLowerLimit = 37.5;
+        intakeConfig.CurrentLimits.SupplyCurrentLowerTime = 0.2;
       }
     }
 
@@ -214,7 +220,7 @@ public final class Constants {
       public static final int indexerMotorID = 14;
 
       public static final double indexerSpeed = 50.0; // RPS
-      public static final double hotdogSpeed = 40.0; // RPS
+      public static final double hotdogSpeed = 65; // RPS
 
       public static final TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration hotdogConfig = new TalonFXConfiguration();
@@ -223,7 +229,7 @@ public final class Constants {
       public static final double indexerKV = 0.1285;
 
       public static final double hotdogKP = 0;
-      public static final double hotdogKV = 0.1175;
+      public static final double hotdogKV = 0.11;
 
       static {
         indexerConfig.Slot0.kP = indexerKP;
@@ -237,10 +243,12 @@ public final class Constants {
         hotdogConfig.Slot0.kP = hotdogKP;
         hotdogConfig.Slot0.kV = hotdogKV;
         hotdogConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        hotdogConfig.CurrentLimits.StatorCurrentLimit = 80;
+        hotdogConfig.CurrentLimits.StatorCurrentLimit = 50;
         hotdogConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 30;
         hotdogConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        hotdogConfig.CurrentLimits.SupplyCurrentLowerLimit = 40;
+        hotdogConfig.CurrentLimits.SupplyCurrentLowerTime = 0.5;
       }
     }
     // Josh wrote this part of the code, easter egg of 2026

@@ -31,8 +31,8 @@ import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static final double LINEAR_INPUT_RATE_LIMIT = 2.5;
-  private static final double ANGULAR_INPUT_RATE_LIMIT = 3.0;
+  private static final double LINEAR_INPUT_RATE_LIMIT = 1;
+  private static final double ANGULAR_INPUT_RATE_LIMIT = 1.5;
   private static final double ANGLE_KP = 5.0;
   private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
@@ -71,31 +71,31 @@ public class DriveCommands {
     SlewRateLimiter omegaFilter = new SlewRateLimiter(ANGULAR_INPUT_RATE_LIMIT);
 
     return Commands.run(
-        () -> {
-          double filteredX = xFilter.calculate(xSupplier.getAsDouble());
-          double filteredY = yFilter.calculate(ySupplier.getAsDouble());
-          double filteredOmega = omegaFilter.calculate(omegaSupplier.getAsDouble());
+            () -> {
+              double filteredX = xFilter.calculate(xSupplier.getAsDouble());
+              double filteredY = yFilter.calculate(ySupplier.getAsDouble());
+              double filteredOmega = omegaFilter.calculate(omegaSupplier.getAsDouble());
 
-          // Get linear velocity
-          Translation2d linearVelocity = getLinearVelocityFromJoysticks(filteredX, filteredY);
+              // Get linear velocity
+              Translation2d linearVelocity = getLinearVelocityFromJoysticks(filteredX, filteredY);
 
-          // Apply rotation deadband
-          double omega = MathUtil.applyDeadband(filteredOmega, DEADBAND);
+              // Apply rotation deadband
+              double omega = MathUtil.applyDeadband(filteredOmega, DEADBAND);
 
-          // Square rotation value for more precise control
-          omega = Math.copySign(omega * omega, omega);
+              // Square rotation value for more precise control
+              omega = Math.copySign(omega * omega, omega);
 
-          // Convert to field relative speeds & send command
-          ChassisSpeeds speeds =
-              new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds, AllianceFlipUtil.apply(drive.getRotation())));
-        },
-        drive)
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega * drive.getMaxAngularSpeedRadPerSec());
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds, AllianceFlipUtil.apply(drive.getRotation())));
+            },
+            drive)
         .beforeStarting(
             () -> {
               xFilter.reset(xSupplier.getAsDouble());

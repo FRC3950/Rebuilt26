@@ -203,16 +203,20 @@ public class RobotContainer {
             () -> {
               indexer.startIndexer();
               indexer.startHotdog();
+              intake.startIntake();
             },
-            indexer));
+            indexer,
+            intake));
     NamedCommands.registerCommand(
         "End Shoot",
         Commands.runOnce(
             () -> {
               indexer.stopIndexer();
               indexer.stopHotdog();
+              intake.stopIntake();
             },
-            indexer));
+            indexer,
+            intake));
 
     SmartDashboard.putData("Turret Subsystem", turret1);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
