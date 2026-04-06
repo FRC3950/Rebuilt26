@@ -57,6 +57,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.Field2dPublisher;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -71,6 +72,7 @@ public class RobotContainer {
   private final Turret turret2;
   private final TurretVisualization turretVisualization;
   private final Vision vision;
+  private final Field2dPublisher fieldPublisher;
   private final Intake intake;
   private final Indexer indexer;
   private final Command simulationCommand;
@@ -167,6 +169,7 @@ public class RobotContainer {
             flywheelFollowerID2,
             CANivore);
     turretVisualization = new TurretVisualization(turret1, turret2);
+    fieldPublisher = new Field2dPublisher("Field", drive::getPose);
 
     if (Constants.currentMode == Constants.Mode.SIM) {
       FuelSimulationController fuelSimulationController =
