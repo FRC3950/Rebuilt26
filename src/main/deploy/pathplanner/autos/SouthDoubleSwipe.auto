@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SouthStoot_NeutralOne"
@@ -20,12 +26,6 @@
           "type": "path",
           "data": {
             "pathName": "NeutralOne_SouthStoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Start Shoot"
           }
         },
         {
@@ -50,12 +50,6 @@
           "type": "path",
           "data": {
             "pathName": "NeutralTwo_SouthStoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Start Shoot"
           }
         },
         {

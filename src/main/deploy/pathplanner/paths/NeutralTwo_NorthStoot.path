@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "Shoot Early",
-      "waypointRelativePos": 0.9193976970770629,
+      "waypointRelativePos": 0.9041297935103247,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
