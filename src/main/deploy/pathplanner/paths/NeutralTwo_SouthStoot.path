@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.5,
-        "y": 4.025
+        "x": 5.9959430486505685,
+        "y": 0.6470636224127428
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.25,
-        "y": 4.025
+        "x": 5.477499657041362,
+        "y": 0.6511270502091034
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "SouthNeutralSecondSwipe"
     },
     {
       "anchor": {
-        "x": 2.5,
-        "y": 4.025
+        "x": 3.8269118747463473,
+        "y": 0.6470636224127428
       },
       "prevControl": {
-        "x": 2.75,
-        "y": 4.025
+        "x": 3.3447590210717473,
+        "y": 0.6439028574641259
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "SouthStoot"
     }
   ],
   "rotationTargets": [],
@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "SOUTH",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

@@ -216,7 +216,7 @@ public final class Constants {
       public static final int indexerMotorID = 14;
 
       public static final double indexerSpeed = 50.0; // RPS
-      public static final double hotdogSpeed = 40.0; // RPS
+      public static final double hotdogSpeed = 65; // RPS
       public static final double unjamHotdog = -50;
 
       public static final TalonFXConfiguration indexerConfig = new TalonFXConfiguration();

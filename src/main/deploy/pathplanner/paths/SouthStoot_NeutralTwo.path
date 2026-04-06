@@ -1,0 +1,131 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.8269118747463473,
+        "y": 0.6470636224127428
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.046564376440832,
+        "y": 0.766448623561775
+      },
+      "isLocked": false,
+      "linkedName": "SouthStoot"
+    },
+    {
+      "anchor": {
+        "x": 7.382355608258929,
+        "y": 0.7759753259435878
+      },
+      "prevControl": {
+        "x": 3.8782585458815344,
+        "y": 0.5345715494237464
+      },
+      "nextControl": {
+        "x": 8.444227187476825,
+        "y": 0.8491296378359562
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.78833293171672,
+        "y": 3.693923434963474
+      },
+      "prevControl": {
+        "x": 8.638502793669971,
+        "y": 3.002424624108909
+      },
+      "nextControl": {
+        "x": 7.20549680183788,
+        "y": 4.167982218708571
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.2025465769581976,
+        "y": 3.374452649401379
+      },
+      "prevControl": {
+        "x": 6.553749983578918,
+        "y": 3.834352296590776
+      },
+      "nextControl": {
+        "x": 6.050816180612326,
+        "y": 3.1757622197759825
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.9959430486505685,
+        "y": 0.6470636224127428
+      },
+      "prevControl": {
+        "x": 5.927258426132955,
+        "y": 2.7444111605285713
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "SouthNeutralSecondSwipe"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6707188901345322,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1.1417635930493177,
+      "rotationDegrees": 92.0
+    },
+    {
+      "waypointRelativePos": 1.747302410313889,
+      "rotationDegrees": 110.0
+    },
+    {
+      "waypointRelativePos": 3.3220641816143783,
+      "rotationDegrees": -90.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake Zone",
+      "waypointRelativePos": 1.0725130688806912,
+      "endWaypointRelativePos": 3.906519065190648,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake While Held"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "SOUTH",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}
