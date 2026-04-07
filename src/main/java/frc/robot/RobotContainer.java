@@ -58,7 +58,6 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Field2dPublisher;
-import frc.robot.util.SmartShotUtil;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -77,8 +76,6 @@ public class RobotContainer {
   private final Intake intake;
   private final Indexer indexer;
   private final Command simulationCommand;
-  private final SmartShotUtil smartShotUtil;
-
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
 
@@ -93,8 +90,6 @@ public class RobotContainer {
   public RobotContainer() {
     intake = new Intake();
     indexer = new Indexer();
-    smartShotUtil = new SmartShotUtil();
-
     switch (Constants.currentMode) {
       case REAL:
         drive =
@@ -258,8 +253,6 @@ public class RobotContainer {
   }
 
   public void checkMode() {
-    smartShotUtil.publish();
-
     BindingMode selectedBindingMode = getSelectedBindingMode();
     SmartDashboard.putString("Code Mode/Selected", selectedBindingMode.name());
     Logger.recordOutput("Controls/BindingModeSelected", selectedBindingMode.name());

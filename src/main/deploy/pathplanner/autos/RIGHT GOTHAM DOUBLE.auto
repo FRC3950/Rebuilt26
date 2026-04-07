@@ -19,13 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NorthStoot_NeutralOne"
+            "pathName": "SouthStoot_NeutralOne"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "NeutralOne_NorthStoot"
+            "pathName": "NeutralOne_SouthStoot"
           }
         },
         {
@@ -43,13 +43,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NorthStoot_NeutralTwo"
+            "pathName": "SouthStoot_NeutralTwo"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "NeutralTwo_NorthStoot"
+            "pathName": "NeutralTwo_SouthStoot"
           }
         },
         {
@@ -67,7 +67,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

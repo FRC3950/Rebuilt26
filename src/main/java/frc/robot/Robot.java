@@ -68,7 +68,7 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     Logger.start();
 
-    RobotController.setBrownoutVoltage(4.5);
+    RobotController.setBrownoutVoltage(5.5);
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
