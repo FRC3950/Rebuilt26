@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.servohub.ServoChannel;
@@ -117,15 +116,9 @@ public final class Constants {
       static {
         // Azimuth Motor Config
         applyAzimuthConfig(
-            leftAzimuthConfig,
-            ForwardLimitSourceValue.RemoteCANdiS1,
-            leftMinAzimuthControlAngle,
-            leftMaxAzimuthControlAngle);
+            leftAzimuthConfig, leftMinAzimuthControlAngle, leftMaxAzimuthControlAngle);
         applyAzimuthConfig(
-            rightAzimuthConfig,
-            ForwardLimitSourceValue.RemoteCANdiS2,
-            rightMinAzimuthControlAngle,
-            rightMaxAzimuthControlAngle);
+            rightAzimuthConfig, rightMinAzimuthControlAngle, rightMaxAzimuthControlAngle);
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
@@ -138,10 +131,7 @@ public final class Constants {
       }
 
       private static void applyAzimuthConfig(
-          TalonFXConfiguration config,
-          ForwardLimitSourceValue forwardLimitSource,
-          double minControlAngleDeg,
-          double maxControlAngleDeg) {
+          TalonFXConfiguration config, double minControlAngleDeg, double maxControlAngleDeg) {
         config.Slot0.kP = azimuthKP;
         config.Slot0.kV = azimuthKV;
         config.Slot0.kS = azimuthKS;
@@ -149,10 +139,6 @@ public final class Constants {
         config.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        config.HardwareLimitSwitch.ForwardLimitAutosetPositionEnable = true;
-        config.HardwareLimitSwitch.ForwardLimitAutosetPositionValue = 0;
-        config.HardwareLimitSwitch.ForwardLimitRemoteSensorID = TURRET_CANDI_ID;
-        config.HardwareLimitSwitch.ForwardLimitSource = forwardLimitSource;
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
             Units.degreesToRotations(
