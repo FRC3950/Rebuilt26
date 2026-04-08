@@ -83,6 +83,16 @@ public class TunerConstants {
   // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
   private static final Pigeon2Configuration pigeonConfigs = null;
 
+  /** Returns a fresh copy of the base drive Talon FX configs defined above. */
+  public static TalonFXConfiguration getDriveInitialConfigs() {
+    return driveInitialConfigs.clone();
+  }
+
+  /** Returns a fresh copy of the base steer Talon FX configs defined above. */
+  public static TalonFXConfiguration getSteerInitialConfigs() {
+    return steerInitialConfigs.clone();
+  }
+
   // CAN bus that the devices are located on;
   // All swerve devices must share the same CAN bus
   public static final CANBus kCANBus = new CANBus("CANivore", "./logs/example.hoot");
