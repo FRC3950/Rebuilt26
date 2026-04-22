@@ -73,9 +73,9 @@ public final class Constants {
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
-      public static final double leftMinAzimuthControlAngle = -330;
-      public static final double leftMaxAzimuthControlAngle = 10;
-      public static final double rightMinAzimuthControlAngle = -330;
+      public static final double leftMinAzimuthControlAngle = -380;
+      public static final double leftMaxAzimuthControlAngle = 1;
+      public static final double rightMinAzimuthControlAngle = -365;
       public static final double rightMaxAzimuthControlAngle = 10;
       public static final double azimuthSoftLimitMarginDeg = 10.0;
       public static final double minHoodAngle = 13;
@@ -150,7 +150,7 @@ public final class Constants {
                     minControlAngleDeg - azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
                 * azimuthGearRatio;
         config.CurrentLimits.StatorCurrentLimit = 60;
-        config.CurrentLimits.SupplyCurrentLimit = 30;
+        config.CurrentLimits.SupplyCurrentLimit = 25;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
       }
