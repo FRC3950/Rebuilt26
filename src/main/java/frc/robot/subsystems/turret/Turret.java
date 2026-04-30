@@ -2,10 +2,6 @@ package frc.robot.subsystems.turret;
 
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
 
-import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.CANdi;
-import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,10 +10,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.subsystems.turret.turret_base.Azimuth;
-import frc.robot.subsystems.turret.turret_base.Flywheels;
-import frc.robot.subsystems.turret.turret_base.Hood;
+import frc.robot.subsystems.turret.turret_base.azimuth.Azimuth;
+import frc.robot.subsystems.turret.turret_base.flywheels.Flywheels;
+import frc.robot.subsystems.turret.turret_base.hood.Hood;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Turret extends SubsystemBase {
@@ -28,9 +23,6 @@ public class Turret extends SubsystemBase {
   private final Azimuth azimuth;
   private final double minAzimuthControlAngleDeg;
   private final double maxAzimuthControlAngleDeg;
-  private final CANdi turretZeroingCandi;
-  private final boolean usesCandiS1;
-
   private static boolean lockedIn = false;
   private boolean zeroSwitchClosedLastPoll = false;
 
@@ -39,24 +31,18 @@ public class Turret extends SubsystemBase {
   // private final MechanismLigament2d turretLigament;
 
   public Turret(
-      int azimuthMotorId,
-      TalonFXConfiguration azimuthConfig,
+      String name,
+      Azimuth azimuth,
+      Hood hood,
+      Flywheels flywheels,
       double minAzimuthControlAngleDeg,
-      double maxAzimuthControlAngleDeg,
-      ServoChannel.ChannelId hoodChannelId,
-      int flywheelID,
-      TalonFXConfiguration flywheelConfig,
-      int flywheelFollowerID,
-      CANBus canbus) {
-    setName("Turret" + azimuthMotorId);
+      double maxAzimuthControlAngleDeg) {
+    setName(name);
+    this.azimuth = azimuth;
+    this.hood = hood;
+    this.flywheels = flywheels;
     this.minAzimuthControlAngleDeg = minAzimuthControlAngleDeg;
     this.maxAzimuthControlAngleDeg = maxAzimuthControlAngleDeg;
-    usesCandiS1 = azimuthMotorId == frc.robot.Constants.SubsystemConstants.Turret.azimuthID;
-    turretZeroingCandi =
-        Constants.currentMode == Constants.Mode.REAL ? new CANdi(TURRET_CANDI_ID, canbus) : null;
-    hood = new Hood(hoodChannelId);
-    flywheels = new Flywheels(flywheelID, flywheelConfig, flywheelFollowerID, canbus);
-    azimuth = new Azimuth(azimuthMotorId, azimuthConfig, canbus);
   }
 
   /** Returns the live turret pose with robot-relative translation and measured azimuth. */
@@ -69,9 +55,7 @@ public class Turret extends SubsystemBase {
   }
 
   private double getVisualizationAngleDeg() {
-    return Constants.currentMode == Constants.Mode.SIM
-        ? azimuth.getSetpointDeg()
-        : azimuth.getMotorAngleDeg();
+    return azimuth.getMeasuredAngleDeg();
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
@@ -125,6 +109,11 @@ public class Turret extends SubsystemBase {
   }
 
   @AutoLogOutput
+  public double getRequestedHoodAngleDeg() {
+    return hood.getSetpointDeg();
+  }
+
+  @AutoLogOutput
   public double getMeasuredFlywheelRps() {
     return flywheels.getMeasuredVelocityRps();
   }
@@ -141,7 +130,11 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (DriverStation.isDisabled() && turretZeroingCandi != null) {
+    azimuth.periodic();
+    hood.periodic();
+    flywheels.periodic();
+
+    if (DriverStation.isDisabled()) {
       updateDisabledZeroing();
     } else {
       zeroSwitchClosedLastPoll = false;
@@ -149,10 +142,7 @@ public class Turret extends SubsystemBase {
   }
 
   private void updateDisabledZeroing() {
-    boolean zeroSwitchClosed =
-        usesCandiS1
-            ? Boolean.TRUE.equals(turretZeroingCandi.getS1Closed().getValue())
-            : Boolean.TRUE.equals(turretZeroingCandi.getS2Closed().getValue());
+    boolean zeroSwitchClosed = azimuth.isZeroSwitchClosed();
     if (zeroSwitchClosed && !zeroSwitchClosedLastPoll) {
       azimuth.zeroPosition();
     }

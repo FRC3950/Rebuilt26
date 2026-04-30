@@ -4,43 +4,40 @@
 
 package frc.robot.subsystems.intake;
 
-import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Intake.*;
 
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
-  private final TalonFX intakeMotor;
-  private final TalonFX pivotMotor;
-  private final MotionMagicVoltage mmRequest = new MotionMagicVoltage(0);
-  private final VelocityVoltage intakeControlRequest = new VelocityVoltage(0);
+  private final IntakeIO io;
+  private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+
   private double commandedRollerSpeed = 0.0;
   private double pivotSetpoint = upPos;
   private boolean isIntaking = false;
 
-  /** Creates a new intake. */
-  public Intake() {
-    intakeMotor = new TalonFX(intakeMotorID, CANivore);
-    pivotMotor = new TalonFX(pivotMotorID, CANivore);
+  public Intake(IntakeIO io) {
+    this.io = io;
+  }
 
-    pivotMotor.getConfigurator().apply(pivotConfig);
-    intakeMotor.getConfigurator().apply(intakeConfig);
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("Intake", inputs);
   }
 
   public void setIntakeSpeed(double speed) {
     commandedRollerSpeed = speed;
     isIntaking = speed > 0.0;
-    intakeMotor.setControl(intakeControlRequest.withVelocity(speed));
+    io.setRollerVelocity(speed);
   }
 
   public void reverseIntake() {
-    intakeMotor.setControl(intakeControlRequest.withVelocity(unjamSpeed));
+    setIntakeSpeed(unjamSpeed);
   }
 
   public void startIntake() {
@@ -59,12 +56,16 @@ public class Intake extends SubsystemBase {
 
   @AutoLogOutput(key = "Intake/Current Speed")
   public double getIntakeCurrentSpeed() {
-    return intakeMotor.getVelocity().getValueAsDouble();
+    return inputs.rollerVelocityRps;
+  }
+
+  public double getMeasuredRollerSpeed() {
+    return inputs.rollerVelocityRps;
   }
 
   public void setPivotPosition(double position) {
     pivotSetpoint = position;
-    pivotMotor.setControl(mmRequest.withPosition(position));
+    io.setPivotPosition(position);
   }
 
   public void extend() {
@@ -76,12 +77,12 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean isAcceptablePosition(double targetPos) {
-    return Math.abs(pivotMotor.getPosition().getValueAsDouble() - targetPos) < 0.05;
+    return Math.abs(inputs.pivotPosition - targetPos) < 0.05;
   }
 
   @AutoLogOutput(key = "Intake/Pivot Position")
   public double getPivotPosition() {
-    return pivotMotor.getPosition().getValueAsDouble();
+    return inputs.pivotPosition;
   }
 
   public double getCommandedRollerSpeed() {
@@ -102,6 +103,10 @@ public class Intake extends SubsystemBase {
     return Math.abs(pivotSetpoint - downPos) < 1e-9;
   }
 
+  public boolean isPivotMeasuredDown() {
+    return isAcceptablePosition(downPos);
+  }
+
   public Command extendCommand() {
     return this.runOnce(this::extend);
   }
@@ -115,7 +120,7 @@ public class Intake extends SubsystemBase {
   }
 
   public Command zeroIntake() {
-    return Commands.runOnce(() -> pivotMotor.setPosition(0), this);
+    return Commands.runOnce(io::zeroPivotPosition, this);
   }
 
   public Command offIntake() {

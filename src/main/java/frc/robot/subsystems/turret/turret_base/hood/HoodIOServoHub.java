@@ -1,6 +1,13 @@
-package frc.robot.subsystems.turret.turret_base;
+package frc.robot.subsystems.turret.turret_base.hood;
 
-import static frc.robot.Constants.SubsystemConstants.Turret.*;
+import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CENTER_PULSE_US;
+import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_1;
+import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_2;
+import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_HUB_CAN_ID;
+import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_MAX_PULSE_US;
+import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_MIN_PULSE_US;
+import static frc.robot.Constants.SubsystemConstants.Turret.maxHoodAngle;
+import static frc.robot.Constants.SubsystemConstants.Turret.minHoodAngle;
 
 import com.revrobotics.ResetMode;
 import com.revrobotics.servohub.ServoChannel;
@@ -9,42 +16,34 @@ import com.revrobotics.servohub.config.ServoChannelConfig;
 import com.revrobotics.servohub.config.ServoHubConfig;
 import edu.wpi.first.math.MathUtil;
 
-public class Hood {
+public class HoodIOServoHub implements HoodIO {
   private static ServoHub hoodServoHub;
 
   private final ServoChannel hoodServo;
   private final boolean invertPulseDirection;
-  private double lastSetpointDeg = minHoodAngle;
   private double positionDeg = minHoodAngle;
+  private int pulseWidthUs = hoodAngleToPulseWidthUs(minHoodAngle, false);
 
-  public Hood(ServoChannel.ChannelId hoodChannelId) {
+  public HoodIOServoHub(ServoChannel.ChannelId hoodChannelId) {
     hoodServo = getConfiguredHoodServoHub().getServoChannel(hoodChannelId);
     invertPulseDirection = hoodChannelId == HOOD_SERVO_CHANNEL_2;
-    initializeAtMinimum();
-  }
-
-  public void setAngleDeg(double hoodAngleDeg) {
-    double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
-    hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(clampedHoodAngleDeg, invertPulseDirection));
-    lastSetpointDeg = clampedHoodAngleDeg;
-    positionDeg = clampedHoodAngleDeg;
-  }
-
-  public double getPositionDeg() {
-    return positionDeg;
-  }
-
-  public double getSetpointDeg() {
-    return lastSetpointDeg;
-  }
-
-  private void initializeAtMinimum() {
-    lastSetpointDeg = minHoodAngle;
-    positionDeg = minHoodAngle;
-
+    setAngleDeg(minHoodAngle);
     hoodServo.setEnabled(true);
     hoodServo.setPowered(true);
-    hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(minHoodAngle, invertPulseDirection));
+  }
+
+  @Override
+  public void updateInputs(HoodIOInputs inputs) {
+    inputs.connected = true;
+    inputs.positionDeg = positionDeg;
+    inputs.pulseWidthUs = pulseWidthUs;
+  }
+
+  @Override
+  public void setAngleDeg(double hoodAngleDeg) {
+    positionDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
+    pulseWidthUs = hoodAngleToPulseWidthUs(positionDeg, invertPulseDirection);
+    hoodServo.setPulseWidth(pulseWidthUs);
   }
 
   private static synchronized ServoHub getConfiguredHoodServoHub() {
@@ -54,13 +53,11 @@ public class Hood {
       ServoHubConfig hubConfig = new ServoHubConfig();
       ServoChannelConfig turret1Config =
           new ServoChannelConfig(HOOD_SERVO_CHANNEL_1)
-              .pulseRange(
-                  HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
+              .pulseRange(HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
               .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
       ServoChannelConfig turret2Config =
           new ServoChannelConfig(HOOD_SERVO_CHANNEL_2)
-              .pulseRange(
-                  HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
+              .pulseRange(HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
               .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
 
       hubConfig.apply(HOOD_SERVO_CHANNEL_1, turret1Config);

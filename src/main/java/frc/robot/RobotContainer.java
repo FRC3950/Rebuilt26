@@ -48,10 +48,28 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerIO;
+import frc.robot.subsystems.indexer.IndexerIOSim;
+import frc.robot.subsystems.indexer.IndexerIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
 import frc.robot.subsystems.turret.TurretVisualization;
+import frc.robot.subsystems.turret.turret_base.azimuth.Azimuth;
+import frc.robot.subsystems.turret.turret_base.azimuth.AzimuthIO;
+import frc.robot.subsystems.turret.turret_base.azimuth.AzimuthIOSim;
+import frc.robot.subsystems.turret.turret_base.azimuth.AzimuthIOTalonFX;
+import frc.robot.subsystems.turret.turret_base.flywheels.Flywheels;
+import frc.robot.subsystems.turret.turret_base.flywheels.FlywheelsIO;
+import frc.robot.subsystems.turret.turret_base.flywheels.FlywheelsIOSim;
+import frc.robot.subsystems.turret.turret_base.flywheels.FlywheelsIOTalonFX;
+import frc.robot.subsystems.turret.turret_base.hood.Hood;
+import frc.robot.subsystems.turret.turret_base.hood.HoodIO;
+import frc.robot.subsystems.turret.turret_base.hood.HoodIOServoHub;
+import frc.robot.subsystems.turret.turret_base.hood.HoodIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -88,10 +106,10 @@ public class RobotContainer {
   private BindingMode appliedBindingMode = BindingMode.COMPETITION;
 
   public RobotContainer() {
-    intake = new Intake();
-    indexer = new Indexer();
     switch (Constants.currentMode) {
       case REAL:
+        intake = new Intake(new IntakeIOTalonFX());
+        indexer = new Indexer(new IndexerIOTalonFX());
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -107,9 +125,13 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
                 new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+        turret1 = createRealLeftTurret();
+        turret2 = createRealRightTurret();
         break;
 
       case SIM:
+        intake = new Intake(new IntakeIOSim());
+        indexer = new Indexer(new IndexerIOSim());
         drive =
             new Drive(
                 new GyroIO() {},
@@ -127,9 +149,13 @@ public class RobotContainer {
                     VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(
                     VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
+        turret1 = createSimLeftTurret();
+        turret2 = createSimRightTurret();
         break;
 
       default:
+        intake = new Intake(new IntakeIO() {});
+        indexer = new Indexer(new IndexerIO() {});
         drive =
             new Drive(
                 new GyroIO() {},
@@ -141,31 +167,10 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        turret1 = createNoOpLeftTurret();
+        turret2 = createNoOpRightTurret();
         break;
     }
-
-    turret1 =
-        new Turret(
-            azimuthID,
-            leftAzimuthConfig,
-            leftMinAzimuthControlAngle,
-            leftMaxAzimuthControlAngle,
-            HOOD_SERVO_CHANNEL_2,
-            flywheelID,
-            flywheelConfig,
-            flywheelFollowerID,
-            CANivore);
-    turret2 =
-        new Turret(
-            azimuthID2,
-            rightAzimuthConfig,
-            rightMinAzimuthControlAngle,
-            rightMaxAzimuthControlAngle,
-            HOOD_SERVO_CHANNEL_1,
-            flywheelID2,
-            flywheelConfig,
-            flywheelFollowerID2,
-            CANivore);
     turretVisualization = new TurretVisualization(turret1, turret2);
     fieldPublisher = new Field2dPublisher("Field", drive::getPose);
 
@@ -174,19 +179,19 @@ public class RobotContainer {
           new FuelSimulationController(
               drive::getPose,
               drive::getFieldRelativeSpeeds,
-              intake::getCommandedRollerSpeed,
-              intake::isPivotCommandedDown,
-              indexer::isFeedingForward,
+              intake::getMeasuredRollerSpeed,
+              intake::isPivotMeasuredDown,
+              indexer::isMeasuredFeedingForward,
               new FuelSimulationController.TurretSimSource(
                   robotToTurret1,
-                  turret1::getCommandedAzimuthDeg,
-                  turret1::getCommandedHoodAngleDeg,
-                  turret1::getCommandedFlywheelRps),
+                  turret1::getMeasuredAzimuthDeg,
+                  turret1::getRequestedHoodAngleDeg,
+                  turret1::getMeasuredFlywheelRps),
               new FuelSimulationController.TurretSimSource(
                   robotToTurret2,
-                  turret2::getCommandedAzimuthDeg,
-                  turret2::getCommandedHoodAngleDeg,
-                  turret2::getCommandedFlywheelRps));
+                  turret2::getMeasuredAzimuthDeg,
+                  turret2::getRequestedHoodAngleDeg,
+                  turret2::getMeasuredFlywheelRps));
       simulationCommand = new FuelSimCommand(fuelSimulationController);
       SmartDashboard.putData(
           "Fuel Sim/Reset Field Fuel",
@@ -349,6 +354,74 @@ public class RobotContainer {
         .a(competitionButtonLoop)
         .onTrue(Commands.runOnce(Turret::toggleTurretMode))
         .debounce(0.25);
+  }
+
+  private Turret createRealLeftTurret() {
+    return new Turret(
+        "LeftTurret",
+        new Azimuth(
+            "Turret/Left/Azimuth",
+            new AzimuthIOTalonFX(azimuthID, leftAzimuthConfig, CANivore, true)),
+        new Hood("Turret/Left/Hood", new HoodIOServoHub(HOOD_SERVO_CHANNEL_2)),
+        new Flywheels(
+            "Turret/Left/Flywheels",
+            new FlywheelsIOTalonFX(flywheelID, flywheelConfig, flywheelFollowerID, CANivore)),
+        leftMinAzimuthControlAngle,
+        leftMaxAzimuthControlAngle);
+  }
+
+  private Turret createRealRightTurret() {
+    return new Turret(
+        "RightTurret",
+        new Azimuth(
+            "Turret/Right/Azimuth",
+            new AzimuthIOTalonFX(azimuthID2, rightAzimuthConfig, CANivore, false)),
+        new Hood("Turret/Right/Hood", new HoodIOServoHub(HOOD_SERVO_CHANNEL_1)),
+        new Flywheels(
+            "Turret/Right/Flywheels",
+            new FlywheelsIOTalonFX(flywheelID2, flywheelConfig, flywheelFollowerID2, CANivore)),
+        rightMinAzimuthControlAngle,
+        rightMaxAzimuthControlAngle);
+  }
+
+  private Turret createSimLeftTurret() {
+    return new Turret(
+        "LeftTurret",
+        new Azimuth("Turret/Left/Azimuth", new AzimuthIOSim()),
+        new Hood("Turret/Left/Hood", new HoodIOSim()),
+        new Flywheels("Turret/Left/Flywheels", new FlywheelsIOSim()),
+        leftMinAzimuthControlAngle,
+        leftMaxAzimuthControlAngle);
+  }
+
+  private Turret createSimRightTurret() {
+    return new Turret(
+        "RightTurret",
+        new Azimuth("Turret/Right/Azimuth", new AzimuthIOSim()),
+        new Hood("Turret/Right/Hood", new HoodIOSim()),
+        new Flywheels("Turret/Right/Flywheels", new FlywheelsIOSim()),
+        rightMinAzimuthControlAngle,
+        rightMaxAzimuthControlAngle);
+  }
+
+  private Turret createNoOpLeftTurret() {
+    return new Turret(
+        "LeftTurret",
+        new Azimuth("Turret/Left/Azimuth", new AzimuthIO() {}),
+        new Hood("Turret/Left/Hood", new HoodIO() {}),
+        new Flywheels("Turret/Left/Flywheels", new FlywheelsIO() {}),
+        leftMinAzimuthControlAngle,
+        leftMaxAzimuthControlAngle);
+  }
+
+  private Turret createNoOpRightTurret() {
+    return new Turret(
+        "RightTurret",
+        new Azimuth("Turret/Right/Azimuth", new AzimuthIO() {}),
+        new Hood("Turret/Right/Hood", new HoodIO() {}),
+        new Flywheels("Turret/Right/Flywheels", new FlywheelsIO() {}),
+        rightMinAzimuthControlAngle,
+        rightMaxAzimuthControlAngle);
   }
 
   private void configureCrazyBindings() {

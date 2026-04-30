@@ -4,36 +4,33 @@
 
 package frc.robot.subsystems.indexer;
 
-import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Indexer.*;
 
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Indexer extends SubsystemBase {
+  private final IndexerIO io;
+  private final IndexerIOInputsAutoLogged inputs = new IndexerIOInputsAutoLogged();
 
-  TalonFX hotdogMotor;
-  TalonFX indexerMotor;
-
-  private final VelocityVoltage indexerControl = new VelocityVoltage(0);
-  private final VelocityVoltage hotdogControl = new VelocityVoltage(0);
   private double commandedIndexerSpeed = 0.0;
   private double commandedHotdogSpeed = 0.0;
 
-  public Indexer() {
-    hotdogMotor = new TalonFX(hotdogMotorID, CANivore);
-    indexerMotor = new TalonFX(indexerMotorID, CANivore);
+  public Indexer(IndexerIO io) {
+    this.io = io;
+  }
 
-    hotdogMotor.getConfigurator().apply(hotdogConfig);
-    indexerMotor.getConfigurator().apply(indexerConfig);
+  @Override
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("Indexer", inputs);
   }
 
   public void setIndexerSpeed(double speed) {
     commandedIndexerSpeed = speed;
-    indexerMotor.setControl(indexerControl.withVelocity(speed));
+    io.setIndexerVelocity(speed);
   }
 
   public void startIndexer() {
@@ -46,12 +43,12 @@ public class Indexer extends SubsystemBase {
 
   @AutoLogOutput(key = "Indexer/Indexer Speed")
   public double getIndexerCurrentSpeed() {
-    return indexerMotor.getVelocity().getValueAsDouble();
+    return inputs.indexerVelocityRps;
   }
 
   public void setHotdogSpeed(double speed) {
     commandedHotdogSpeed = speed;
-    hotdogMotor.setControl(hotdogControl.withVelocity(speed));
+    io.setHotdogVelocity(speed);
   }
 
   public void startHotdog() {
@@ -68,7 +65,7 @@ public class Indexer extends SubsystemBase {
 
   @AutoLogOutput(key = "Indexer/Hotdog Speed")
   public double getHotdogCurrentSpeed() {
-    return hotdogMotor.getVelocity().getValueAsDouble();
+    return inputs.hotdogVelocityRps;
   }
 
   public double getCommandedIndexerSpeed() {
@@ -88,6 +85,10 @@ public class Indexer extends SubsystemBase {
   @AutoLogOutput(key = "Indexer/Feeding Forward")
   public boolean isFeedingForward() {
     return commandedIndexerSpeed > 0.0 && commandedHotdogSpeed > 0.0;
+  }
+
+  public boolean isMeasuredFeedingForward() {
+    return inputs.indexerVelocityRps > 0.0 && inputs.hotdogVelocityRps > 0.0;
   }
 
   public Command feedCommand() {
