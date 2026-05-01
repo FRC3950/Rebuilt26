@@ -31,7 +31,10 @@ public class FlywheelsIOSim implements FlywheelsIO {
     double requestedVolts =
         controller.calculate(velocityRps, targetRps)
             + MechanismSimConstants.Turret.FLYWHEEL_KV_VOLTS_PER_RPS * targetRps;
-    double maxVoltageStep = MAX_VOLTAGE * LOOP_PERIOD_SECS / MechanismSimConstants.Turret.FLYWHEEL_VOLTAGE_RAMP_PERIOD_SECS;
+    double maxVoltageStep =
+        MAX_VOLTAGE
+            * LOOP_PERIOD_SECS
+            / MechanismSimConstants.Turret.FLYWHEEL_VOLTAGE_RAMP_PERIOD_SECS;
     appliedVolts += MathUtil.clamp(requestedVolts - appliedVolts, -maxVoltageStep, maxVoltageStep);
     appliedVolts = MathUtil.clamp(appliedVolts, -MAX_VOLTAGE, MAX_VOLTAGE);
 

@@ -46,7 +46,8 @@ public class AzimuthIOTalonFX implements AzimuthIO {
     var status = BaseStatusSignal.refreshAll(position, velocity, appliedVolts, current);
     inputs.connected = connectedDebounce.calculate(status.isOK());
     inputs.positionDeg = Units.rotationsToDegrees(position.getValueAsDouble() / azimuthGearRatio);
-    inputs.velocityDegPerSec = Units.rotationsToDegrees(velocity.getValueAsDouble() / azimuthGearRatio);
+    inputs.velocityDegPerSec =
+        Units.rotationsToDegrees(velocity.getValueAsDouble() / azimuthGearRatio);
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = current.getValueAsDouble();
     inputs.zeroSwitchClosed =

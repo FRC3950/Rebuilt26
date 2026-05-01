@@ -44,7 +44,8 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
 
   @Override
   public void updateInputs(FlywheelsIOInputs inputs) {
-    var leaderStatus = BaseStatusSignal.refreshAll(leaderVelocity, leaderAppliedVolts, leaderCurrent);
+    var leaderStatus =
+        BaseStatusSignal.refreshAll(leaderVelocity, leaderAppliedVolts, leaderCurrent);
     var followerStatus = BaseStatusSignal.refreshAll(followerVelocity);
 
     inputs.leaderConnected = leaderConnectedDebounce.calculate(leaderStatus.isOK());

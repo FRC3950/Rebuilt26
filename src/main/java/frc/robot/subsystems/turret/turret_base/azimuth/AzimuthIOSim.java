@@ -20,7 +20,8 @@ public class AzimuthIOSim implements AzimuthIO {
               azimuthGearRatio),
           MechanismSimConstants.Turret.AZIMUTH_GEARBOX);
   private final PIDController controller =
-      new PIDController(MechanismSimConstants.Turret.AZIMUTH_KP, 0.0, MechanismSimConstants.Turret.AZIMUTH_KD);
+      new PIDController(
+          MechanismSimConstants.Turret.AZIMUTH_KP, 0.0, MechanismSimConstants.Turret.AZIMUTH_KD);
 
   private double targetAngleDeg = 0.0;
   private double sensorOffsetDeg = 0.0;
@@ -30,7 +31,8 @@ public class AzimuthIOSim implements AzimuthIO {
   public void updateInputs(AzimuthIOInputs inputs) {
     appliedVolts =
         MathUtil.clamp(
-            controller.calculate(sim.getAngularPositionRad(), Units.degreesToRadians(targetAngleDeg)),
+            controller.calculate(
+                sim.getAngularPositionRad(), Units.degreesToRadians(targetAngleDeg)),
             -MAX_VOLTAGE,
             MAX_VOLTAGE);
     sim.setInputVoltage(appliedVolts);

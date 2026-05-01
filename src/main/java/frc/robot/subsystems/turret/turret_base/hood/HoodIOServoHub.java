@@ -53,11 +53,13 @@ public class HoodIOServoHub implements HoodIO {
       ServoHubConfig hubConfig = new ServoHubConfig();
       ServoChannelConfig turret1Config =
           new ServoChannelConfig(HOOD_SERVO_CHANNEL_1)
-              .pulseRange(HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
+              .pulseRange(
+                  HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
               .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
       ServoChannelConfig turret2Config =
           new ServoChannelConfig(HOOD_SERVO_CHANNEL_2)
-              .pulseRange(HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
+              .pulseRange(
+                  HOOD_SERVO_MIN_PULSE_US, HOOD_SERVO_CENTER_PULSE_US, HOOD_SERVO_MAX_PULSE_US)
               .disableBehavior(ServoChannelConfig.BehaviorWhenDisabled.kSupplyPower);
 
       hubConfig.apply(HOOD_SERVO_CHANNEL_1, turret1Config);

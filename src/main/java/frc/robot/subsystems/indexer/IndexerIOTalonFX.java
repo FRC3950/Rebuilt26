@@ -41,8 +41,10 @@ public class IndexerIOTalonFX implements IndexerIO {
 
   @Override
   public void updateInputs(IndexerIOInputs inputs) {
-    var indexerStatus = BaseStatusSignal.refreshAll(indexerVelocity, indexerAppliedVolts, indexerCurrent);
-    var hotdogStatus = BaseStatusSignal.refreshAll(hotdogVelocity, hotdogAppliedVolts, hotdogCurrent);
+    var indexerStatus =
+        BaseStatusSignal.refreshAll(indexerVelocity, indexerAppliedVolts, indexerCurrent);
+    var hotdogStatus =
+        BaseStatusSignal.refreshAll(hotdogVelocity, hotdogAppliedVolts, hotdogCurrent);
 
     inputs.indexerConnected = indexerConnectedDebounce.calculate(indexerStatus.isOK());
     inputs.indexerVelocityRps = indexerVelocity.getValueAsDouble();

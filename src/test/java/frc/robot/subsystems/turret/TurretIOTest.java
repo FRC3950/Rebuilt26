@@ -68,6 +68,8 @@ class TurretIOTest {
 
     turret.runSetpoints(Rotation2d.kZero, 45.0, 60.0);
 
-    assertEquals(frc.robot.Constants.SubsystemConstants.Turret.maxHoodAngle, turret.getRequestedHoodAngleDeg());
+    assertEquals(
+        frc.robot.Constants.SubsystemConstants.Turret.maxHoodAngle,
+        turret.getRequestedHoodAngleDeg());
   }
 }

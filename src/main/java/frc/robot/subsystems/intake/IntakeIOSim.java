@@ -36,7 +36,8 @@ public class IntakeIOSim implements IntakeIO {
       new PIDController(
           MechanismSimConstants.Intake.ROLLER_KP, 0.0, MechanismSimConstants.Intake.ROLLER_KD);
   private final PIDController pivotController =
-      new PIDController(MechanismSimConstants.Intake.PIVOT_KP, 0.0, MechanismSimConstants.Intake.PIVOT_KD);
+      new PIDController(
+          MechanismSimConstants.Intake.PIVOT_KP, 0.0, MechanismSimConstants.Intake.PIVOT_KD);
 
   private double rollerSetpointRps = 0.0;
   private double pivotSetpoint = frc.robot.Constants.SubsystemConstants.Intake.upPos;
@@ -93,7 +94,8 @@ public class IntakeIOSim implements IntakeIO {
 
   @Override
   public void zeroPivotPosition() {
-    pivotSensorOffset = MechanismSimConstants.Intake.pivotAngleRadToPosition(pivotSim.getAngleRads());
+    pivotSensorOffset =
+        MechanismSimConstants.Intake.pivotAngleRadToPosition(pivotSim.getAngleRads());
     pivotSetpoint = frc.robot.Constants.SubsystemConstants.Intake.upPos;
   }
 }

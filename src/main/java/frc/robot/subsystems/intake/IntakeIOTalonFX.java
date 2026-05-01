@@ -43,8 +43,10 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    var rollerStatus = BaseStatusSignal.refreshAll(rollerVelocity, rollerAppliedVolts, rollerCurrent);
-    var pivotStatus = BaseStatusSignal.refreshAll(pivotPosition, pivotVelocity, pivotAppliedVolts, pivotCurrent);
+    var rollerStatus =
+        BaseStatusSignal.refreshAll(rollerVelocity, rollerAppliedVolts, rollerCurrent);
+    var pivotStatus =
+        BaseStatusSignal.refreshAll(pivotPosition, pivotVelocity, pivotAppliedVolts, pivotCurrent);
 
     inputs.rollerConnected = rollerConnectedDebounce.calculate(rollerStatus.isOK());
     inputs.rollerVelocityRps = rollerVelocity.getValueAsDouble();
