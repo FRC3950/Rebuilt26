@@ -1,0 +1,4 @@
+interface:
+  display_name: "Chuck Robot Architecture"
+  short_description: "Map Chuck robot symptoms to code"
+  default_prompt: "Use $chuck-robot-architecture to translate a physical symptom on Chuck into mechanisms, code paths, telemetry, and safe diagnostics."
