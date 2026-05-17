@@ -17,7 +17,7 @@ Use `rebuilt-game-info` when the symptom depends on REBUILT field context: hub s
 2. Identify the physical path: intake, hotdogs, indexer, turret, drive, vision, auto, or electronics.
 3. Load only the needed reference:
    - `references/physical-robot.md` for mechanism layout, names, frame convention, electronics, and CAN context.
-   - `references/code-architecture.md` for subsystem, command, IO, constants, sim, auto, and telemetry structure.
+   - `references/code-architecture.md` for subsystem, command, IO, constants, auto, and telemetry structure.
    - `references/action-flows.md` for intake, feed, shoot, targeting, vision, auto, and disabled zeroing flows.
    - `references/physical-debugging.md` for symptom-to-code lookup and diagnostic prompts.
    - `references/current-gaps.md` for intended robot behavior that is missing or partial in code.
@@ -32,7 +32,7 @@ For physical robot debugging, answer with:
 - involved physical parts and team nicknames
 - likely code files/classes and constants
 - AdvantageKit or NetworkTables keys to inspect
-- safe on-robot or sim diagnostics
+- safe on-robot diagnostics
 - the smallest likely code/config change only after evidence points there
 
 Do not jump straight to code edits for symptoms that could be a jam, wiring issue, missing zero, bad camera mount, wrong selected auto, or operator-control mismatch.

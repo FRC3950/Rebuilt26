@@ -102,3 +102,13 @@ If path following works but robot action does not, inspect selected auto, marker
 While disabled, each `Turret.periodic()` polls its azimuth zero switch. On the rising edge, it calls `azimuth.zeroPosition()`. During enabled operation, the edge memory is reset and zeroing does not occur.
 
 For a turret that hits a limit, first verify the disabled zero switch behavior and measured/commanded azimuth before widening soft limits.
+
+## Control Mode Switching
+
+Competition and CRAZY bindings are separate `EventLoop`s. The dashboard-selected binding mode only applies while the robot is disabled. If a student changes the chooser while enabled and controls do not change, that is expected.
+
+For control symptoms, identify the active binding mode first. A button that works in CRAZY may be on the operator controller in competition mode.
+
+## Drive Speed Reduction During Game Actions
+
+Drive speed is intentionally reduced while the intake is active or while the indexer/hotdog are feeding forward. If drivers report that the robot "gets slow" when intaking or shooting, inspect `Intake.isIntaking()`, `Indexer.isFeedingForward()`, and `Drive.getMaxLinearSpeedMetersPerSec()` before changing swerve tuning.

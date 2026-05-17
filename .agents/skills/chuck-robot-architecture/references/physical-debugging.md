@@ -7,7 +7,7 @@ Use this when a student describes a real symptom. Start with evidence, not edits
 Ask or infer only what is needed:
 
 - Which mechanism moved, failed to move, sounded wrong, or jammed?
-- Did it happen disabled, auto, teleop, sim, after switching binding mode, while intaking, while shooting, or while driving?
+- Did it happen disabled, auto, teleop, after switching binding mode, while intaking, while shooting, or while driving?
 - Is it one side only, one turret only, one camera only, or whole robot?
 - Did the command/telemetry show the robot was trying to do the action?
 - Was the mechanism unloaded, loaded with FUEL, or under defense/contact?
@@ -39,8 +39,12 @@ Ask or infer only what is needed:
 | Auto follows path but shooting does not happen | PathPlanner `.auto`/`.path`, `NamedCommands`, `RobotContainer`, `Indexer` | auto selection, trajectory logs, indexer/hotdog/intake commands | verify selected auto and marker spelling, then check whether feed outputs ever command |
 | Auto shoots but misses the hub | `GetAdjustedShot`, `shot_table.json`, `Drive`, `Vision`, `AllianceFlipUtil` | pose, target pose, hood/flywheel/azimuth setpoints, measured flywheel RPS | compare auto pose to field and test same shot in teleop from same spot |
 | Vision pose jumps near the hub | `Vision`, `VisionIOLimelight`, `VisionConstants`, `Drive.addVisionMeasurement()` | accepted/rejected poses per camera, tag IDs, odometry pose | identify whether one camera causes jumps before changing global filters |
+| Only right-side camera poses look wrong | `VisionConstants`, Limelight physical config, AdvantageScope robot config | camera 1 accepted poses, tag IDs, camera transform assumptions | compare Java transform to physical mount; known right-camera config mismatch exists |
 | Robot drives fine but field-relative feels rotated | gyro IO, pose reset, `DriveCommands`, alliance or heading reset bindings | gyro yaw, robot pose rotation, driver command values | reset heading intentionally and compare robot-relative vs field-relative drive |
+| Robot gets slow only while intaking or shooting | `Drive.getMaxLinearSpeedMetersPerSec`, `Intake.isIntaking`, `Indexer.isFeedingForward` | intake state, indexer feeding state, commanded chassis speeds | confirm speed reduction is intentional before retuning drive |
 | One swerve module behaves differently | `Module`, `ModuleIOTalonFX`, `TunerConstants`, generated configs | measured/setpoint module states, drive/turn currents | raise robot safely, command low speed, compare module direction and encoder readings |
+| Button works on one controller/mode but not another | `RobotContainer`, `CrazyModeBindings`, binding mode chooser | selected/applied binding mode, command scheduling, subsystem command state | confirm competition vs CRAZY mode and remember mode changes apply only while disabled |
+| Auto event marker appears in GUI but robot does not act | PathPlanner marker command payload, registered `NamedCommands`, marker spelling | selected auto, marker names, intake/indexer command telemetry | verify marker has a command payload and matches a registered name |
 
 ## Response Pattern
 

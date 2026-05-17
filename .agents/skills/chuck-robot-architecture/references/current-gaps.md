@@ -10,10 +10,9 @@ Use this to avoid inventing robot capabilities that are not currently in the rep
 - Two turrets with azimuth, hood, and flywheel control.
 - REV Servo Hub hood output.
 - CANdi-backed turret zero switch reads.
-- Limelight-backed real vision and PhotonVision-backed sim vision.
+- Limelight-backed real vision.
 - Shot table interpolation for hood angle, flywheel RPS, and time of flight.
 - Shoot-on-the-move compensation using field-relative velocity.
-- Sim support for FUEL intake and launch behavior.
 
 ## Known Missing Or Partial
 
@@ -23,8 +22,14 @@ Use this to avoid inventing robot capabilities that are not currently in the rep
 - No current command appears to gate feeding on turret-ready, flywheel-ready, or hood-ready state.
 - `Start Shoot` starts intake, hotdogs, and indexer; it relies on default turret targeting for aim/setpoints.
 - Turret azimuth limits are marked as placeholders in constants and should be treated carefully.
+- Intake pivot positions are also marked as placeholder/update-me values.
+- Hood position has no feedback sensor in code; the stored hood position is the commanded pulse-derived value.
+- Hood servos share one static Servo Hub and are configured to keep power while disabled.
+- `Turret.lockedIn` is static, so the lock-mode toggle affects both turret instances.
 - Physical robot intent includes a divided hopper/hotdog floor, but software treats hotdogs as one motor output.
-- The code can simulate FUEL capacity and launch behavior, but real robot FUEL position is not directly sensed.
+- Real robot FUEL position is not directly sensed.
+- `limelight-right` has a known transform mismatch between Java constants and AdvantageScope config; confirm physical authority before editing.
+- PathPlanner settings do not exactly match drive-code mass/MOI/module spacing; confirm before tuning auto tracking.
 
 ## How To Discuss Gaps
 

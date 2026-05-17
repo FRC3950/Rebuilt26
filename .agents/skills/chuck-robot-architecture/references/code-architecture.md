@@ -7,12 +7,13 @@ Use this to map robot behavior to code paths before editing.
 - Java WPILib command-based robot.
 - GradleRIO 2026 project with AdvantageKit logging.
 - CTRE Phoenix 6, REVLib, PathPlannerLib, AdvantageKit, and PhotonVision vendordeps are present.
+- Toolchain snapshot from this checkout: GradleRIO `2026.2.1`, Phoenix 6 `26.1.3`, REVLib `2026.0.5`, PathPlannerLib `2026.1.2`, AdvantageKit `26.0.2`.
 - `Robot.java` stays thin; `RobotContainer` constructs subsystems, controls, autos, and named commands.
 - Hardware code follows an IO pattern:
   - subsystem owns behavior and logging
   - `*IO` defines hardware interface
   - `*IOTalonFX`, `*IOServoHub`, or `*IOLimelight` talks to real hardware
-  - `*IOSim` or no-op IO supports sim/replay
+  - no-op IO supports replay/unavailable hardware paths
 
 ## Where To Search First
 
@@ -29,7 +30,6 @@ Use this to map robot behavior to code paths before editing.
 | Vision pose | `subsystems/vision/*`, `VisionConstants.java`, `Drive.addVisionMeasurement()` |
 | Field transforms | `Constants.FieldConstants`, `util/AllianceFlipUtil.java`, `util/Zones.java` |
 | Autos and event markers | `src/main/deploy/pathplanner/autos`, `src/main/deploy/pathplanner/paths`, `RobotContainer` `NamedCommands` |
-| Fuel simulation | `sim/FuelSimulationController.java`, `FuelSimCommand.java`, `FuelLaunchCalculator.java` |
 
 ## Subsystems
 
@@ -47,6 +47,24 @@ Use this to map robot behavior to code paths before editing.
 - Binding mode can only be applied while disabled.
 - Turrets have default `TurretTargeting` commands in competition defaults.
 - `Turret.toggleTurretMode()` changes a static targeting mode used by both turrets.
+- Competition driver controller is port `0`; operator controller is port `1`.
+- Driver controls swerve, heading reset, and hub-facing drive lock.
+- Operator controls intake, retract, feed/shoot, unjam/reverse, and turret mode toggle.
+- `CRAZY` mode moves major actions to the driver controller only.
+
+## Important Trigger Bindings
+
+| Mode/input | Behavior |
+|---|---|
+| Driver left stick + right X | Default swerve drive |
+| Driver `Y` | Reset current pose rotation to zero while preserving translation |
+| Driver `A` held | Drive while facing the hub target |
+| Operator left trigger held | `IntakeCommand`: extend intake and run roller |
+| Operator right bumper | Retract intake |
+| Operator right trigger held | Start indexer and hotdog; stop both on release |
+| Operator `B` held | Reverse intake and hotdog for unjam |
+| Operator `A` | Toggle shared turret targeting lock mode |
+| Robot in neutral zone | Both turrets target closer ferry target instead of hub |
 
 ## Autos
 
@@ -62,6 +80,10 @@ Use this to map robot behavior to code paths before editing.
   - `End Shoot`
 - `Start Shoot` starts indexer, hotdogs, and intake. Turret aiming is expected to come from default turret commands.
 - If an auto drives correctly but does not shoot, inspect selected auto, path event markers, named-command spelling, and whether indexer/hotdog telemetry changes.
+- Existing auto names include `BlueSeedAuto`, `RedSeedAuto`, `PLAYOFF LEFT BATMAN`, `RIGHT GOTHAM DOUBLE`, and `SweepyFerry`.
+- Seed autos are path/pose-only and have no events.
+- North/south double autos use PathPlanner event markers such as `Intake Zone` and `Shoot Early`; a regression test checks that path event markers carry command payloads.
+- PathPlanner event triggers were moved into GUI path markers; do not re-add ad hoc event-trigger logic in `RobotContainer` without a clear reason.
 
 ## Important Telemetry Names
 
@@ -70,3 +92,12 @@ Use this to map robot behavior to code paths before editing.
 - Drive: `SwerveStates/Measured`, `SwerveStates/Setpoints`, `SwerveChassisSpeeds/Measured`, `SwerveChassisSpeeds/Setpoints`, `Odometry/Trajectory`, `Odometry/TrajectorySetpoint`
 - Vision: `Vision/Camera0/RobotPosesAccepted`, `Vision/Camera1/RobotPosesAccepted`, rejected-pose equivalents, and `Vision/Summary/*`
 - Turret values are logged through component keys such as `Turret/Left/Azimuth`, `Turret/Right/Flywheels`, plus `@AutoLogOutput` values from `Turret`.
+
+## Code Gotchas
+
+- `Drive.getMaxLinearSpeedMetersPerSec()` reduces teleop speed to `2.5 m/s` while intake or feed is active.
+- PathPlanner drive/rotation PID is currently `5.0, 0.0, 0.0`.
+- Drive code mass/MOI differs from PathPlanner settings; confirm which reflects the real robot before tuning autos.
+- `.auto` files report `"version": "2025.0"` in this 2026 project; confirm compatibility before assuming the file format is wrong.
+- `GetAdjustedShot.ShootingParameters.isValid()` prints when invalid; a missing or bad shot table can spam stdout.
+- `Drive.periodic()` stops all modules and clears setpoint logs while disabled.

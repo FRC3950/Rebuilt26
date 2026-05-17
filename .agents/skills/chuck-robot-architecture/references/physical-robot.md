@@ -46,6 +46,8 @@ Use this when a student describes what Chuck physically did or when code needs r
 ## Drive, Vision, And Electronics
 
 - Drivebase: four SDS MK4i swerve modules with Kraken X60 motors and Colson wheels.
+- Code-confirmed module hardware is TalonFX drive, TalonFX steer, and CANcoder absolute encoder per module.
+- Code geometry: module locations are about `10.875 in` forward/back and `11.375 in` left/right from robot center, giving about `21.75 in` wheelbase and `22.75 in` track width.
 - The code is based on the AdvantageKit CTRE swerve template, upgraded to the IO-style subsystem pattern.
 - Chuck uses a roboRIO 2.0, REV PDH, mini PDH, CTRE CANivore, and REV Servo Hub.
 - Most CAN devices are on the CTRE CANivore.
@@ -53,6 +55,32 @@ Use this when a student describes what Chuck physically did or when code needs r
 - Vision has two Limelights:
   - `limelight-back`, mounted near the turrets
   - `limelight-right`, mounted on the robot's right side
+
+## CAN And Port Map
+
+| Device | ID / port | Bus |
+|---|---:|---|
+| Front-left drive / steer / encoder | `9` / `8` / `44` | CANivore |
+| Front-right drive / steer / encoder | `6` / `7` / `41` | CANivore |
+| Back-left drive / steer / encoder | `0` / `1` / `43` | CANivore |
+| Back-right drive / steer / encoder | `10` / `11` / `42` | CANivore |
+| Pigeon 2 | `46` | CANivore |
+| Intake roller / pivot | `5` / `12` | CANivore |
+| Hotdog / indexer | `4` / `14` | CANivore |
+| Left turret azimuth / flywheel leader / follower | `19` / `3` / `2` | CANivore |
+| Right turret azimuth / flywheel leader / follower | `17` / `16` / `18` | CANivore |
+| Turret zeroing CANdi | `45` | CANivore |
+| Hood Servo Hub | `63` | roboRIO CAN |
+
+- No roboRIO DIO, PWM, analog, or pneumatics are currently represented in project source.
+- Turret zero switches use CANdi S1/S2, not roboRIO DIO.
+
+## Camera Pose Notes
+
+- `limelight-back` code transform: `(-0.3118612, 0.2235454, 0.2118868)` m, pitch `-30 deg`, yaw `180 deg`.
+- `limelight-right` code transform: `(13.372 in, -2.875 in, 7.48 in)`, pitch `-20 deg`, yaw `-90 deg`.
+- `limelight-right` has a known mismatch between Java `VisionConstants` and the AdvantageScope model config. Confirm which source is authoritative before changing camera poses.
+- Real Limelight mounting/configuration must be updated separately from Java constants when the physical camera pose changes.
 
 ## Known Physical Context Limits
 
