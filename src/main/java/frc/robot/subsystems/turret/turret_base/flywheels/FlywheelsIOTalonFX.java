@@ -23,7 +23,11 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
   private final StatusSignal<AngularVelocity> leaderVelocity;
   private final StatusSignal<Voltage> leaderAppliedVolts;
   private final StatusSignal<Current> leaderCurrent;
+  private final StatusSignal<Voltage> leaderSupplyVoltage;
+  private final StatusSignal<Current> leaderSupplyCurrent;
   private final StatusSignal<AngularVelocity> followerVelocity;
+  private final StatusSignal<Voltage> followerSupplyVoltage;
+  private final StatusSignal<Current> followerSupplyCurrent;
   private final Debouncer leaderConnectedDebounce =
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final Debouncer followerConnectedDebounce =
@@ -36,7 +40,11 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
     leaderVelocity = flywheel.getVelocity();
     leaderAppliedVolts = flywheel.getMotorVoltage();
     leaderCurrent = flywheel.getStatorCurrent();
+    leaderSupplyVoltage = flywheel.getSupplyVoltage();
+    leaderSupplyCurrent = flywheel.getSupplyCurrent();
     followerVelocity = flywheelFollower.getVelocity();
+    followerSupplyVoltage = flywheelFollower.getSupplyVoltage();
+    followerSupplyCurrent = flywheelFollower.getSupplyCurrent();
 
     flywheel.getConfigurator().apply(flywheelConfig);
     flywheelFollower.setControl(new Follower(flywheelID, MotorAlignmentValue.Opposed));
@@ -45,8 +53,14 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
   @Override
   public void updateInputs(FlywheelsIOInputs inputs) {
     var leaderStatus =
-        BaseStatusSignal.refreshAll(leaderVelocity, leaderAppliedVolts, leaderCurrent);
-    var followerStatus = BaseStatusSignal.refreshAll(followerVelocity);
+        BaseStatusSignal.refreshAll(
+            leaderVelocity,
+            leaderAppliedVolts,
+            leaderCurrent,
+            leaderSupplyVoltage,
+            leaderSupplyCurrent);
+    var followerStatus =
+        BaseStatusSignal.refreshAll(followerVelocity, followerSupplyVoltage, followerSupplyCurrent);
 
     inputs.leaderConnected = leaderConnectedDebounce.calculate(leaderStatus.isOK());
     inputs.followerConnected = followerConnectedDebounce.calculate(followerStatus.isOK());
@@ -54,6 +68,10 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
     inputs.followerVelocityRps = followerVelocity.getValueAsDouble() / flywheelGearRatio;
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps = leaderCurrent.getValueAsDouble();
+    inputs.leaderSupplyVoltageVolts = leaderSupplyVoltage.getValueAsDouble();
+    inputs.leaderSupplyCurrentAmps = leaderSupplyCurrent.getValueAsDouble();
+    inputs.followerSupplyVoltageVolts = followerSupplyVoltage.getValueAsDouble();
+    inputs.followerSupplyCurrentAmps = followerSupplyCurrent.getValueAsDouble();
   }
 
   @Override

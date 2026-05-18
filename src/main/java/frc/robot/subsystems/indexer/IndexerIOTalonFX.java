@@ -25,9 +25,13 @@ public class IndexerIOTalonFX implements IndexerIO {
   private final StatusSignal<AngularVelocity> indexerVelocity = indexerMotor.getVelocity();
   private final StatusSignal<Voltage> indexerAppliedVolts = indexerMotor.getMotorVoltage();
   private final StatusSignal<Current> indexerCurrent = indexerMotor.getStatorCurrent();
+  private final StatusSignal<Voltage> indexerSupplyVoltage = indexerMotor.getSupplyVoltage();
+  private final StatusSignal<Current> indexerSupplyCurrent = indexerMotor.getSupplyCurrent();
   private final StatusSignal<AngularVelocity> hotdogVelocity = hotdogMotor.getVelocity();
   private final StatusSignal<Voltage> hotdogAppliedVolts = hotdogMotor.getMotorVoltage();
   private final StatusSignal<Current> hotdogCurrent = hotdogMotor.getStatorCurrent();
+  private final StatusSignal<Voltage> hotdogSupplyVoltage = hotdogMotor.getSupplyVoltage();
+  private final StatusSignal<Current> hotdogSupplyCurrent = hotdogMotor.getSupplyCurrent();
 
   private final Debouncer indexerConnectedDebounce =
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
@@ -42,19 +46,33 @@ public class IndexerIOTalonFX implements IndexerIO {
   @Override
   public void updateInputs(IndexerIOInputs inputs) {
     var indexerStatus =
-        BaseStatusSignal.refreshAll(indexerVelocity, indexerAppliedVolts, indexerCurrent);
+        BaseStatusSignal.refreshAll(
+            indexerVelocity,
+            indexerAppliedVolts,
+            indexerCurrent,
+            indexerSupplyVoltage,
+            indexerSupplyCurrent);
     var hotdogStatus =
-        BaseStatusSignal.refreshAll(hotdogVelocity, hotdogAppliedVolts, hotdogCurrent);
+        BaseStatusSignal.refreshAll(
+            hotdogVelocity,
+            hotdogAppliedVolts,
+            hotdogCurrent,
+            hotdogSupplyVoltage,
+            hotdogSupplyCurrent);
 
     inputs.indexerConnected = indexerConnectedDebounce.calculate(indexerStatus.isOK());
     inputs.indexerVelocityRps = indexerVelocity.getValueAsDouble();
     inputs.indexerAppliedVolts = indexerAppliedVolts.getValueAsDouble();
     inputs.indexerCurrentAmps = indexerCurrent.getValueAsDouble();
+    inputs.indexerSupplyVoltageVolts = indexerSupplyVoltage.getValueAsDouble();
+    inputs.indexerSupplyCurrentAmps = indexerSupplyCurrent.getValueAsDouble();
 
     inputs.hotdogConnected = hotdogConnectedDebounce.calculate(hotdogStatus.isOK());
     inputs.hotdogVelocityRps = hotdogVelocity.getValueAsDouble();
     inputs.hotdogAppliedVolts = hotdogAppliedVolts.getValueAsDouble();
     inputs.hotdogCurrentAmps = hotdogCurrent.getValueAsDouble();
+    inputs.hotdogSupplyVoltageVolts = hotdogSupplyVoltage.getValueAsDouble();
+    inputs.hotdogSupplyCurrentAmps = hotdogSupplyCurrent.getValueAsDouble();
   }
 
   @Override

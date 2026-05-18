@@ -122,4 +122,3 @@ Analysis:
 - Build transition table with timestamp, from, to, and duration.
 - Compare transition timing with sensor values.
 - Flag impossible transitions, rapid oscillation, or states that never exit.
-

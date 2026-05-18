@@ -100,4 +100,3 @@ This is a compact index for online lookup. Do not treat it as a copy of the docs
   - `site:docs.limelightvision.io LimelightHelpers Java getBotPose`
   - `site:github.com/LimelightVision/limelightlib-wpijava LimelightHelpers`
   - `site:docs.limelightvision.io NetworkTables tx ty tv botpose`
-

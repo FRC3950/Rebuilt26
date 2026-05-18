@@ -34,9 +34,14 @@ public class HoodIOServoHub implements HoodIO {
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
+    ServoHub servoHub = getConfiguredHoodServoHub();
     inputs.connected = true;
     inputs.positionDeg = positionDeg;
     inputs.pulseWidthUs = pulseWidthUs;
+    inputs.hubDeviceVoltageVolts = servoHub.getDeviceVoltage();
+    inputs.hubDeviceCurrentAmps = servoHub.getDeviceCurrent();
+    inputs.servoVoltageVolts = servoHub.getServoVoltage();
+    inputs.channelCurrentAmps = hoodServo.getCurrent();
   }
 
   @Override

@@ -4,6 +4,7 @@ import static frc.robot.Constants.SubsystemConstants.Turret.maxFlywheelRps;
 import static frc.robot.Constants.SubsystemConstants.Turret.minFlywheelRps;
 
 import edu.wpi.first.math.MathUtil;
+import frc.robot.util.BatteryLogger;
 import org.littletonrobotics.junction.Logger;
 
 public class Flywheels {
@@ -21,6 +22,8 @@ public class Flywheels {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(logKey, inputs);
+    BatteryLogger.reportCurrentUsage(logKey + "/Leader", inputs.leaderSupplyCurrentAmps);
+    BatteryLogger.reportCurrentUsage(logKey + "/Follower", inputs.followerSupplyCurrentAmps);
   }
 
   public void setTargetRps(double flywheelSpeedRps) {

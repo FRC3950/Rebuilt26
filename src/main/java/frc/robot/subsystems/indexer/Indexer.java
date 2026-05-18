@@ -8,6 +8,7 @@ import static frc.robot.Constants.SubsystemConstants.Indexer.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.BatteryLogger;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -26,6 +27,8 @@ public class Indexer extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Indexer", inputs);
+    BatteryLogger.reportCurrentUsage("Indexer/Indexer", inputs.indexerSupplyCurrentAmps);
+    BatteryLogger.reportCurrentUsage("Indexer/Hotdog", inputs.hotdogSupplyCurrentAmps);
   }
 
   public void setIndexerSpeed(double speed) {

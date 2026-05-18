@@ -117,4 +117,3 @@ For telemetry reports:
 - Recommended code/config changes and a verification step.
 
 If a parser, docs page, or NT client is unavailable, state what is missing and propose the smallest local helper or tool needed. Do not pretend telemetry or documentation was inspected.
-

@@ -26,10 +26,14 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final StatusSignal<AngularVelocity> rollerVelocity = intakeMotor.getVelocity();
   private final StatusSignal<Voltage> rollerAppliedVolts = intakeMotor.getMotorVoltage();
   private final StatusSignal<Current> rollerCurrent = intakeMotor.getStatorCurrent();
+  private final StatusSignal<Voltage> rollerSupplyVoltage = intakeMotor.getSupplyVoltage();
+  private final StatusSignal<Current> rollerSupplyCurrent = intakeMotor.getSupplyCurrent();
   private final StatusSignal<Angle> pivotPosition = pivotMotor.getPosition();
   private final StatusSignal<AngularVelocity> pivotVelocity = pivotMotor.getVelocity();
   private final StatusSignal<Voltage> pivotAppliedVolts = pivotMotor.getMotorVoltage();
   private final StatusSignal<Current> pivotCurrent = pivotMotor.getStatorCurrent();
+  private final StatusSignal<Voltage> pivotSupplyVoltage = pivotMotor.getSupplyVoltage();
+  private final StatusSignal<Current> pivotSupplyCurrent = pivotMotor.getSupplyCurrent();
 
   private final Debouncer rollerConnectedDebounce =
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
@@ -44,20 +48,35 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
     var rollerStatus =
-        BaseStatusSignal.refreshAll(rollerVelocity, rollerAppliedVolts, rollerCurrent);
+        BaseStatusSignal.refreshAll(
+            rollerVelocity,
+            rollerAppliedVolts,
+            rollerCurrent,
+            rollerSupplyVoltage,
+            rollerSupplyCurrent);
     var pivotStatus =
-        BaseStatusSignal.refreshAll(pivotPosition, pivotVelocity, pivotAppliedVolts, pivotCurrent);
+        BaseStatusSignal.refreshAll(
+            pivotPosition,
+            pivotVelocity,
+            pivotAppliedVolts,
+            pivotCurrent,
+            pivotSupplyVoltage,
+            pivotSupplyCurrent);
 
     inputs.rollerConnected = rollerConnectedDebounce.calculate(rollerStatus.isOK());
     inputs.rollerVelocityRps = rollerVelocity.getValueAsDouble();
     inputs.rollerAppliedVolts = rollerAppliedVolts.getValueAsDouble();
     inputs.rollerCurrentAmps = rollerCurrent.getValueAsDouble();
+    inputs.rollerSupplyVoltageVolts = rollerSupplyVoltage.getValueAsDouble();
+    inputs.rollerSupplyCurrentAmps = rollerSupplyCurrent.getValueAsDouble();
 
     inputs.pivotConnected = pivotConnectedDebounce.calculate(pivotStatus.isOK());
     inputs.pivotPosition = pivotPosition.getValueAsDouble();
     inputs.pivotVelocityRps = pivotVelocity.getValueAsDouble();
     inputs.pivotAppliedVolts = pivotAppliedVolts.getValueAsDouble();
     inputs.pivotCurrentAmps = pivotCurrent.getValueAsDouble();
+    inputs.pivotSupplyVoltageVolts = pivotSupplyVoltage.getValueAsDouble();
+    inputs.pivotSupplyCurrentAmps = pivotSupplyCurrent.getValueAsDouble();
   }
 
   @Override

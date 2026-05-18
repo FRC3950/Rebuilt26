@@ -9,11 +9,15 @@ public interface IndexerIO {
     public double indexerVelocityRps = 0.0;
     public double indexerAppliedVolts = 0.0;
     public double indexerCurrentAmps = 0.0;
+    public double indexerSupplyVoltageVolts = 0.0;
+    public double indexerSupplyCurrentAmps = 0.0;
 
     public boolean hotdogConnected = false;
     public double hotdogVelocityRps = 0.0;
     public double hotdogAppliedVolts = 0.0;
     public double hotdogCurrentAmps = 0.0;
+    public double hotdogSupplyVoltageVolts = 0.0;
+    public double hotdogSupplyCurrentAmps = 0.0;
   }
 
   default void updateInputs(IndexerIOInputs inputs) {}

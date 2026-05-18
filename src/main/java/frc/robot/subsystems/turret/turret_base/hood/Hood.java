@@ -4,6 +4,7 @@ import static frc.robot.Constants.SubsystemConstants.Turret.maxHoodAngle;
 import static frc.robot.Constants.SubsystemConstants.Turret.minHoodAngle;
 
 import edu.wpi.first.math.MathUtil;
+import frc.robot.util.BatteryLogger;
 import org.littletonrobotics.junction.Logger;
 
 public class Hood {
@@ -22,6 +23,7 @@ public class Hood {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(logKey, inputs);
+    BatteryLogger.reportCurrentUsage(logKey, inputs.channelCurrentAmps);
   }
 
   public void setAngleDeg(double hoodAngleDeg) {

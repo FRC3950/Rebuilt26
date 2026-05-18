@@ -27,6 +27,8 @@ public class AzimuthIOTalonFX implements AzimuthIO {
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<Voltage> appliedVolts;
   private final StatusSignal<Current> current;
+  private final StatusSignal<Voltage> supplyVoltage;
+  private final StatusSignal<Current> supplyCurrent;
   private final Debouncer connectedDebounce = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
 
   public AzimuthIOTalonFX(
@@ -47,18 +49,24 @@ public class AzimuthIOTalonFX implements AzimuthIO {
     velocity = azimuth.getVelocity();
     appliedVolts = azimuth.getMotorVoltage();
     current = azimuth.getStatorCurrent();
+    supplyVoltage = azimuth.getSupplyVoltage();
+    supplyCurrent = azimuth.getSupplyCurrent();
     azimuth.getConfigurator().apply(azimuthConfig);
   }
 
   @Override
   public void updateInputs(AzimuthIOInputs inputs) {
-    var status = BaseStatusSignal.refreshAll(position, velocity, appliedVolts, current);
+    var status =
+        BaseStatusSignal.refreshAll(
+            position, velocity, appliedVolts, current, supplyVoltage, supplyCurrent);
     inputs.connected = connectedDebounce.calculate(status.isOK());
     inputs.positionDeg = Units.rotationsToDegrees(position.getValueAsDouble() / azimuthGearRatio);
     inputs.velocityDegPerSec =
         Units.rotationsToDegrees(velocity.getValueAsDouble() / azimuthGearRatio);
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = current.getValueAsDouble();
+    inputs.supplyVoltageVolts = supplyVoltage.getValueAsDouble();
+    inputs.supplyCurrentAmps = supplyCurrent.getValueAsDouble();
     if (zeroingCandi == null) {
       inputs.zeroSwitchClosed = false;
       return;

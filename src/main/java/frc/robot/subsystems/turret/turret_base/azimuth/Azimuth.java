@@ -1,5 +1,6 @@
 package frc.robot.subsystems.turret.turret_base.azimuth;
 
+import frc.robot.util.BatteryLogger;
 import org.littletonrobotics.junction.Logger;
 
 public class Azimuth {
@@ -17,6 +18,7 @@ public class Azimuth {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(logKey, inputs);
+    BatteryLogger.reportCurrentUsage(logKey, inputs.supplyCurrentAmps);
   }
 
   public void setTargetAngleDeg(double targetAngleDeg) {

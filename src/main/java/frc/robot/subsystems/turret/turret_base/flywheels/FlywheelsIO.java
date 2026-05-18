@@ -11,6 +11,10 @@ public interface FlywheelsIO {
     public double followerVelocityRps = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
+    public double leaderSupplyVoltageVolts = 0.0;
+    public double leaderSupplyCurrentAmps = 0.0;
+    public double followerSupplyVoltageVolts = 0.0;
+    public double followerSupplyCurrentAmps = 0.0;
   }
 
   default void updateInputs(FlywheelsIOInputs inputs) {}

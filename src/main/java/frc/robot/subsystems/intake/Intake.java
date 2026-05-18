@@ -9,6 +9,7 @@ import static frc.robot.Constants.SubsystemConstants.Intake.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.BatteryLogger;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -28,6 +29,8 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake", inputs);
+    BatteryLogger.reportCurrentUsage("Intake/Roller", inputs.rollerSupplyCurrentAmps);
+    BatteryLogger.reportCurrentUsage("Intake/Pivot", inputs.pivotSupplyCurrentAmps);
   }
 
   public void setIntakeSpeed(double speed) {
