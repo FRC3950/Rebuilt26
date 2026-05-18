@@ -31,9 +31,18 @@ public class AzimuthIOTalonFX implements AzimuthIO {
 
   public AzimuthIOTalonFX(
       int azimuthID, TalonFXConfiguration azimuthConfig, CANBus canbus, boolean usesCandiS1) {
+    this(azimuthID, azimuthConfig, canbus, usesCandiS1, true);
+  }
+
+  public AzimuthIOTalonFX(
+      int azimuthID,
+      TalonFXConfiguration azimuthConfig,
+      CANBus canbus,
+      boolean usesCandiS1,
+      boolean enableZeroSwitch) {
     this.usesCandiS1 = usesCandiS1;
     azimuth = new TalonFX(azimuthID, canbus);
-    zeroingCandi = new CANdi(TURRET_CANDI_ID, canbus);
+    zeroingCandi = enableZeroSwitch ? new CANdi(TURRET_CANDI_ID, canbus) : null;
     position = azimuth.getPosition();
     velocity = azimuth.getVelocity();
     appliedVolts = azimuth.getMotorVoltage();
@@ -50,6 +59,10 @@ public class AzimuthIOTalonFX implements AzimuthIO {
         Units.rotationsToDegrees(velocity.getValueAsDouble() / azimuthGearRatio);
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.currentAmps = current.getValueAsDouble();
+    if (zeroingCandi == null) {
+      inputs.zeroSwitchClosed = false;
+      return;
+    }
     inputs.zeroSwitchClosed =
         usesCandiS1
             ? Boolean.TRUE.equals(zeroingCandi.getS1Closed().getValue())
