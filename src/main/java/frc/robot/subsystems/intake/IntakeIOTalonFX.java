@@ -10,6 +10,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
@@ -18,6 +19,8 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
 public class IntakeIOTalonFX implements IntakeIO {
+  private static final int POWER_STATUS_PERIOD_LOOPS = 5;
+
   private final TalonFX intakeMotor = new TalonFX(intakeMotorID, CANivore);
   private final TalonFX pivotMotor = new TalonFX(pivotMotorID, CANivore);
   private final MotionMagicVoltage pivotControl = new MotionMagicVoltage(0);
@@ -39,44 +42,56 @@ public class IntakeIOTalonFX implements IntakeIO {
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final Debouncer pivotConnectedDebounce =
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private int refreshCounter = 0;
 
   public IntakeIOTalonFX() {
     pivotMotor.getConfigurator().apply(pivotConfig);
     intakeMotor.getConfigurator().apply(intakeConfig);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        50.0,
+        rollerVelocity,
+        rollerAppliedVolts,
+        rollerCurrent,
+        pivotPosition,
+        pivotVelocity,
+        pivotAppliedVolts,
+        pivotCurrent);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        10.0, rollerSupplyVoltage, rollerSupplyCurrent, pivotSupplyVoltage, pivotSupplyCurrent);
+    ParentDevice.optimizeBusUtilizationForAll(intakeMotor, pivotMotor);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
+    boolean refreshPowerSignals = refreshCounter % POWER_STATUS_PERIOD_LOOPS == 0;
     var rollerStatus =
-        BaseStatusSignal.refreshAll(
-            rollerVelocity,
-            rollerAppliedVolts,
-            rollerCurrent,
-            rollerSupplyVoltage,
-            rollerSupplyCurrent);
+        BaseStatusSignal.refreshAll(rollerVelocity, rollerAppliedVolts, rollerCurrent);
     var pivotStatus =
-        BaseStatusSignal.refreshAll(
-            pivotPosition,
-            pivotVelocity,
-            pivotAppliedVolts,
-            pivotCurrent,
-            pivotSupplyVoltage,
-            pivotSupplyCurrent);
+        BaseStatusSignal.refreshAll(pivotPosition, pivotVelocity, pivotAppliedVolts, pivotCurrent);
+    if (refreshPowerSignals) {
+      BaseStatusSignal.refreshAll(
+          rollerSupplyVoltage, rollerSupplyCurrent, pivotSupplyVoltage, pivotSupplyCurrent);
+    }
 
     inputs.rollerConnected = rollerConnectedDebounce.calculate(rollerStatus.isOK());
     inputs.rollerVelocityRps = rollerVelocity.getValueAsDouble();
     inputs.rollerAppliedVolts = rollerAppliedVolts.getValueAsDouble();
     inputs.rollerCurrentAmps = rollerCurrent.getValueAsDouble();
-    inputs.rollerSupplyVoltageVolts = rollerSupplyVoltage.getValueAsDouble();
-    inputs.rollerSupplyCurrentAmps = rollerSupplyCurrent.getValueAsDouble();
+    if (refreshPowerSignals) {
+      inputs.rollerSupplyVoltageVolts = rollerSupplyVoltage.getValueAsDouble();
+      inputs.rollerSupplyCurrentAmps = rollerSupplyCurrent.getValueAsDouble();
+    }
 
     inputs.pivotConnected = pivotConnectedDebounce.calculate(pivotStatus.isOK());
     inputs.pivotPosition = pivotPosition.getValueAsDouble();
     inputs.pivotVelocityRps = pivotVelocity.getValueAsDouble();
     inputs.pivotAppliedVolts = pivotAppliedVolts.getValueAsDouble();
     inputs.pivotCurrentAmps = pivotCurrent.getValueAsDouble();
-    inputs.pivotSupplyVoltageVolts = pivotSupplyVoltage.getValueAsDouble();
-    inputs.pivotSupplyCurrentAmps = pivotSupplyCurrent.getValueAsDouble();
+    if (refreshPowerSignals) {
+      inputs.pivotSupplyVoltageVolts = pivotSupplyVoltage.getValueAsDouble();
+      inputs.pivotSupplyCurrentAmps = pivotSupplyCurrent.getValueAsDouble();
+    }
+    refreshCounter++;
   }
 
   @Override

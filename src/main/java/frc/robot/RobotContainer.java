@@ -99,6 +99,7 @@ public class RobotContainer {
   private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
 
   private BindingMode appliedBindingMode = BindingMode.COMPETITION;
+  private BindingMode lastPublishedSelectedBindingMode = null;
 
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -254,8 +255,7 @@ public class RobotContainer {
 
   public void checkMode() {
     BindingMode selectedBindingMode = getSelectedBindingMode();
-    SmartDashboard.putString("Code Mode/Selected", selectedBindingMode.name());
-    Logger.recordOutput("Controls/BindingModeSelected", selectedBindingMode.name());
+    publishSelectedBindingMode(selectedBindingMode);
 
     if (!shouldApplyBindingMode(
         selectedBindingMode, appliedBindingMode, DriverStation.isDisabled())) {
@@ -442,6 +442,16 @@ public class RobotContainer {
     appliedBindingMode = bindingMode;
     SmartDashboard.putString("Code Mode/Applied", appliedBindingMode.name());
     Logger.recordOutput("Controls/BindingModeApplied", appliedBindingMode.name());
+  }
+
+  private void publishSelectedBindingMode(BindingMode selectedBindingMode) {
+    if (selectedBindingMode == lastPublishedSelectedBindingMode) {
+      return;
+    }
+
+    lastPublishedSelectedBindingMode = selectedBindingMode;
+    SmartDashboard.putString("Code Mode/Selected", selectedBindingMode.name());
+    Logger.recordOutput("Controls/BindingModeSelected", selectedBindingMode.name());
   }
 
   private BindingMode getSelectedBindingMode() {

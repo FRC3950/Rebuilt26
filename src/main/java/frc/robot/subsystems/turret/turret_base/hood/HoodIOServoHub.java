@@ -17,12 +17,15 @@ import com.revrobotics.servohub.config.ServoHubConfig;
 import edu.wpi.first.math.MathUtil;
 
 public class HoodIOServoHub implements HoodIO {
+  private static final int POWER_STATUS_PERIOD_LOOPS = 5;
+
   private static ServoHub hoodServoHub;
 
   private final ServoChannel hoodServo;
   private final boolean invertPulseDirection;
   private double positionDeg = minHoodAngle;
   private int pulseWidthUs = hoodAngleToPulseWidthUs(minHoodAngle, false);
+  private int refreshCounter = 0;
 
   public HoodIOServoHub(ServoChannel.ChannelId hoodChannelId) {
     hoodServo = getConfiguredHoodServoHub().getServoChannel(hoodChannelId);
@@ -34,14 +37,17 @@ public class HoodIOServoHub implements HoodIO {
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    ServoHub servoHub = getConfiguredHoodServoHub();
     inputs.connected = true;
     inputs.positionDeg = positionDeg;
     inputs.pulseWidthUs = pulseWidthUs;
-    inputs.hubDeviceVoltageVolts = servoHub.getDeviceVoltage();
-    inputs.hubDeviceCurrentAmps = servoHub.getDeviceCurrent();
-    inputs.servoVoltageVolts = servoHub.getServoVoltage();
-    inputs.channelCurrentAmps = hoodServo.getCurrent();
+    if (refreshCounter % POWER_STATUS_PERIOD_LOOPS == 0) {
+      ServoHub servoHub = getConfiguredHoodServoHub();
+      inputs.hubDeviceVoltageVolts = servoHub.getDeviceVoltage();
+      inputs.hubDeviceCurrentAmps = servoHub.getDeviceCurrent();
+      inputs.servoVoltageVolts = servoHub.getServoVoltage();
+      inputs.channelCurrentAmps = hoodServo.getCurrent();
+    }
+    refreshCounter++;
   }
 
   @Override

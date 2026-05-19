@@ -13,10 +13,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
 import frc.robot.util.Distancer;
 import java.util.List;
+import org.littletonrobotics.junction.Logger;
 
 public class GetAdjustedShot {
   private static final int LOOKAHEAD_ITERATIONS = 10;
   private static final double SHOT_EXTRA_LATENCY_SECS = 0.05;
+  private static boolean lastReportedValid = true;
+  private static String lastReportedInvalidReason = "";
 
   private final LinearFilter turretAngleFilter =
       LinearFilter.movingAverage((int) Math.max(1, Math.round(0.1 / Constants.loopPeriodSecs)));
@@ -32,8 +35,15 @@ public class GetAdjustedShot {
       double flywheelSpeed, // same units as flywheelSpeeds[] (ex: RPS)
       String invalidReason) {
     public boolean isValid() {
-      if (!isValid) {
-        System.out.println("Invalid shot parameters: " + invalidReason);
+      if (isValid) {
+        if (!lastReportedValid) {
+          Logger.recordOutput("Turret/InvalidShotReason", "");
+        }
+        lastReportedValid = true;
+      } else if (lastReportedValid || !invalidReason.equals(lastReportedInvalidReason)) {
+        Logger.recordOutput("Turret/InvalidShotReason", invalidReason);
+        lastReportedValid = false;
+        lastReportedInvalidReason = invalidReason;
       }
       return isValid;
     }

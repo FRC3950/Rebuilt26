@@ -62,12 +62,16 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    boolean shouldFlushNetworkTables = false;
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
+      shouldFlushNetworkTables |= inputs[i].hasNewData;
     }
 
-    if (Constants.currentMode == Constants.Mode.REAL) NetworkTableInstance.getDefault().flush();
+    if (Constants.currentMode == Constants.Mode.REAL && shouldFlushNetworkTables) {
+      NetworkTableInstance.getDefault().flush();
+    }
 
     // Initialize logging values
     List<Pose3d> allTagPoses = new LinkedList<>();

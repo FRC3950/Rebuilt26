@@ -5,9 +5,12 @@ import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class TurretVisualization extends SubsystemBase {
+  private static final Pose3d[] ZEROED_COMPONENT_POSES = {new Pose3d(), new Pose3d()};
+
   private final Turret turret1;
   private final Turret turret2;
 
@@ -18,7 +21,11 @@ public class TurretVisualization extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d(), new Pose3d()});
+    if (Constants.currentMode != Constants.Mode.REPLAY) {
+      return;
+    }
+
+    Logger.recordOutput("ZeroedComponentPoses", ZEROED_COMPONENT_POSES);
     Logger.recordOutput(
         "FinalComponentPoses",
         new Pose3d[] {

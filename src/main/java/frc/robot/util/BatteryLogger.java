@@ -11,12 +11,17 @@ import org.littletonrobotics.junction.Logger;
 
 public final class BatteryLogger {
   private static final BatteryLogger instance = new BatteryLogger();
+  private static final int DETAIL_LOG_PERIOD_LOOPS = 5;
+  private static final int PDH_LOG_PERIOD_LOOPS = 5;
 
   private final Map<String, Double> currentReports = new HashMap<>();
+  private final Map<String, Double> currentRollups = new HashMap<>();
+  private final Map<String, String[]> rollupKeysByReportKey = new HashMap<>();
   private final Map<String, Double> energyJoules = new HashMap<>();
   private final Set<String> previouslyLoggedRollups = new HashSet<>();
   private final PowerDistribution powerDistribution;
   private double totalReportedEnergyJoules = 0.0;
+  private int loopCounter = 0;
 
   private BatteryLogger() {
     powerDistribution =
@@ -33,17 +38,18 @@ public final class BatteryLogger {
 
   public void periodicAfterScheduler() {
     double voltageVolts = getBatteryVoltage();
-    Map<String, Double> currentRollups = new HashMap<>();
+    currentRollups.clear();
+    double totalReportedCurrentAmps = 0.0;
 
     for (var entry : currentReports.entrySet()) {
       double currentAmps = sanitize(entry.getValue());
+      totalReportedCurrentAmps += currentAmps;
       addRollups(currentRollups, entry.getKey(), currentAmps);
     }
 
-    double totalReportedCurrentAmps =
-        currentReports.values().stream().mapToDouble(BatteryLogger::sanitize).sum();
     double totalReportedPowerWatts = totalReportedCurrentAmps * voltageVolts;
     totalReportedEnergyJoules += totalReportedPowerWatts * Constants.loopPeriodSecs;
+    boolean logDetails = loopCounter % DETAIL_LOG_PERIOD_LOOPS == 0;
 
     for (var rollup : currentRollups.entrySet()) {
       String key = rollup.getKey();
@@ -53,31 +59,43 @@ public final class BatteryLogger {
           energyJoules.getOrDefault(key, 0.0) + powerWatts * Constants.loopPeriodSecs;
       energyJoules.put(key, totalEnergyJoules);
 
-      Logger.recordOutput("EnergyLogger/Current/" + key, currentAmps);
-      Logger.recordOutput("EnergyLogger/Power/" + key, powerWatts);
-      Logger.recordOutput("EnergyLogger/Energy/" + key, totalEnergyJoules);
-    }
-
-    for (String staleKey : previouslyLoggedRollups) {
-      if (!currentRollups.containsKey(staleKey)) {
-        Logger.recordOutput("EnergyLogger/Current/" + staleKey, 0.0);
-        Logger.recordOutput("EnergyLogger/Power/" + staleKey, 0.0);
+      if (logDetails) {
+        Logger.recordOutput("EnergyLogger/Current/" + key, currentAmps);
+        Logger.recordOutput("EnergyLogger/Power/" + key, powerWatts);
+        Logger.recordOutput("EnergyLogger/Energy/" + key, totalEnergyJoules);
       }
     }
-    previouslyLoggedRollups.clear();
-    previouslyLoggedRollups.addAll(currentRollups.keySet());
+
+    if (logDetails) {
+      for (String staleKey : previouslyLoggedRollups) {
+        if (!currentRollups.containsKey(staleKey)) {
+          Logger.recordOutput("EnergyLogger/Current/" + staleKey, 0.0);
+          Logger.recordOutput("EnergyLogger/Power/" + staleKey, 0.0);
+        }
+      }
+      previouslyLoggedRollups.clear();
+      previouslyLoggedRollups.addAll(currentRollups.keySet());
+    }
 
     Logger.recordOutput("EnergyLogger/Current/TotalReportedAmps", totalReportedCurrentAmps);
     Logger.recordOutput("EnergyLogger/Power/TotalReportedWatts", totalReportedPowerWatts);
     Logger.recordOutput("EnergyLogger/Energy/TotalReportedJoules", totalReportedEnergyJoules);
     Logger.recordOutput("EnergyLogger/VoltageVolts", voltageVolts);
 
-    logPowerDistribution(totalReportedPowerWatts);
+    if (loopCounter % PDH_LOG_PERIOD_LOOPS == 0) {
+      logPowerDistribution(totalReportedPowerWatts);
+    }
     currentReports.clear();
+    loopCounter++;
   }
 
   private void report(String key, double... currentAmps) {
-    if (key == null || key.isBlank()) {
+    if (key == null) {
+      return;
+    }
+
+    String trimmedKey = key.strip();
+    if (trimmedKey.isEmpty()) {
       return;
     }
 
@@ -85,13 +103,10 @@ public final class BatteryLogger {
     for (double currentAmp : currentAmps) {
       totalCurrentAmps += sanitize(currentAmp);
     }
-    currentReports.merge(key, totalCurrentAmps, Double::sum);
+    currentReports.merge(trimmedKey, totalCurrentAmps, Double::sum);
   }
 
   private double getBatteryVoltage() {
-    if (powerDistribution != null) {
-      return sanitize(powerDistribution.getVoltage());
-    }
     return sanitize(RobotController.getBatteryVoltage());
   }
 
@@ -113,14 +128,17 @@ public final class BatteryLogger {
         "EnergyLogger/Power/PdhMinusReportedWatts", pdhPowerWatts - totalReportedPowerWatts);
   }
 
-  private static void addRollups(Map<String, Double> rollups, String key, double currentAmps) {
-    String trimmedKey = key.strip();
-    if (trimmedKey.isEmpty()) {
-      return;
+  private void addRollups(Map<String, Double> rollups, String key, double currentAmps) {
+    for (String rollupKey : rollupKeysByReportKey.computeIfAbsent(key, BatteryLogger::rollupKeys)) {
+      rollups.merge(rollupKey, currentAmps, Double::sum);
     }
+  }
 
-    String[] parts = trimmedKey.split("/");
+  private static String[] rollupKeys(String key) {
+    String[] parts = key.split("/");
+    String[] rollupKeys = new String[parts.length];
     StringBuilder prefix = new StringBuilder();
+    int count = 0;
     for (String part : parts) {
       if (part.isBlank()) {
         continue;
@@ -129,8 +147,15 @@ public final class BatteryLogger {
         prefix.append('/');
       }
       prefix.append(part);
-      rollups.merge(prefix.toString(), currentAmps, Double::sum);
+      rollupKeys[count++] = prefix.toString();
     }
+
+    if (count == rollupKeys.length) {
+      return rollupKeys;
+    }
+    String[] compactRollupKeys = new String[count];
+    System.arraycopy(rollupKeys, 0, compactRollupKeys, 0, count);
+    return compactRollupKeys;
   }
 
   private static double sanitize(double value) {
