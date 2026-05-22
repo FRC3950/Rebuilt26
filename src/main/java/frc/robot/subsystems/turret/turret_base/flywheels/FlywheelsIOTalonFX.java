@@ -51,6 +51,7 @@ public class FlywheelsIOTalonFX implements FlywheelsIO {
     followerSupplyCurrent = flywheelFollower.getSupplyCurrent();
 
     flywheel.getConfigurator().apply(flywheelConfig);
+    flywheelFollower.getConfigurator().apply(flywheelConfig);
     flywheelFollower.setControl(new Follower(flywheelID, MotorAlignmentValue.Opposed));
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0, leaderVelocity, leaderAppliedVolts, leaderCurrent, followerVelocity);

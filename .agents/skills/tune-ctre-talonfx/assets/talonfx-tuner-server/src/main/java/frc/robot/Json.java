@@ -38,7 +38,9 @@ final class Json {
           out.append(',');
         }
         first = false;
-        out.append(quote(String.valueOf(entry.getKey()))).append(':').append(stringify(entry.getValue()));
+        out.append(quote(String.valueOf(entry.getKey())))
+            .append(':')
+            .append(stringify(entry.getValue()));
       }
       return out.append('}').toString();
     }

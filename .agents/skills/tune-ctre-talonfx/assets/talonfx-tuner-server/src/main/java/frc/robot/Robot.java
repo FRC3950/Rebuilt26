@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,9 +52,11 @@ public class Robot extends TimedRobot {
       configureDevices(bootConfig);
       startHttpServer(intValue(bootConfig, "httpPort", 5805));
       System.out.println("[talonfx-tuner] ready on port " + intValue(bootConfig, "httpPort", 5805));
-      System.out.println("[talonfx-tuner] Phoenix Diagnostics should also be running after TalonFX construction.");
+      System.out.println(
+          "[talonfx-tuner] Phoenix Diagnostics should also be running after TalonFX construction.");
     } catch (Exception ex) {
-      DriverStation.reportError("[talonfx-tuner] startup failed: " + ex.getMessage(), ex.getStackTrace());
+      DriverStation.reportError(
+          "[talonfx-tuner] startup failed: " + ex.getMessage(), ex.getStackTrace());
       throw new RuntimeException(ex);
     }
   }
@@ -75,8 +76,7 @@ public class Robot extends TimedRobot {
   }
 
   private Map<String, Object> readBootConfig() throws IOException {
-    Path configPath =
-        Filesystem.getDeployDirectory().toPath().resolve("talonfx-tuner-config.json");
+    Path configPath = Filesystem.getDeployDirectory().toPath().resolve("talonfx-tuner-config.json");
     return Json.parseObject(Files.readString(configPath, StandardCharsets.UTF_8));
   }
 
@@ -109,14 +109,15 @@ public class Robot extends TimedRobot {
       }
     }
 
-    healthSignals = new StatusSignal<?>[] {
-      leader.getVersion(false),
-      leader.getPosition(false),
-      leader.getVelocity(false),
-      leader.getSupplyVoltage(false),
-      leader.getStatorCurrent(false),
-      leader.getFault_UnlicensedFeatureInUse(false)
-    };
+    healthSignals =
+        new StatusSignal<?>[] {
+          leader.getVersion(false),
+          leader.getPosition(false),
+          leader.getVelocity(false),
+          leader.getSupplyVoltage(false),
+          leader.getStatorCurrent(false),
+          leader.getFault_UnlicensedFeatureInUse(false)
+        };
     BaseStatusSignal.setUpdateFrequencyForAll(50, healthSignals);
     ParentDevice.optimizeBusUtilizationForAll(allDevices());
     configured = true;
@@ -282,15 +283,18 @@ public class Robot extends TimedRobot {
       case "velocity-voltage" -> leader.setControl(new VelocityVoltage(setpoint));
       case "velocity-torque-current" -> leader.setControl(new VelocityTorqueCurrentFOC(setpoint));
       case "motion-magic-voltage" -> leader.setControl(new MotionMagicVoltage(setpoint));
-      case "motion-magic-torque-current" ->
-          leader.setControl(new MotionMagicTorqueCurrentFOC(setpoint));
+      case "motion-magic-torque-current" -> leader.setControl(
+          new MotionMagicTorqueCurrentFOC(setpoint));
       default -> throw new IllegalArgumentException("Unsupported mode: " + mode);
     }
   }
 
   private Map<String, Object> sample(String mode, double setpoint, double elapsed) {
     boolean positionMode = mode.startsWith("motion-magic");
-    double actual = positionMode ? leader.getPosition(false).getValueAsDouble() : leader.getVelocity(false).getValueAsDouble();
+    double actual =
+        positionMode
+            ? leader.getPosition(false).getValueAsDouble()
+            : leader.getVelocity(false).getValueAsDouble();
     double error = setpoint - actual;
     Map<String, Object> sample = new LinkedHashMap<>();
     sample.put("t", elapsed);
@@ -305,12 +309,21 @@ public class Robot extends TimedRobot {
     sample.put("supplyVoltage", leader.getSupplyVoltage(false).getValueAsDouble());
     sample.put("batteryVoltage", RobotController.getBatteryVoltage());
     sample.put("deviceTempC", leader.getDeviceTemp(false).getValueAsDouble());
-    sample.put("unlicensedFault", Boolean.TRUE.equals(leader.getFault_UnlicensedFeatureInUse(false).getValue()));
-    sample.put("undervoltageFault", Boolean.TRUE.equals(leader.getFault_Undervoltage(false).getValue()));
-    sample.put("statorLimitFault", Boolean.TRUE.equals(leader.getFault_StatorCurrLimit(false).getValue()));
-    sample.put("supplyLimitFault", Boolean.TRUE.equals(leader.getFault_SupplyCurrLimit(false).getValue()));
-    sample.put("forwardLimitFault", Boolean.TRUE.equals(leader.getFault_ForwardHardLimit(false).getValue()));
-    sample.put("reverseLimitFault", Boolean.TRUE.equals(leader.getFault_ReverseHardLimit(false).getValue()));
+    sample.put(
+        "unlicensedFault",
+        Boolean.TRUE.equals(leader.getFault_UnlicensedFeatureInUse(false).getValue()));
+    sample.put(
+        "undervoltageFault", Boolean.TRUE.equals(leader.getFault_Undervoltage(false).getValue()));
+    sample.put(
+        "statorLimitFault", Boolean.TRUE.equals(leader.getFault_StatorCurrLimit(false).getValue()));
+    sample.put(
+        "supplyLimitFault", Boolean.TRUE.equals(leader.getFault_SupplyCurrLimit(false).getValue()));
+    sample.put(
+        "forwardLimitFault",
+        Boolean.TRUE.equals(leader.getFault_ForwardHardLimit(false).getValue()));
+    sample.put(
+        "reverseLimitFault",
+        Boolean.TRUE.equals(leader.getFault_ReverseHardLimit(false).getValue()));
     return sample;
   }
 
@@ -324,13 +337,16 @@ public class Robot extends TimedRobot {
     if (doubleEntry(sample, "deviceTempC") > doubleValue(safety, "maxDeviceTempC", 85)) {
       return "device temperature above maximum";
     }
-    if (Math.abs(doubleEntry(sample, "motorVoltage")) > doubleValue(safety, "maxAbsVoltage", 16.0) + 0.1) {
+    if (Math.abs(doubleEntry(sample, "motorVoltage"))
+        > doubleValue(safety, "maxAbsVoltage", 16.0) + 0.1) {
       return "motor voltage above requested cap";
     }
-    if (Math.abs(doubleEntry(sample, "statorCurrent")) > doubleValue(safety, "maxAbsStatorCurrent", 800) + 5) {
+    if (Math.abs(doubleEntry(sample, "statorCurrent"))
+        > doubleValue(safety, "maxAbsStatorCurrent", 800) + 5) {
       return "stator current above requested cap";
     }
-    if (Math.abs(doubleEntry(sample, "supplyCurrent")) > doubleValue(safety, "maxAbsSupplyCurrent", 800) + 5) {
+    if (Math.abs(doubleEntry(sample, "supplyCurrent"))
+        > doubleValue(safety, "maxAbsSupplyCurrent", 800) + 5) {
       return "supply current above requested cap";
     }
     return "";
@@ -378,7 +394,9 @@ public class Robot extends TimedRobot {
       health.put("velocityRps", leader.getVelocity(false).getValueAsDouble());
       health.put("supplyVoltage", leader.getSupplyVoltage(false).getValueAsDouble());
       health.put("statorCurrent", leader.getStatorCurrent(false).getValueAsDouble());
-      health.put("unlicensedFault", Boolean.TRUE.equals(leader.getFault_UnlicensedFeatureInUse(false).getValue()));
+      health.put(
+          "unlicensedFault",
+          Boolean.TRUE.equals(leader.getFault_UnlicensedFeatureInUse(false).getValue()));
     }
     return health;
   }
@@ -431,23 +449,29 @@ public class Robot extends TimedRobot {
 
   private void validateSetpoints(String mode, List<Double> setpoints, Map<String, Object> safety) {
     boolean positionMode = mode.startsWith("motion-magic");
-    double min = doubleValue(safety, positionMode ? "minPosition" : "minVelocity", -Double.MAX_VALUE);
-    double max = doubleValue(safety, positionMode ? "maxPosition" : "maxVelocity", Double.MAX_VALUE);
-    if (positionMode && (!safety.containsKey("minPosition") || !safety.containsKey("maxPosition"))) {
+    double min =
+        doubleValue(safety, positionMode ? "minPosition" : "minVelocity", -Double.MAX_VALUE);
+    double max =
+        doubleValue(safety, positionMode ? "maxPosition" : "maxVelocity", Double.MAX_VALUE);
+    if (positionMode
+        && (!safety.containsKey("minPosition") || !safety.containsKey("maxPosition"))) {
       throw new IllegalArgumentException("Motion Magic tests require minPosition and maxPosition");
     }
-    if (!positionMode && (!safety.containsKey("minVelocity") || !safety.containsKey("maxVelocity"))) {
+    if (!positionMode
+        && (!safety.containsKey("minVelocity") || !safety.containsKey("maxVelocity"))) {
       throw new IllegalArgumentException("Velocity tests require minVelocity and maxVelocity");
     }
     for (double setpoint : setpoints) {
       if (setpoint < min || setpoint > max) {
-        throw new IllegalArgumentException("setpoint " + setpoint + " is outside [" + min + ", " + max + "]");
+        throw new IllegalArgumentException(
+            "setpoint " + setpoint + " is outside [" + min + ", " + max + "]");
       }
     }
   }
 
   private double setpointAt(List<Double> setpoints, double elapsed, double durationSec) {
-    int index = Math.min(setpoints.size() - 1, (int) Math.floor(elapsed / durationSec * setpoints.size()));
+    int index =
+        Math.min(setpoints.size() - 1, (int) Math.floor(elapsed / durationSec * setpoints.size()));
     return setpoints.get(index);
   }
 
@@ -531,6 +555,8 @@ public class Robot extends TimedRobot {
   }
 
   private static MotorAlignmentValue motorAlignment(String value) {
-    return "Opposed".equalsIgnoreCase(value) ? MotorAlignmentValue.Opposed : MotorAlignmentValue.Aligned;
+    return "Opposed".equalsIgnoreCase(value)
+        ? MotorAlignmentValue.Opposed
+        : MotorAlignmentValue.Aligned;
   }
 }

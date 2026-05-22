@@ -3,6 +3,8 @@ package frc.robot.subsystems.turret;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.turret.turret_base.azimuth.Azimuth;
 import frc.robot.subsystems.turret.turret_base.azimuth.AzimuthIO;
 import frc.robot.subsystems.turret.turret_base.flywheels.Flywheels;
@@ -57,19 +59,50 @@ class TurretIOTest {
 
   @Test
   void requestedHoodAngleUsesServoSetpoint() {
-    Turret turret =
-        new Turret(
-            "TestTurret",
-            new Azimuth("Test/Azimuth", new FakeAzimuthIO()),
-            new Hood("Test/Hood", new FakeHoodIO()),
-            new Flywheels("Test/Flywheels", new FakeFlywheelsIO()),
-            -180.0,
-            180.0);
+    Turret turret = createTestTurret(new FakeAzimuthIO());
 
     turret.runSetpoints(Rotation2d.kZero, 45.0, 60.0);
 
     assertEquals(
         frc.robot.Constants.SubsystemConstants.Turret.maxHoodAngle,
         turret.getRequestedHoodAngleDeg());
+  }
+
+  @Test
+  void zeroAzimuthLockUsesDegrees() {
+    FakeAzimuthIO azimuthIO = new FakeAzimuthIO();
+    Turret turret = createTestTurret(azimuthIO, -380.0, 1.0);
+
+    turret.runZeroAzimuthTarget(
+        new GetAdjustedShot.ShootingParameters(true, Rotation2d.kZero, 0.0, 20.0, 60.0, ""));
+
+    assertEquals(-135.0, azimuthIO.requestedAngleDeg, 1e-9);
+  }
+
+  @Test
+  void simVisualizationUsesCommandedAzimuth() {
+    Turret turret = createTestTurret(new FakeAzimuthIO());
+
+    turret.runSetpoints(Rotation2d.fromDegrees(42.0), 20.0, 60.0);
+
+    assertEquals(
+        42.0,
+        Units.radiansToDegrees(turret.getRobotPose3d(Translation2d.kZero).getRotation().getZ()),
+        1e-9);
+  }
+
+  private static Turret createTestTurret(FakeAzimuthIO azimuthIO) {
+    return createTestTurret(azimuthIO, -180.0, 180.0);
+  }
+
+  private static Turret createTestTurret(
+      FakeAzimuthIO azimuthIO, double minAzimuthDeg, double maxAzimuthDeg) {
+    return new Turret(
+        "TestTurret",
+        new Azimuth("Test/Azimuth", azimuthIO),
+        new Hood("Test/Hood", new FakeHoodIO()),
+        new Flywheels("Test/Flywheels", new FakeFlywheelsIO()),
+        minAzimuthDeg,
+        maxAzimuthDeg);
   }
 }

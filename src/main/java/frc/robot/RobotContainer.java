@@ -126,8 +126,8 @@ public class RobotContainer {
         break;
 
       case SIM:
-        intake = new Intake(new IntakeIOTalonFX());
-        indexer = new Indexer(new IndexerIOTalonFX());
+        intake = new Intake(new IntakeIO() {});
+        indexer = new Indexer(new IndexerIO() {});
         drive =
             new Drive(
                 new GyroIO() {},
@@ -145,8 +145,8 @@ public class RobotContainer {
                     VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(
                     VisionConstants.camera1Name, VisionConstants.robotToCamera1, drive::getPose));
-        turret1 = createSimLeftTurretWithRealIo();
-        turret2 = createSimRightTurretWithRealIo();
+        turret1 = createNoOpLeftTurret();
+        turret2 = createNoOpRightTurret();
         break;
 
       default:
@@ -371,34 +371,6 @@ public class RobotContainer {
         new Azimuth(
             "Turret/Right/Azimuth",
             new AzimuthIOTalonFX(azimuthID2, rightAzimuthConfig, CANivore, false)),
-        new Hood("Turret/Right/Hood", new HoodIOServoHub(HOOD_SERVO_CHANNEL_1)),
-        new Flywheels(
-            "Turret/Right/Flywheels",
-            new FlywheelsIOTalonFX(flywheelID2, flywheelConfig, flywheelFollowerID2, CANivore)),
-        rightMinAzimuthControlAngle,
-        rightMaxAzimuthControlAngle);
-  }
-
-  private Turret createSimLeftTurretWithRealIo() {
-    return new Turret(
-        "LeftTurret",
-        new Azimuth(
-            "Turret/Left/Azimuth",
-            new AzimuthIOTalonFX(azimuthID, leftAzimuthConfig, CANivore, true, false)),
-        new Hood("Turret/Left/Hood", new HoodIOServoHub(HOOD_SERVO_CHANNEL_2)),
-        new Flywheels(
-            "Turret/Left/Flywheels",
-            new FlywheelsIOTalonFX(flywheelID, flywheelConfig, flywheelFollowerID, CANivore)),
-        leftMinAzimuthControlAngle,
-        leftMaxAzimuthControlAngle);
-  }
-
-  private Turret createSimRightTurretWithRealIo() {
-    return new Turret(
-        "RightTurret",
-        new Azimuth(
-            "Turret/Right/Azimuth",
-            new AzimuthIOTalonFX(azimuthID2, rightAzimuthConfig, CANivore, false, false)),
         new Hood("Turret/Right/Hood", new HoodIOServoHub(HOOD_SERVO_CHANNEL_1)),
         new Flywheels(
             "Turret/Right/Flywheels",

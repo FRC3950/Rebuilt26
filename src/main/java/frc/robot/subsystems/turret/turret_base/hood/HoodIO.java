@@ -12,6 +12,8 @@ public interface HoodIO {
     public double hubDeviceCurrentAmps = 0.0;
     public double servoVoltageVolts = 0.0;
     public double channelCurrentAmps = 0.0;
+    public boolean hubHasActiveFault = false;
+    public boolean hubHasActiveWarning = false;
   }
 
   default void updateInputs(HoodIOInputs inputs) {}

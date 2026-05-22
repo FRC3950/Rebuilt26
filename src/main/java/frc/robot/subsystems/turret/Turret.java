@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.turret.turret_base.azimuth.Azimuth;
 import frc.robot.subsystems.turret.turret_base.flywheels.Flywheels;
 import frc.robot.subsystems.turret.turret_base.hood.Hood;
@@ -55,7 +56,9 @@ public class Turret extends SubsystemBase {
   }
 
   private double getVisualizationAngleDeg() {
-    return azimuth.getMeasuredAngleDeg();
+    return Constants.currentMode == Constants.Mode.SIM
+        ? azimuth.getSetpointDeg()
+        : azimuth.getMeasuredAngleDeg();
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
@@ -73,7 +76,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void runZeroAzimuthTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(new Rotation2d(-135), params.hoodAngleDeg(), params.flywheelSpeed());
+    runSetpoints(Rotation2d.fromDegrees(-135), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 
   public static void toggleTurretMode() {
