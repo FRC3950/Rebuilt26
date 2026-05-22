@@ -6,6 +6,7 @@ import static frc.robot.Constants.FieldConstants.isRobotInNeutralZone;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_1;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_2;
+import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_HUB_CAN_ID;
 import static frc.robot.Constants.SubsystemConstants.Turret.azimuthID;
 import static frc.robot.Constants.SubsystemConstants.Turret.azimuthID2;
 import static frc.robot.Constants.SubsystemConstants.Turret.flywheelConfig;
@@ -24,6 +25,7 @@ import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -94,6 +96,8 @@ public class RobotContainer {
 
   private final EventLoop competitionButtonLoop = new EventLoop();
   private final EventLoop crazyButtonLoop = new EventLoop();
+  private static final int MIN_REV_CAN_ID = 0;
+  private static final int MAX_REV_CAN_ID = 62;
 
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
@@ -357,7 +361,7 @@ public class RobotContainer {
         new Azimuth(
             "Turret/Left/Azimuth",
             new AzimuthIOTalonFX(azimuthID, leftAzimuthConfig, CANivore, true)),
-        new Hood("Turret/Left/Hood", new HoodIOServoHub(HOOD_SERVO_CHANNEL_2)),
+        createRealHood("Turret/Left/Hood", HOOD_SERVO_CHANNEL_2),
         new Flywheels(
             "Turret/Left/Flywheels",
             new FlywheelsIOTalonFX(flywheelID, flywheelConfig, flywheelFollowerID, CANivore)),
@@ -371,12 +375,42 @@ public class RobotContainer {
         new Azimuth(
             "Turret/Right/Azimuth",
             new AzimuthIOTalonFX(azimuthID2, rightAzimuthConfig, CANivore, false)),
-        new Hood("Turret/Right/Hood", new HoodIOServoHub(HOOD_SERVO_CHANNEL_1)),
+        createRealHood("Turret/Right/Hood", HOOD_SERVO_CHANNEL_1),
         new Flywheels(
             "Turret/Right/Flywheels",
             new FlywheelsIOTalonFX(flywheelID2, flywheelConfig, flywheelFollowerID2, CANivore)),
         rightMinAzimuthControlAngle,
         rightMaxAzimuthControlAngle);
+  }
+
+  private Hood createRealHood(String logKey, ServoChannel.ChannelId channelId) {
+    if (!isValidRevServoHubCanId(HOOD_SERVO_HUB_CAN_ID)) {
+      DriverStation.reportError(
+          "REV Servo Hub CAN ID "
+              + HOOD_SERVO_HUB_CAN_ID
+              + " is invalid for REVLib; valid IDs are "
+              + MIN_REV_CAN_ID
+              + "-"
+              + MAX_REV_CAN_ID
+              + ". "
+              + logKey
+              + " will be disabled until the Servo Hub CAN ID is changed.",
+          false);
+      return new Hood(logKey, new HoodIO() {});
+    }
+
+    try {
+      return new Hood(logKey, new HoodIOServoHub(channelId));
+    } catch (RuntimeException ex) {
+      DriverStation.reportError(
+          "Failed to initialize " + logKey + "; hood servo output disabled: " + ex.getMessage(),
+          ex.getStackTrace());
+      return new Hood(logKey, new HoodIO() {});
+    }
+  }
+
+  static boolean isValidRevServoHubCanId(int canId) {
+    return canId >= MIN_REV_CAN_ID && canId <= MAX_REV_CAN_ID;
   }
 
   private Turret createNoOpLeftTurret() {

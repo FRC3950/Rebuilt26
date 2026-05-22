@@ -1,6 +1,5 @@
 package frc.robot.util;
 
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.Constants;
 import java.util.HashMap;
@@ -12,21 +11,16 @@ import org.littletonrobotics.junction.Logger;
 public final class BatteryLogger {
   private static final BatteryLogger instance = new BatteryLogger();
   private static final int DETAIL_LOG_PERIOD_LOOPS = 5;
-  private static final int PDH_LOG_PERIOD_LOOPS = 5;
 
   private final Map<String, Double> currentReports = new HashMap<>();
   private final Map<String, Double> currentRollups = new HashMap<>();
   private final Map<String, String[]> rollupKeysByReportKey = new HashMap<>();
   private final Map<String, Double> energyJoules = new HashMap<>();
   private final Set<String> previouslyLoggedRollups = new HashSet<>();
-  private final PowerDistribution powerDistribution;
   private double totalReportedEnergyJoules = 0.0;
   private int loopCounter = 0;
 
-  private BatteryLogger() {
-    powerDistribution =
-        Constants.currentMode == Constants.Mode.REAL ? new PowerDistribution() : null;
-  }
+  private BatteryLogger() {}
 
   public static BatteryLogger getInstance() {
     return instance;
@@ -82,9 +76,6 @@ public final class BatteryLogger {
     Logger.recordOutput("EnergyLogger/Energy/TotalReportedJoules", totalReportedEnergyJoules);
     Logger.recordOutput("EnergyLogger/VoltageVolts", voltageVolts);
 
-    if (loopCounter % PDH_LOG_PERIOD_LOOPS == 0) {
-      logPowerDistribution(totalReportedPowerWatts);
-    }
     currentReports.clear();
     loopCounter++;
   }
@@ -108,24 +99,6 @@ public final class BatteryLogger {
 
   private double getBatteryVoltage() {
     return sanitize(RobotController.getBatteryVoltage());
-  }
-
-  private void logPowerDistribution(double totalReportedPowerWatts) {
-    if (powerDistribution == null) {
-      return;
-    }
-
-    double pdhPowerWatts = sanitize(powerDistribution.getTotalPower());
-    Logger.recordOutput("PowerDistribution/VoltageVolts", sanitize(powerDistribution.getVoltage()));
-    Logger.recordOutput(
-        "PowerDistribution/TotalCurrentAmps", sanitize(powerDistribution.getTotalCurrent()));
-    Logger.recordOutput("PowerDistribution/TotalPowerWatts", pdhPowerWatts);
-    Logger.recordOutput(
-        "PowerDistribution/TotalEnergyJoules", sanitize(powerDistribution.getTotalEnergy()));
-    Logger.recordOutput(
-        "PowerDistribution/ChannelCurrentsAmps", sanitize(powerDistribution.getAllCurrents()));
-    Logger.recordOutput(
-        "EnergyLogger/Power/PdhMinusReportedWatts", pdhPowerWatts - totalReportedPowerWatts);
   }
 
   private void addRollups(Map<String, Double> rollups, String key, double currentAmps) {
