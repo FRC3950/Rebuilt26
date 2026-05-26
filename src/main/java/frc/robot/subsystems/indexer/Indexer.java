@@ -9,6 +9,7 @@ import static frc.robot.Constants.SubsystemConstants.Indexer.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.BatteryLogger;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -16,11 +17,22 @@ public class Indexer extends SubsystemBase {
   private final IndexerIO io;
   private final IndexerIOInputsAutoLogged inputs = new IndexerIOInputsAutoLogged();
 
+  private BooleanSupplier forwardFeedAllowedSupplier = () -> true;
+  private boolean forwardFeedRequested = false;
   private double commandedIndexerSpeed = 0.0;
   private double commandedHotdogSpeed = 0.0;
 
   public Indexer(IndexerIO io) {
+    this(io, () -> true);
+  }
+
+  public Indexer(IndexerIO io, BooleanSupplier forwardFeedAllowedSupplier) {
     this.io = io;
+    this.forwardFeedAllowedSupplier = forwardFeedAllowedSupplier;
+  }
+
+  public void setForwardFeedAllowedSupplier(BooleanSupplier forwardFeedAllowedSupplier) {
+    this.forwardFeedAllowedSupplier = forwardFeedAllowedSupplier;
   }
 
   @Override
@@ -29,9 +41,18 @@ public class Indexer extends SubsystemBase {
     Logger.processInputs("Indexer", inputs);
     BatteryLogger.reportCurrentUsage("Indexer/Indexer", inputs.indexerSupplyCurrentAmps);
     BatteryLogger.reportCurrentUsage("Indexer/Hotdog", inputs.hotdogSupplyCurrentAmps);
+
+    if (forwardFeedRequested) {
+      applyForwardFeedRequest();
+    }
   }
 
   public void setIndexerSpeed(double speed) {
+    forwardFeedRequested = false;
+    applyIndexerSpeed(speed);
+  }
+
+  private void applyIndexerSpeed(double speed) {
     commandedIndexerSpeed = speed;
     io.setIndexerVelocity(speed);
   }
@@ -50,6 +71,11 @@ public class Indexer extends SubsystemBase {
   }
 
   public void setHotdogSpeed(double speed) {
+    forwardFeedRequested = false;
+    applyHotdogSpeed(speed);
+  }
+
+  private void applyHotdogSpeed(double speed) {
     commandedHotdogSpeed = speed;
     io.setHotdogVelocity(speed);
   }
@@ -85,6 +111,11 @@ public class Indexer extends SubsystemBase {
     return getCommandedIndexerSpeed();
   }
 
+  @AutoLogOutput(key = "Indexer/Forward Feed Requested")
+  public boolean isForwardFeedRequested() {
+    return forwardFeedRequested;
+  }
+
   @AutoLogOutput(key = "Indexer/Feeding Forward")
   public boolean isFeedingForward() {
     return commandedIndexerSpeed > 0.0 && commandedHotdogSpeed > 0.0;
@@ -95,18 +126,31 @@ public class Indexer extends SubsystemBase {
   }
 
   public Command feedCommand() {
-    return this.runEnd(
-        () -> {
-          startIndexer();
-          startHotdog();
-        },
-        () -> {
-          stopIndexer();
-          stopHotdog();
-        });
+    return this.runEnd(this::requestForwardFeed, this::stopForwardFeed);
   }
 
   public Command runEndHotdog(double speed) {
     return this.runEnd(() -> setHotdogSpeed(speed), () -> stopHotdog());
+  }
+
+  public void requestForwardFeed() {
+    forwardFeedRequested = true;
+    applyForwardFeedRequest();
+  }
+
+  public void stopForwardFeed() {
+    forwardFeedRequested = false;
+    applyIndexerSpeed(0.0);
+    applyHotdogSpeed(0.0);
+  }
+
+  private void applyForwardFeedRequest() {
+    if (forwardFeedAllowedSupplier.getAsBoolean()) {
+      applyIndexerSpeed(indexerSpeed);
+      applyHotdogSpeed(hotdogSpeed);
+    } else {
+      applyIndexerSpeed(0.0);
+      applyHotdogSpeed(0.0);
+    }
   }
 }

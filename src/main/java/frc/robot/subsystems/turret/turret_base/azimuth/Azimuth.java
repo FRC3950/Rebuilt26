@@ -9,6 +9,7 @@ public class Azimuth {
   private final AzimuthIOInputsAutoLogged inputs = new AzimuthIOInputsAutoLogged();
 
   private double lastSetpointDeg = 0.0;
+  private double lastVelocitySetpointDegPerSec = 0.0;
 
   public Azimuth(String logKey, AzimuthIO io) {
     this.logKey = logKey;
@@ -22,8 +23,13 @@ public class Azimuth {
   }
 
   public void setTargetAngleDeg(double targetAngleDeg) {
+    setTargetAngleDeg(targetAngleDeg, 0.0);
+  }
+
+  public void setTargetAngleDeg(double targetAngleDeg, double targetVelocityDegPerSec) {
     lastSetpointDeg = targetAngleDeg;
-    io.setTargetAngleDeg(targetAngleDeg);
+    lastVelocitySetpointDegPerSec = targetVelocityDegPerSec;
+    io.setTargetAngleDeg(targetAngleDeg, targetVelocityDegPerSec);
   }
 
   public double getMotorAngleDeg() {
@@ -42,6 +48,10 @@ public class Azimuth {
     return lastSetpointDeg;
   }
 
+  public double getVelocitySetpointDegPerSec() {
+    return lastVelocitySetpointDegPerSec;
+  }
+
   public boolean isZeroSwitchClosed() {
     return inputs.zeroSwitchClosed;
   }
@@ -49,5 +59,6 @@ public class Azimuth {
   public void zeroPosition() {
     io.zeroPosition();
     lastSetpointDeg = 0.0;
+    lastVelocitySetpointDegPerSec = 0.0;
   }
 }

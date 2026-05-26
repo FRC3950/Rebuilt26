@@ -39,6 +39,6 @@ Do not jump straight to code edits for symptoms that could be a jam, wiring issu
 
 ## Core Mental Model
 
-Chuck is an intake-front, rear double-turret REBUILT cycle shooter. FUEL enters through the 4-bar intake, moves through the rolling hopper floor called the hotdogs, reaches the indexer, and is fed to two turret shooters. Drive pose comes from CTRE swerve odometry fused with two Limelights. Turret shot setpoints come from robot pose, target position, robot velocity, turret offset, and `shot_table.json`.
+Chuck is an intake-front, rear double-turret REBUILT cycle shooter. FUEL enters through the 4-bar intake, moves through the rolling hopper floor called the hotdogs, reaches the indexer, and is fed to two turret shooters. Drive pose comes from CTRE swerve odometry fused with two Limelights. Turret shot setpoints come from robot pose, target position, robot velocity, turret offset, and `shot_table.json`; azimuth uses position-plus-velocity voltage tracking for shoot-on-the-move. Forward feed requests are held until both turret flywheels are within ready tolerance.
 
 The current code has no climber subsystem, no real FUEL occupancy sensors, and no hub-active game-state model. Treat those as known gaps, not things to infer from missing files.

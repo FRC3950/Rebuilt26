@@ -7,7 +7,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -24,7 +24,7 @@ public class AzimuthIOTalonFX implements AzimuthIO {
   private final TalonFX azimuth;
   private final CANdi zeroingCandi;
   private final boolean usesCandiS1;
-  private final MotionMagicVoltage azimuthControl = new MotionMagicVoltage(0.0);
+  private final PositionVoltage azimuthControl = new PositionVoltage(0.0).withUpdateFreqHz(250);
 
   private final StatusSignal<Angle> position;
   private final StatusSignal<AngularVelocity> velocity;
@@ -92,8 +92,16 @@ public class AzimuthIOTalonFX implements AzimuthIO {
 
   @Override
   public void setTargetAngleDeg(double targetAngleDeg) {
+    setTargetAngleDeg(targetAngleDeg, 0.0);
+  }
+
+  @Override
+  public void setTargetAngleDeg(double targetAngleDeg, double targetVelocityDegPerSec) {
     double motorRotations = Units.degreesToRotations(targetAngleDeg) * azimuthGearRatio;
-    azimuth.setControl(azimuthControl.withPosition(motorRotations));
+    double motorRotationsPerSecond =
+        Units.degreesToRotations(targetVelocityDegPerSec) * azimuthGearRatio;
+    azimuth.setControl(
+        azimuthControl.withPosition(motorRotations).withVelocity(motorRotationsPerSecond));
   }
 
   @Override

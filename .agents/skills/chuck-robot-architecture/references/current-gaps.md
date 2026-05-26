@@ -12,15 +12,16 @@ Use this to avoid inventing robot capabilities that are not currently in the rep
 - CANdi-backed turret zero switch reads.
 - Limelight-backed real vision.
 - Shot table interpolation for hood angle, flywheel RPS, and time of flight.
-- Shoot-on-the-move compensation using field-relative velocity.
+- Shoot-on-the-move compensation using field-relative velocity and azimuth position-plus-velocity tracking.
+- Per-turret flywheel, TOF, and turn-trim fudge factors.
+- Forward feed gating based on both turret flywheels being within ready tolerance.
 
 ## Known Missing Or Partial
 
 - No climber subsystem is currently present.
 - No real FUEL occupancy sensors are currently represented in intake, hotdog, or indexer code.
 - No explicit hub-active or hub-inactive game-state model is currently represented.
-- No current command appears to gate feeding on turret-ready, flywheel-ready, or hood-ready state.
-- `Start Shoot` starts intake, hotdogs, and indexer; it relies on default turret targeting for aim/setpoints.
+- `Start Shoot` starts intake and requests gated forward feed; it relies on default turret targeting for aim/setpoints.
 - Turret azimuth limits are marked as placeholders in constants and should be treated carefully.
 - Intake pivot positions are also marked as placeholder/update-me values.
 - Hood position has no feedback sensor in code; the stored hood position is the commanded pulse-derived value.

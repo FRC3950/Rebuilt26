@@ -16,7 +16,7 @@ Use this when a student describes what Chuck physically did or when code needs r
 |---|---|---|
 | Chuck | Full robot | Whole repo / `RobotContainer` composition |
 | Turrets | Two rear shooter assemblies | `Turret` objects built from azimuth, hood, and flywheels |
-| Azimuth | Turret rotation axis | `Azimuth`, `AzimuthIOTalonFX`, Motion Magic voltage |
+| Azimuth | Turret rotation axis | `Azimuth`, `AzimuthIOTalonFX`, position-plus-velocity voltage control |
 | Hood | Servo-adjusted launch angle | `Hood`, `HoodIOServoHub` |
 | Flywheels | Shooter wheels with brass inertia wheel and Colson contact wheels | `Flywheels`, `FlywheelsIOTalonFX`, velocity control |
 | Indexer | Ball path feeding both turrets | `Indexer` indexer motor |
@@ -33,6 +33,7 @@ Use this when a student describes what Chuck physically did or when code needs r
 - Azimuth gearing is `10` motor rotations per `1` turret rotation.
 - Each azimuth zero position is detected by a limit switch connected through a CTRE CANdi.
 - The current code zeroes turret azimuth from the switch while disabled.
+- The current code commands azimuth with CTRE `PositionVoltage` using both position and velocity setpoints for shoot-on-the-move tracking.
 
 ## Intake, Hopper, And Feed
 

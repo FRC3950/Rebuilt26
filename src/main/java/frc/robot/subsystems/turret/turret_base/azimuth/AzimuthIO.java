@@ -19,5 +19,9 @@ public interface AzimuthIO {
 
   default void setTargetAngleDeg(double targetAngleDeg) {}
 
+  default void setTargetAngleDeg(double targetAngleDeg, double targetVelocityDegPerSec) {
+    setTargetAngleDeg(targetAngleDeg);
+  }
+
   default void zeroPosition() {}
 }

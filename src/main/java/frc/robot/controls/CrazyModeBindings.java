@@ -63,16 +63,7 @@ public final class CrazyModeBindings {
     driver
         .rightTrigger(0.5, buttonLoop)
         .whileTrue(
-            Commands.startEnd(
-                () -> {
-                  indexer.startIndexer();
-                  indexer.startHotdog();
-                },
-                () -> {
-                  indexer.stopIndexer();
-                  indexer.stopHotdog();
-                },
-                indexer));
+            Commands.startEnd(indexer::requestForwardFeed, indexer::stopForwardFeed, indexer));
 
     driver
         .y(buttonLoop)

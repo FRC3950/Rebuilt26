@@ -46,4 +46,14 @@ public class Flywheels {
   public double getTargetRps() {
     return targetRps;
   }
+
+  public boolean isReadyForFeed(double toleranceRps) {
+    if (targetRps <= 0.0) {
+      return false;
+    }
+
+    double targetMagnitudeRps = Math.abs(targetRps);
+    return Math.abs(Math.abs(inputs.leaderVelocityRps) - targetMagnitudeRps) <= toleranceRps
+        && Math.abs(Math.abs(inputs.followerVelocityRps) - targetMagnitudeRps) <= toleranceRps;
+  }
 }

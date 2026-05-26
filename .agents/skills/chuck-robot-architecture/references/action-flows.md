@@ -27,8 +27,9 @@ Physical flow:
 Code flow:
 1. `Indexer.startHotdog()` commands hotdog velocity.
 2. `Indexer.startIndexer()` commands indexer velocity.
-3. `Indexer.feedCommand()` runs both until interrupted.
-4. `RobotContainer` and `CrazyModeBindings` bind shooting/feed triggers to start/stop both.
+3. `Indexer.feedCommand()` requests forward feed until interrupted.
+4. `RobotContainer` and `CrazyModeBindings` bind shooting/feed triggers to request/stop forward feed.
+5. Positive indexer/hotdog output is applied only when both turret flywheels are within ready tolerance.
 
 No current real sensor tells the code where FUEL stopped.
 
@@ -44,20 +45,23 @@ Code flow:
 1. Default `TurretTargeting` reads `drive.getPose()` and `drive.getFieldRelativeSpeeds()`.
 2. `GetAdjustedShot` calculates turret-to-target distance and compensates for robot velocity.
 3. `shot_table.json` maps distance to hood angle, flywheel RPS, and FUEL time-of-flight.
-4. `Turret.runAutoTarget()` sends azimuth, hood, and flywheel setpoints.
-5. Shooting/feed commands start indexer, hotdogs, and intake.
+4. `Turret.runAutoTarget()` sends azimuth position plus velocity, hood, and flywheel setpoints.
+5. Shooting/feed commands request indexer/hotdog feed and start intake.
+6. The indexer/hotdogs stay stopped until both turret flywheels are within `2.5 RPS` of target.
 
-The current code does not appear to gate feeding on "turrets ready."
+The current feed gate checks flywheel readiness only; it does not know whether FUEL is physically present.
 
 ## Shoot While Moving
 
-`GetAdjustedShot` looks ahead by FUEL time-of-flight plus extra latency. It shifts the turret's predicted field position by field-relative velocity, recalculates distance, and aims at the target from that predicted position.
+`GetAdjustedShot` looks ahead by FUEL time-of-flight plus extra latency and per-turret TOF fudge. It shifts the turret's predicted field position by field-relative turret velocity, recalculates distance, and aims at the target from that predicted position. It also calculates an azimuth velocity setpoint from robot omega, tangential turret velocity, tangential acceleration, and time of flight.
 
 If shots are wrong only while strafing, inspect:
 
 - field-relative velocity from drive
 - robot-to-turret offsets
 - shot table time-of-flight values
+- TOF fudge and flywheel fudge values
+- commanded vs measured azimuth velocity
 - Limelight/odometry pose stability
 - measured flywheel speed under drive load
 

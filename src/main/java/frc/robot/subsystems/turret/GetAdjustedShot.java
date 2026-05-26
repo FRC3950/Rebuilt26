@@ -2,7 +2,6 @@ package frc.robot.subsystems.turret;
 
 import static frc.robot.Constants.FieldConstants.*;
 
-import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -10,7 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Distancer;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -21,9 +20,8 @@ public class GetAdjustedShot {
   private static boolean lastReportedValid = true;
   private static String lastReportedInvalidReason = "";
 
-  private final LinearFilter turretAngleFilter =
-      LinearFilter.movingAverage((int) Math.max(1, Math.round(0.1 / Constants.loopPeriodSecs)));
-  private Rotation2d lastTurretAngle = null;
+  private double previousTangentialVelocityMetersPerSec = 0.0;
+  private double previousTimestampSec = Double.NaN;
 
   public GetAdjustedShot() {}
 
@@ -72,17 +70,25 @@ public class GetAdjustedShot {
   }
 
   public ShootingParameters getParameters(Pose2d robotPose, Translation2d robotToTurret) {
-    return getParameters(robotPose, new ChassisSpeeds(), getHubTranslation(), robotToTurret);
+    return getParameters(robotPose, new ChassisSpeeds(), getHubTranslation(), robotToTurret, 0.0);
   }
 
   public ShootingParameters getParameters(
       Pose2d robotPose, Translation2d target, Translation2d robotToTurret) {
-    return getParameters(robotPose, new ChassisSpeeds(), target, robotToTurret);
+    return getParameters(robotPose, new ChassisSpeeds(), target, robotToTurret, 0.0);
   }
 
   public ShootingParameters getParameters(
       Pose2d robotPose, ChassisSpeeds fieldVelocity, Translation2d robotToTurret) {
-    return getParameters(robotPose, fieldVelocity, getHubTranslation(), robotToTurret);
+    return getParameters(robotPose, fieldVelocity, getHubTranslation(), robotToTurret, 0.0);
+  }
+
+  public ShootingParameters getParameters(
+      Pose2d robotPose,
+      ChassisSpeeds fieldVelocity,
+      Translation2d robotToTurret,
+      double tofFudgeSec) {
+    return getParameters(robotPose, fieldVelocity, getHubTranslation(), robotToTurret, tofFudgeSec);
   }
 
   public ShootingParameters getParameters(
@@ -90,6 +96,15 @@ public class GetAdjustedShot {
       ChassisSpeeds fieldVelocity,
       Translation2d target,
       Translation2d robotToTurret) {
+    return getParameters(robotPose, fieldVelocity, target, robotToTurret, 0.0);
+  }
+
+  public ShootingParameters getParameters(
+      Pose2d robotPose,
+      ChassisSpeeds fieldVelocity,
+      Translation2d target,
+      Translation2d robotToTurret,
+      double tofFudgeSec) {
     Pose2d turretPosition = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
 
@@ -111,7 +126,7 @@ public class GetAdjustedShot {
             false, turretPosition.getRotation(), 0.0, 0.0, 0.0, "shot table is empty");
       }
 
-      double timeOfFlightSecs = shotForDistance.tofSec() + SHOT_EXTRA_LATENCY_SECS;
+      double timeOfFlightSecs = getAdjustedTimeOfFlightSecs(shotForDistance, tofFudgeSec);
       lookaheadTurretTranslation =
           turretPosition
               .getTranslation()
@@ -130,7 +145,13 @@ public class GetAdjustedShot {
 
     Rotation2d turretAngleField = target.minus(lookaheadTurretTranslation).getAngle();
     Rotation2d turretAngleRobot = turretAngleField.minus(robotPose.getRotation());
-    double turretVelocity = calculateTurretVelocity(turretAngleRobot);
+    double timeOfFlightSecs = getAdjustedTimeOfFlightSecs(interpolatedShot, tofFudgeSec);
+    double turretVelocity =
+        calculateTurretVelocity(
+            target.minus(lookaheadTurretTranslation),
+            turretVelocityField,
+            fieldVelocity.omegaRadiansPerSecond,
+            timeOfFlightSecs);
 
     return new ShootingParameters(
         true,
@@ -152,16 +173,59 @@ public class GetAdjustedShot {
         fieldVelocity.vyMetersPerSecond + rotationalVelocityY);
   }
 
-  private double calculateTurretVelocity(Rotation2d turretAngleRobot) {
-    if (lastTurretAngle == null) {
-      lastTurretAngle = turretAngleRobot;
+  private double calculateTurretVelocity(
+      Translation2d turretToTarget,
+      Translation2d turretVelocityField,
+      double robotOmegaRadPerSec,
+      double timeOfFlightSecs) {
+    double distanceMeters = turretToTarget.getNorm();
+    if (distanceMeters <= 0.0) {
+      return 0.0;
     }
 
-    double turretVelocity =
-        turretAngleFilter.calculate(
-            turretAngleRobot.minus(lastTurretAngle).getRadians() / Constants.loopPeriodSecs);
-    lastTurretAngle = turretAngleRobot;
-    return turretVelocity;
+    double tangentialVelocityMetersPerSec =
+        getTangentialComponent(turretToTarget, turretVelocityField);
+    double tangentialAccelerationMetersPerSecSq =
+        getTangentialAccelerationMetersPerSecSq(tangentialVelocityMetersPerSec);
+    double angularVelocityFromTranslation = tangentialVelocityMetersPerSec / distanceMeters;
+    double angularVelocityFromAcceleration =
+        timeOfFlightSecs
+            * tangentialAccelerationMetersPerSecSq
+            * distanceMeters
+            / (Math.pow(distanceMeters, 2)
+                + Math.pow(tangentialVelocityMetersPerSec * timeOfFlightSecs, 2));
+
+    return -robotOmegaRadPerSec + angularVelocityFromTranslation + angularVelocityFromAcceleration;
+  }
+
+  private double getTangentialAccelerationMetersPerSecSq(double tangentialVelocityMetersPerSec) {
+    double nowSec = Timer.getFPGATimestamp();
+    double accelerationMetersPerSecSq = 0.0;
+
+    if (Double.isFinite(previousTimestampSec) && nowSec > previousTimestampSec) {
+      accelerationMetersPerSecSq =
+          (tangentialVelocityMetersPerSec - previousTangentialVelocityMetersPerSec)
+              / (nowSec - previousTimestampSec);
+    }
+
+    previousTangentialVelocityMetersPerSec = tangentialVelocityMetersPerSec;
+    previousTimestampSec = nowSec;
+    return accelerationMetersPerSecSq;
+  }
+
+  private static double getTangentialComponent(Translation2d turretToTarget, Translation2d vector) {
+    double distanceMeters = turretToTarget.getNorm();
+    if (distanceMeters <= 0.0) {
+      return 0.0;
+    }
+
+    Translation2d tangentDirection =
+        turretToTarget.div(distanceMeters).rotateBy(Rotation2d.fromRadians(-Math.PI / 2.0));
+    return vector.dot(tangentDirection);
+  }
+
+  private static double getAdjustedTimeOfFlightSecs(Distancer shot, double tofFudgeSec) {
+    return Math.max(0.0, shot.tofSec() + SHOT_EXTRA_LATENCY_SECS + tofFudgeSec);
   }
 
   private static Distancer getShotForDistance(double distance) {

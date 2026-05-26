@@ -35,8 +35,8 @@ Use this to map robot behavior to code paths before editing.
 
 - `Drive`: four-module swerve, pose estimator, PathPlanner `AutoBuilder`, PathPlanner logging, SysId hooks, and vision measurement fusion.
 - `Intake`: pivot setpoint, roller velocity command, intake state logging, and simple extend/retract/on/off commands.
-- `Indexer`: two controlled outputs: indexer motor and hotdog motor. `isFeedingForward()` is command-state based, not piece-sensor based.
-- `Turret`: combines azimuth, hood, and flywheels. It clamps hood angle, selects a safe azimuth wrap within limits, and zeroes azimuth while disabled.
+- `Indexer`: two controlled outputs: indexer motor and hotdog motor. Forward feed can be requested while applied output is gated by turret flywheel readiness.
+- `Turret`: combines azimuth, hood, and flywheels. It clamps hood angle, applies per-turret flywheel/TOF/turn fudge factors, selects a safe azimuth wrap within limits, commands azimuth position plus velocity, and zeroes azimuth while disabled.
 - `Vision`: accepts pose observations from both cameras, rejects some impossible observations, and forwards accepted poses into drive odometry.
 
 ## Commands And Controls
@@ -61,7 +61,7 @@ Use this to map robot behavior to code paths before editing.
 | Driver `A` held | Drive while facing the hub target |
 | Operator left trigger held | `IntakeCommand`: extend intake and run roller |
 | Operator right bumper | Retract intake |
-| Operator right trigger held | Start indexer and hotdog; stop both on release |
+| Operator right trigger held | Request forward feed; indexer and hotdogs apply only when both turret flywheels are ready |
 | Operator `B` held | Reverse intake and hotdog for unjam |
 | Operator `A` | Toggle shared turret targeting lock mode |
 | Robot in neutral zone | Both turrets target closer ferry target instead of hub |
@@ -78,7 +78,7 @@ Use this to map robot behavior to code paths before editing.
   - `Stop Hotdog`
   - `Start Shoot`
   - `End Shoot`
-- `Start Shoot` starts indexer, hotdogs, and intake. Turret aiming is expected to come from default turret commands.
+- `Start Shoot` requests gated forward feed and starts intake. Turret aiming is expected to come from default turret commands.
 - If an auto drives correctly but does not shoot, inspect selected auto, path event markers, named-command spelling, and whether indexer/hotdog telemetry changes.
 - Existing auto names include `BlueSeedAuto`, `RedSeedAuto`, `PLAYOFF LEFT BATMAN`, `RIGHT GOTHAM DOUBLE`, and `SweepyFerry`.
 - Seed autos are path/pose-only and have no events.
@@ -88,10 +88,10 @@ Use this to map robot behavior to code paths before editing.
 ## Important Telemetry Names
 
 - Intake: `Intake/Current Speed`, `Intake/Pivot Position`, `Intake/Pivot Setpoint`, `Intake/Commanded Roller Speed`
-- Indexer: `Indexer/Indexer Speed`, `Indexer/Hotdog Speed`, `Indexer/Commanded Indexer Speed`, `Indexer/Commanded Hotdog Speed`, `Indexer/Feeding Forward`
+- Indexer: `Indexer/Indexer Speed`, `Indexer/Hotdog Speed`, `Indexer/Commanded Indexer Speed`, `Indexer/Commanded Hotdog Speed`, `Indexer/Forward Feed Requested`, `Indexer/Feeding Forward`
 - Drive: `SwerveStates/Measured`, `SwerveStates/Setpoints`, `SwerveChassisSpeeds/Measured`, `SwerveChassisSpeeds/Setpoints`, `Odometry/Trajectory`, `Odometry/TrajectorySetpoint`
 - Vision: `Vision/Camera0/RobotPosesAccepted`, `Vision/Camera1/RobotPosesAccepted`, rejected-pose equivalents, and `Vision/Summary/*`
-- Turret values are logged through component keys such as `Turret/Left/Azimuth`, `Turret/Right/Flywheels`, plus `@AutoLogOutput` values from `Turret`.
+- Turret values are logged through component keys such as `Turret/Left/Azimuth`, `Turret/Right/Flywheels`, plus `@AutoLogOutput` values from `Turret` such as commanded azimuth velocity, fudge factors, and flywheel-ready state.
 
 ## Code Gotchas
 
@@ -100,4 +100,6 @@ Use this to map robot behavior to code paths before editing.
 - Drive code mass/MOI differs from PathPlanner settings; confirm which reflects the real robot before tuning autos.
 - `.auto` files report `"version": "2025.0"` in this 2026 project; confirm compatibility before assuming the file format is wrong.
 - `GetAdjustedShot.ShootingParameters.isValid()` prints when invalid; a missing or bad shot table can spam stdout.
+- Shoot-on-the-move azimuth tracking depends on field-relative chassis speeds, robot-to-turret offsets, TOF values, and tangential acceleration history.
+- Forward feed requests are not the same as applied feed; check `Indexer/Forward Feed Requested` and `Indexer/Feeding Forward` separately.
 - `Drive.periodic()` stops all modules and clears setpoint logs while disabled.

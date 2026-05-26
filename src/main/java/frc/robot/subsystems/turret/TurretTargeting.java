@@ -66,8 +66,10 @@ public class TurretTargeting extends Command {
         targetOverrideSupplier != null ? targetOverrideSupplier.get() : null;
     var params =
         targetOverride == null
-            ? shotCalc.getParameters(robotPose, fieldVelocity, robotToTurret)
-            : shotCalc.getParameters(robotPose, fieldVelocity, targetOverride, robotToTurret);
+            ? shotCalc.getParameters(
+                robotPose, fieldVelocity, robotToTurret, turret.getTofFudgeSec())
+            : shotCalc.getParameters(
+                robotPose, fieldVelocity, targetOverride, robotToTurret, turret.getTofFudgeSec());
 
     if (params.isValid()) {
       if (Turret.getTargetingMode()) {

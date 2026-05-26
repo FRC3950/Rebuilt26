@@ -57,6 +57,7 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
+import frc.robot.subsystems.turret.TurretTuningDashboard;
 import frc.robot.subsystems.turret.TurretVisualization;
 import frc.robot.subsystems.turret.turret_base.azimuth.Azimuth;
 import frc.robot.subsystems.turret.turret_base.azimuth.AzimuthIO;
@@ -173,6 +174,10 @@ public class RobotContainer {
     }
     turretVisualization = new TurretVisualization(turret1, turret2);
     fieldPublisher = new Field2dPublisher("Field", drive::getPose);
+    indexer.setForwardFeedAllowedSupplier(
+        () ->
+            Constants.currentMode != Constants.Mode.REAL
+                || (turret1.isFlywheelReadyForFeed() && turret2.isFlywheelReadyForFeed()));
 
     if (Constants.currentMode == Constants.Mode.SIM) {
       FuelSimulationController fuelSimulationController =
@@ -213,8 +218,7 @@ public class RobotContainer {
         "Start Shoot",
         Commands.runOnce(
             () -> {
-              indexer.startIndexer();
-              indexer.startHotdog();
+              indexer.requestForwardFeed();
               intake.startIntake();
             },
             indexer,
@@ -223,14 +227,14 @@ public class RobotContainer {
         "End Shoot",
         Commands.runOnce(
             () -> {
-              indexer.stopIndexer();
-              indexer.stopHotdog();
+              indexer.stopForwardFeed();
               intake.stopIntake();
             },
             indexer,
             intake));
 
     SmartDashboard.putData("Turret Subsystem", turret1);
+    TurretTuningDashboard.register(turret1, turret2);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
 
     bindingModeChooser = new LoggedDashboardChooser<>("Code Mode");
@@ -304,16 +308,7 @@ public class RobotContainer {
     operator
         .rightTrigger(0.5, competitionButtonLoop)
         .whileTrue(
-            Commands.startEnd(
-                () -> {
-                  indexer.startIndexer();
-                  indexer.startHotdog();
-                },
-                () -> {
-                  indexer.stopIndexer();
-                  indexer.stopHotdog();
-                },
-                indexer));
+            Commands.startEnd(indexer::requestForwardFeed, indexer::stopForwardFeed, indexer));
 
     driver
         .y(competitionButtonLoop)
