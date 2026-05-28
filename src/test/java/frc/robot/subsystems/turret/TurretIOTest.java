@@ -141,6 +141,13 @@ class TurretIOTest {
         1e-9);
   }
 
+  @Test
+  void turretLogKeyIsSideSpecific() {
+    Turret turret = createTestTurret(new FakeAzimuthIO());
+
+    assertEquals("Turret/Test", turret.getLogKey());
+  }
+
   private static Turret createTestTurret(FakeAzimuthIO azimuthIO) {
     return createTestTurret(azimuthIO, -180.0, 180.0);
   }

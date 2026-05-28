@@ -56,6 +56,72 @@ class IndexerIOTest {
   }
 
   @Test
+  void latchedForwardFeedContinuesWhenGateDrops() {
+    FakeIndexerIO io = new FakeIndexerIO();
+    Gate gate = new Gate();
+    gate.allowed = true;
+    Indexer indexer = new Indexer(io, () -> gate.allowed);
+
+    indexer.requestForwardFeed();
+
+    assertTrue(indexer.isForwardFeedGateLatched());
+    assertTrue(indexer.isFeedingForward());
+
+    gate.allowed = false;
+    indexer.periodic();
+
+    assertTrue(indexer.isForwardFeedRequested());
+    assertTrue(indexer.isForwardFeedGateLatched());
+    assertTrue(indexer.isFeedingForward());
+    assertEquals(
+        frc.robot.Constants.SubsystemConstants.Indexer.indexerSpeed, io.indexerVelocityRps, 1e-9);
+    assertEquals(
+        frc.robot.Constants.SubsystemConstants.Indexer.hotdogSpeed, io.hotdogVelocityRps, 1e-9);
+  }
+
+  @Test
+  void stoppingForwardFeedClearsGateLatchForNextRequest() {
+    FakeIndexerIO io = new FakeIndexerIO();
+    Gate gate = new Gate();
+    gate.allowed = true;
+    Indexer indexer = new Indexer(io, () -> gate.allowed);
+
+    indexer.requestForwardFeed();
+    assertTrue(indexer.isForwardFeedGateLatched());
+
+    indexer.stopForwardFeed();
+    gate.allowed = false;
+    indexer.requestForwardFeed();
+
+    assertTrue(indexer.isForwardFeedRequested());
+    assertFalse(indexer.isForwardFeedGateLatched());
+    assertFalse(indexer.isFeedingForward());
+    assertEquals(0.0, io.indexerVelocityRps, 1e-9);
+    assertEquals(0.0, io.hotdogVelocityRps, 1e-9);
+  }
+
+  @Test
+  void manualCommandsClearForwardFeedGateLatch() {
+    FakeIndexerIO io = new FakeIndexerIO();
+    Gate gate = new Gate();
+    gate.allowed = true;
+    Indexer indexer = new Indexer(io, () -> gate.allowed);
+
+    indexer.requestForwardFeed();
+    assertTrue(indexer.isForwardFeedGateLatched());
+
+    indexer.setIndexerSpeed(-frc.robot.Constants.SubsystemConstants.Indexer.indexerSpeed);
+    gate.allowed = false;
+    indexer.requestForwardFeed();
+
+    assertTrue(indexer.isForwardFeedRequested());
+    assertFalse(indexer.isForwardFeedGateLatched());
+    assertFalse(indexer.isFeedingForward());
+    assertEquals(0.0, io.indexerVelocityRps, 1e-9);
+    assertEquals(0.0, io.hotdogVelocityRps, 1e-9);
+  }
+
+  @Test
   void reverseAndSingleHotdogCommandsBypassForwardFeedGate() {
     FakeIndexerIO io = new FakeIndexerIO();
     Indexer indexer = new Indexer(io, () -> false);

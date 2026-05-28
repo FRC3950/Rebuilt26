@@ -19,6 +19,7 @@ public class Indexer extends SubsystemBase {
 
   private BooleanSupplier forwardFeedAllowedSupplier = () -> true;
   private boolean forwardFeedRequested = false;
+  private boolean forwardFeedGateLatched = false;
   private double commandedIndexerSpeed = 0.0;
   private double commandedHotdogSpeed = 0.0;
 
@@ -49,6 +50,7 @@ public class Indexer extends SubsystemBase {
 
   public void setIndexerSpeed(double speed) {
     forwardFeedRequested = false;
+    forwardFeedGateLatched = false;
     applyIndexerSpeed(speed);
   }
 
@@ -72,6 +74,7 @@ public class Indexer extends SubsystemBase {
 
   public void setHotdogSpeed(double speed) {
     forwardFeedRequested = false;
+    forwardFeedGateLatched = false;
     applyHotdogSpeed(speed);
   }
 
@@ -116,6 +119,16 @@ public class Indexer extends SubsystemBase {
     return forwardFeedRequested;
   }
 
+  @AutoLogOutput(key = "Indexer/Forward Feed Allowed")
+  public boolean isForwardFeedAllowed() {
+    return forwardFeedAllowedSupplier.getAsBoolean();
+  }
+
+  @AutoLogOutput(key = "Indexer/Forward Feed Gate Latched")
+  public boolean isForwardFeedGateLatched() {
+    return forwardFeedGateLatched;
+  }
+
   @AutoLogOutput(key = "Indexer/Feeding Forward")
   public boolean isFeedingForward() {
     return commandedIndexerSpeed > 0.0 && commandedHotdogSpeed > 0.0;
@@ -140,12 +153,17 @@ public class Indexer extends SubsystemBase {
 
   public void stopForwardFeed() {
     forwardFeedRequested = false;
+    forwardFeedGateLatched = false;
     applyIndexerSpeed(0.0);
     applyHotdogSpeed(0.0);
   }
 
   private void applyForwardFeedRequest() {
-    if (forwardFeedAllowedSupplier.getAsBoolean()) {
+    if (!forwardFeedGateLatched && forwardFeedAllowedSupplier.getAsBoolean()) {
+      forwardFeedGateLatched = true;
+    }
+
+    if (forwardFeedGateLatched) {
       applyIndexerSpeed(indexerSpeed);
       applyHotdogSpeed(hotdogSpeed);
     } else {

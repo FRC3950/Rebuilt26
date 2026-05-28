@@ -16,7 +16,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.turret.turret_base.azimuth.Azimuth;
 import frc.robot.subsystems.turret.turret_base.flywheels.Flywheels;
 import frc.robot.subsystems.turret.turret_base.hood.Hood;
-import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
   private static final double ANGLE_WRAP_DEGREES = 360.0;
@@ -29,6 +29,7 @@ public class Turret extends SubsystemBase {
   private final Hood hood;
   private final Flywheels flywheels;
   private final Azimuth azimuth;
+  private final String logKey;
   private final double minAzimuthControlAngleDeg;
   private final double maxAzimuthControlAngleDeg;
   private static boolean lockedIn = false;
@@ -52,8 +53,13 @@ public class Turret extends SubsystemBase {
     this.azimuth = azimuth;
     this.hood = hood;
     this.flywheels = flywheels;
+    logKey = createLogKey(name);
     this.minAzimuthControlAngleDeg = minAzimuthControlAngleDeg;
     this.maxAzimuthControlAngleDeg = maxAzimuthControlAngleDeg;
+  }
+
+  String getLogKey() {
+    return logKey;
   }
 
   /** Returns the live turret pose with robot-relative translation and measured azimuth. */
@@ -163,67 +169,54 @@ public class Turret extends SubsystemBase {
     return lockedIn;
   }
 
-  @AutoLogOutput
   public double getCommandedAzimuthDeg() {
     return azimuth.getSetpointDeg();
   }
 
-  @AutoLogOutput
   public double getCommandedHoodAngleDeg() {
     return hood.getSetpointDeg();
   }
 
-  @AutoLogOutput
   public double getCommandedFlywheelRps() {
     return flywheels.getTargetRps();
   }
 
-  @AutoLogOutput
   public double getMeasuredAzimuthDeg() {
     return azimuth.getMeasuredAngleDeg();
   }
 
-  @AutoLogOutput
   public double getRequestedHoodAngleDeg() {
     return hood.getSetpointDeg();
   }
 
-  @AutoLogOutput
   public double getMeasuredFlywheelRps() {
     return flywheels.getMeasuredVelocityRps();
   }
 
-  @AutoLogOutput
   public double getMeasuredFlywheelFollowerRps() {
     return flywheels.getFollowerVelocityRps();
   }
 
-  @AutoLogOutput
   public double getFlywheelFudgeFactor() {
     return flywheelFudgeFactor;
   }
 
-  @AutoLogOutput
   public double getTofFudgeSec() {
     return tofFudgeSec;
   }
 
-  @AutoLogOutput
   public double getTurnTrimDeg() {
     return turnTrimDeg;
   }
 
-  @AutoLogOutput
   public double getCommandedAzimuthVelocityDegPerSec() {
     return azimuth.getVelocitySetpointDegPerSec();
   }
 
-  @AutoLogOutput
   public boolean isTargetingLocked() {
     return getTargetingMode();
   }
 
-  @AutoLogOutput
   public boolean isFlywheelReadyForFeed() {
     return flywheels.isReadyForFeed(FLYWHEEL_READY_TOLERANCE_RPS);
   }
@@ -239,6 +232,8 @@ public class Turret extends SubsystemBase {
     } else {
       zeroSwitchClosedLastPoll = false;
     }
+
+    logOutputs();
   }
 
   private void updateDisabledZeroing() {
@@ -247,6 +242,30 @@ public class Turret extends SubsystemBase {
       azimuth.zeroPosition();
     }
     zeroSwitchClosedLastPoll = zeroSwitchClosed;
+  }
+
+  private void logOutputs() {
+    Logger.recordOutput(logKey + "/CommandedAzimuthDeg", getCommandedAzimuthDeg());
+    Logger.recordOutput(
+        logKey + "/CommandedAzimuthVelocityDegPerSec", getCommandedAzimuthVelocityDegPerSec());
+    Logger.recordOutput(logKey + "/CommandedHoodAngleDeg", getCommandedHoodAngleDeg());
+    Logger.recordOutput(logKey + "/RequestedHoodAngleDeg", getRequestedHoodAngleDeg());
+    Logger.recordOutput(logKey + "/CommandedFlywheelRps", getCommandedFlywheelRps());
+    Logger.recordOutput(logKey + "/MeasuredAzimuthDeg", getMeasuredAzimuthDeg());
+    Logger.recordOutput(logKey + "/MeasuredFlywheelRps", getMeasuredFlywheelRps());
+    Logger.recordOutput(logKey + "/MeasuredFlywheelFollowerRps", getMeasuredFlywheelFollowerRps());
+    Logger.recordOutput(logKey + "/FlywheelFudgeFactor", getFlywheelFudgeFactor());
+    Logger.recordOutput(logKey + "/TofFudgeSec", getTofFudgeSec());
+    Logger.recordOutput(logKey + "/TurnTrimDeg", getTurnTrimDeg());
+    Logger.recordOutput(logKey + "/IsTargetingLocked", isTargetingLocked());
+    Logger.recordOutput(logKey + "/IsFlywheelReadyForFeed", isFlywheelReadyForFeed());
+  }
+
+  private static String createLogKey(String name) {
+    if (name.endsWith("Turret") && name.length() > "Turret".length()) {
+      return "Turret/" + name.substring(0, name.length() - "Turret".length());
+    }
+    return "Turret/" + name;
   }
 
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
