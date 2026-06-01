@@ -64,6 +64,16 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier) {
+    return joystickDrive(
+        drive, xSupplier, ySupplier, omegaSupplier, drive::getMaxLinearSpeedMetersPerSec);
+  }
+
+  public static Command joystickDrive(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      DoubleSupplier maxLinearSpeedSupplier) {
 
     return Commands.run(
         () -> {
@@ -79,11 +89,12 @@ public class DriveCommands {
           omega = Math.copySign(omega * omega, omega);
 
           // Convert to field relative speeds & send command
+          double maxLinearSpeedMetersPerSec = maxLinearSpeedSupplier.getAsDouble();
           ChassisSpeeds speeds =
               new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+                  linearVelocity.getX() * maxLinearSpeedMetersPerSec,
+                  linearVelocity.getY() * maxLinearSpeedMetersPerSec,
+                  omega * maxLinearSpeedMetersPerSec / Drive.DRIVE_BASE_RADIUS);
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds, AllianceFlipUtil.apply(drive.getRotation())));
@@ -101,6 +112,16 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Supplier<Rotation2d> rotationSupplier) {
+    return joystickDriveAtAngle(
+        drive, xSupplier, ySupplier, rotationSupplier, drive::getMaxLinearSpeedMetersPerSec);
+  }
+
+  public static Command joystickDriveAtAngle(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Rotation2d> rotationSupplier,
+      DoubleSupplier maxLinearSpeedSupplier) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -124,11 +145,14 @@ public class DriveCommands {
                       drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
               // Convert to field relative speeds & send command
+              double maxLinearSpeedMetersPerSec = maxLinearSpeedSupplier.getAsDouble();
+              double maxAngularSpeedRadPerSec =
+                  maxLinearSpeedMetersPerSec / Drive.DRIVE_BASE_RADIUS;
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                      omega);
+                      linearVelocity.getX() * maxLinearSpeedMetersPerSec,
+                      linearVelocity.getY() * maxLinearSpeedMetersPerSec,
+                      MathUtil.clamp(omega, -maxAngularSpeedRadPerSec, maxAngularSpeedRadPerSec));
               drive.runVelocity(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds, AllianceFlipUtil.apply(drive.getRotation())));

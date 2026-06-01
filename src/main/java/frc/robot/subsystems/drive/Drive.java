@@ -47,6 +47,7 @@ import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -88,6 +89,8 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine rotationSysId;
   private final BooleanSupplier intakeActiveSupplier;
   private final BooleanSupplier feedActiveSupplier;
+  private DoubleSupplier maxLinearSpeedSupplier = this::getPhysicalMaxLinearSpeedMetersPerSec;
+  private DoubleSupplier reducedSpeedSupplier = () -> SubsystemConstants.Drive.reducedSpeed;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
@@ -404,9 +407,21 @@ public class Drive extends SubsystemBase {
   public double getMaxLinearSpeedMetersPerSec() {
     if (DriverStation.isTeleopEnabled()
         && (intakeActiveSupplier.getAsBoolean() || feedActiveSupplier.getAsBoolean())) {
-      return SubsystemConstants.Drive.reducedSpeed;
+      return reducedSpeedSupplier.getAsDouble();
     }
+    return maxLinearSpeedSupplier.getAsDouble();
+  }
+
+  public double getPhysicalMaxLinearSpeedMetersPerSec() {
     return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+  }
+
+  public void setMaxLinearSpeedSupplier(DoubleSupplier maxLinearSpeedSupplier) {
+    this.maxLinearSpeedSupplier = maxLinearSpeedSupplier;
+  }
+
+  public void setReducedSpeedSupplier(DoubleSupplier reducedSpeedSupplier) {
+    this.reducedSpeedSupplier = reducedSpeedSupplier;
   }
 
   /** Returns the maximum angular speed in radians per sec. */

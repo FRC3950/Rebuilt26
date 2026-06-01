@@ -6,13 +6,13 @@
     "GLOBAL": {
       "font": "Proggy Dotted",
       "fps": "120",
-      "height": "720",
+      "height": "1285",
       "maximized": "0",
       "style": "0",
       "userScale": "2",
-      "width": "1280",
-      "xpos": "-1",
-      "ypos": "-1"
+      "width": "2560",
+      "xpos": "0",
+      "ypos": "59"
     }
   },
   "Window": {
@@ -23,53 +23,63 @@
     },
     "###/SmartDashboard/Turret Subsystem": {
       "Collapsed": "0",
-      "Pos": "1,362",
+      "Pos": "0,339",
       "Size": "271,86"
+    },
+    "###ControllerRemapping": {
+      "Collapsed": "0",
+      "Pos": "1513,108",
+      "Size": "430,650"
     },
     "###FMS": {
       "Collapsed": "0",
       "Pos": "9,525",
-      "Size": "283,140"
+      "Size": "169,184"
     },
     "###Joysticks": {
       "Collapsed": "0",
-      "Pos": "239,458",
-      "Size": "796,155"
+      "Pos": "200,899",
+      "Size": "796,234"
     },
     "###Keyboard 0 Settings": {
       "Collapsed": "0",
-      "Pos": "10,50",
-      "Size": "300,560"
+      "Pos": "432,147",
+      "Size": "300,537"
     },
     "###Keyboard 2 Settings": {
       "Collapsed": "0",
-      "Pos": "630,50",
+      "Pos": "764,87",
+      "Size": "300,560"
+    },
+    "###Keyboard 3 Settings": {
+      "Collapsed": "0",
+      "Pos": "1197,83",
       "Size": "300,560"
     },
     "###NetworkTables": {
       "Collapsed": "0",
-      "Pos": "250,277",
+      "Pos": "1501,887",
       "Size": "750,185"
     },
     "###NetworkTables Info": {
       "Collapsed": "0",
-      "Pos": "250,130",
+      "Pos": "1920,616",
       "Size": "750,145"
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1025,20",
+      "Pos": "1322,208",
       "Size": "250,630"
     },
     "###System Joysticks": {
       "Collapsed": "0",
-      "Pos": "5,350",
+      "Pos": "216,494",
       "Size": "192,218"
     },
     "###Timing": {
       "Collapsed": "0",
       "Pos": "5,150",
-      "Size": "141,150"
+      "Size": "141,127"
     },
     "Debug##Default": {
       "Collapsed": "0",

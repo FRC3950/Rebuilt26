@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.drive.Drive;
@@ -21,19 +20,43 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
+import java.util.function.DoubleSupplier;
 
-public final class CrazyModeBindings {
-  private CrazyModeBindings() {}
+public final class CompBindings {
+  private CompBindings() {}
 
   public static void configure(
       EventLoop buttonLoop,
       CommandXboxController driver,
+      CommandXboxController operator,
       Drive drive,
       Intake intake,
       Indexer indexer,
       Turret turret1,
       Turret turret2) {
-    driver
+    configure(
+        buttonLoop,
+        driver,
+        operator,
+        drive,
+        intake,
+        indexer,
+        turret1,
+        turret2,
+        drive::getMaxLinearSpeedMetersPerSec);
+  }
+
+  public static void configure(
+      EventLoop buttonLoop,
+      CommandXboxController driver,
+      CommandXboxController operator,
+      Drive drive,
+      Intake intake,
+      Indexer indexer,
+      Turret turret1,
+      Turret turret2,
+      DoubleSupplier maxLinearSpeedSupplier) {
+    operator
         .leftTrigger(0.5, buttonLoop)
         .whileTrue(
             new IntakeCommand(
@@ -42,7 +65,6 @@ public final class CrazyModeBindings {
                   var speeds = drive.getRobotRelativeSpeeds();
                   return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
                 }));
-
     Trigger neutralZoneFerryTrigger =
         new Trigger(buttonLoop, () -> isRobotInNeutralZone(drive.getPose().getX()));
     neutralZoneFerryTrigger.whileTrue(
@@ -58,9 +80,9 @@ public final class CrazyModeBindings {
                 robotToTurret2,
                 () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
 
-    driver.rightBumper(buttonLoop).onTrue(intake.retractCommand());
+    operator.rightBumper(buttonLoop).onTrue(intake.retractCommand());
 
-    driver
+    operator
         .rightTrigger(0.5, buttonLoop)
         .whileTrue(
             Commands.startEnd(indexer::requestForwardFeed, indexer::stopForwardFeed, indexer));
@@ -83,27 +105,23 @@ public final class CrazyModeBindings {
                       getHubTranslation().minus(drive.getPose().getTranslation());
                   return new Rotation2d(robotToHub.getX(), robotToHub.getY())
                       .rotateBy(new Rotation2d(Math.PI));
-                }));
-    driver
+                },
+                maxLinearSpeedSupplier));
+    operator
         .b(buttonLoop)
-        .and(driver.start(buttonLoop).negate())
-        .whileTrue(Commands.startEnd(() -> intake.setIntakeSpeed(-45), intake::stopIntake, intake));
-    driver
-        .start(buttonLoop)
-        .and(driver.b(buttonLoop))
         .whileTrue(
             Commands.startEnd(
                 () -> {
-                  indexer.setIndexerSpeed(-Constants.SubsystemConstants.Indexer.indexerSpeed);
-                  indexer.setHotdogSpeed(-Constants.SubsystemConstants.Indexer.hotdogSpeed);
+                  intake.reverseIntake();
+                  indexer.reverseHotdog();
                 },
                 () -> {
-                  indexer.stopIndexer();
+                  intake.stopIntake();
                   indexer.stopHotdog();
                 },
+                intake,
                 indexer));
-    new Trigger(buttonLoop, () -> driver.getHID().getPOV() == 180)
-        .onTrue(Commands.runOnce(Turret::toggleTurretMode))
-        .debounce(0.25);
+
+    operator.a(buttonLoop).onTrue(Commands.runOnce(Turret::toggleTurretMode)).debounce(0.25);
   }
 }

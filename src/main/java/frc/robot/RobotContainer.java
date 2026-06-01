@@ -1,8 +1,5 @@
 package frc.robot;
 
-import static frc.robot.Constants.FieldConstants.getCloserFerryTarget;
-import static frc.robot.Constants.FieldConstants.getHubTranslation;
-import static frc.robot.Constants.FieldConstants.isRobotInNeutralZone;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_1;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_2;
@@ -26,9 +23,6 @@ import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.servohub.ServoChannel;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,10 +30,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.controls.CrazyModeBindings;
+import frc.robot.controls.CompBindings;
+import frc.robot.controls.DemoContainer;
 import frc.robot.generated.TunerConstants;
 import frc.robot.sim.FuelSimCommand;
 import frc.robot.sim.FuelSimulationController;
@@ -78,9 +71,9 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
-  public enum BindingMode {
+  public enum CodeMode {
     COMPETITION,
-    CRAZY
+    DEMO
   }
 
   private final Drive drive;
@@ -96,15 +89,15 @@ public class RobotContainer {
   private final CommandXboxController operator = new CommandXboxController(1);
 
   private final EventLoop competitionButtonLoop = new EventLoop();
-  private final EventLoop crazyButtonLoop = new EventLoop();
   private static final int MIN_REV_CAN_ID = 0;
   private static final int MAX_REV_CAN_ID = 62;
 
   private final LoggedDashboardChooser<Command> autoChooser;
-  private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
+  private final LoggedDashboardChooser<CodeMode> codeModeChooser;
 
-  private BindingMode appliedBindingMode = BindingMode.COMPETITION;
-  private BindingMode lastPublishedSelectedBindingMode = null;
+  private DemoContainer demoContainer = null;
+  private CodeMode appliedCodeMode = CodeMode.COMPETITION;
+  private CodeMode lastPublishedSelectedCodeMode = null;
 
   public RobotContainer() {
     switch (Constants.currentMode) {
@@ -237,14 +230,13 @@ public class RobotContainer {
     TurretTuningDashboard.register(turret1, turret2);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
 
-    bindingModeChooser = new LoggedDashboardChooser<>("Code Mode");
-    bindingModeChooser.addDefaultOption("Competition", BindingMode.COMPETITION);
-    bindingModeChooser.addOption("CRAZY", BindingMode.CRAZY);
+    codeModeChooser = new LoggedDashboardChooser<>("Code Mode");
+    codeModeChooser.addDefaultOption("Competition", CodeMode.COMPETITION);
+    codeModeChooser.addOption("Demo", CodeMode.DEMO);
 
     configureCompetitionBindings();
-    configureCrazyBindings();
     applyCompetitionDefaults();
-    applyBindingMode(BindingMode.COMPETITION);
+    applyCodeMode(CodeMode.COMPETITION);
   }
 
   public Command getAutonomousCommand() {
@@ -262,92 +254,27 @@ public class RobotContainer {
   }
 
   public void checkMode() {
-    BindingMode selectedBindingMode = getSelectedBindingMode();
-    publishSelectedBindingMode(selectedBindingMode);
+    CodeMode selectedCodeMode = getSelectedCodeMode();
+    publishSelectedCodeMode(selectedCodeMode);
 
-    if (!shouldApplyBindingMode(
-        selectedBindingMode, appliedBindingMode, DriverStation.isDisabled())) {
+    if (shouldApplyCodeMode(selectedCodeMode, appliedCodeMode, DriverStation.isDisabled())) {
+      applyCodeMode(selectedCodeMode);
       return;
     }
 
-    applyBindingMode(selectedBindingMode);
+    if (appliedCodeMode == CodeMode.DEMO && demoContainer != null) {
+      demoContainer.checkMode(DriverStation.isDisabled());
+    }
   }
 
-  static boolean shouldApplyBindingMode(
-      BindingMode selectedBindingMode, BindingMode currentBindingMode, boolean isDisabled) {
-    return isDisabled && selectedBindingMode != currentBindingMode;
+  static boolean shouldApplyCodeMode(
+      CodeMode selectedCodeMode, CodeMode currentCodeMode, boolean isDisabled) {
+    return isDisabled && selectedCodeMode != currentCodeMode;
   }
 
   private void configureCompetitionBindings() {
-    operator
-        .leftTrigger(0.5, competitionButtonLoop)
-        .whileTrue(
-            new IntakeCommand(
-                intake,
-                () -> {
-                  var speeds = drive.getRobotRelativeSpeeds();
-                  return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
-                }));
-    Trigger neutralZoneFerryTrigger =
-        new Trigger(competitionButtonLoop, () -> isRobotInNeutralZone(drive.getPose().getX()));
-    neutralZoneFerryTrigger.whileTrue(
-        Commands.parallel(
-            new TurretTargeting(
-                turret1,
-                drive,
-                robotToTurret1,
-                () -> getCloserFerryTarget(drive.getPose().getTranslation())),
-            new TurretTargeting(
-                turret2,
-                drive,
-                robotToTurret2,
-                () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
-
-    operator.rightBumper(competitionButtonLoop).onTrue(intake.retractCommand());
-
-    operator
-        .rightTrigger(0.5, competitionButtonLoop)
-        .whileTrue(
-            Commands.startEnd(indexer::requestForwardFeed, indexer::stopForwardFeed, indexer));
-
-    driver
-        .y(competitionButtonLoop)
-        .onTrue(
-            Commands.runOnce(
-                () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                drive));
-    driver
-        .a(competitionButtonLoop)
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driver.getLeftY(),
-                () -> -driver.getLeftX(),
-                () -> {
-                  Translation2d robotToHub =
-                      getHubTranslation().minus(drive.getPose().getTranslation());
-                  return new Rotation2d(robotToHub.getX(), robotToHub.getY())
-                      .rotateBy(new Rotation2d(Math.PI));
-                }));
-    operator
-        .b(competitionButtonLoop)
-        .whileTrue(
-            Commands.startEnd(
-                () -> {
-                  intake.reverseIntake();
-                  indexer.reverseHotdog();
-                },
-                () -> {
-                  intake.stopIntake();
-                  indexer.stopHotdog();
-                },
-                intake,
-                indexer));
-
-    operator
-        .a(competitionButtonLoop)
-        .onTrue(Commands.runOnce(Turret::toggleTurretMode))
-        .debounce(0.25);
+    CompBindings.configure(
+        competitionButtonLoop, driver, operator, drive, intake, indexer, turret1, turret2);
   }
 
   private Turret createRealLeftTurret() {
@@ -428,36 +355,42 @@ public class RobotContainer {
         rightMaxAzimuthControlAngle);
   }
 
-  private void configureCrazyBindings() {
-    CrazyModeBindings.configure(crazyButtonLoop, driver, drive, intake, indexer, turret1, turret2);
+  private void applyCodeMode(CodeMode codeMode) {
+    switch (codeMode) {
+      case COMPETITION:
+        drive.setMaxLinearSpeedSupplier(drive::getPhysicalMaxLinearSpeedMetersPerSec);
+        drive.setReducedSpeedSupplier(() -> Constants.SubsystemConstants.Drive.reducedSpeed);
+        CommandScheduler.getInstance().setActiveButtonLoop(competitionButtonLoop);
+        break;
+      case DEMO:
+        if (demoContainer == null) {
+          demoContainer =
+              new DemoContainer(driver, operator, drive, intake, indexer, turret1, turret2);
+        }
+        drive.setMaxLinearSpeedSupplier(demoContainer::getMaxDriveSpeedMetersPerSec);
+        drive.setReducedSpeedSupplier(demoContainer::getReducedSpeedMetersPerSec);
+        demoContainer.applyCurrentBindingMode();
+        break;
+    }
+
+    appliedCodeMode = codeMode;
+    SmartDashboard.putString("Code Mode/Applied", appliedCodeMode.name());
+    Logger.recordOutput("Controls/CodeModeApplied", appliedCodeMode.name());
   }
 
-  private void applyBindingMode(BindingMode bindingMode) {
-    CommandScheduler.getInstance()
-        .setActiveButtonLoop(
-            switch (bindingMode) {
-              case COMPETITION -> competitionButtonLoop;
-              case CRAZY -> crazyButtonLoop;
-            });
-
-    appliedBindingMode = bindingMode;
-    SmartDashboard.putString("Code Mode/Applied", appliedBindingMode.name());
-    Logger.recordOutput("Controls/BindingModeApplied", appliedBindingMode.name());
-  }
-
-  private void publishSelectedBindingMode(BindingMode selectedBindingMode) {
-    if (selectedBindingMode == lastPublishedSelectedBindingMode) {
+  private void publishSelectedCodeMode(CodeMode selectedCodeMode) {
+    if (selectedCodeMode == lastPublishedSelectedCodeMode) {
       return;
     }
 
-    lastPublishedSelectedBindingMode = selectedBindingMode;
-    SmartDashboard.putString("Code Mode/Selected", selectedBindingMode.name());
-    Logger.recordOutput("Controls/BindingModeSelected", selectedBindingMode.name());
+    lastPublishedSelectedCodeMode = selectedCodeMode;
+    SmartDashboard.putString("Code Mode/Selected", selectedCodeMode.name());
+    Logger.recordOutput("Controls/CodeModeSelected", selectedCodeMode.name());
   }
 
-  private BindingMode getSelectedBindingMode() {
-    BindingMode selectedBindingMode = bindingModeChooser.get();
-    return selectedBindingMode != null ? selectedBindingMode : BindingMode.COMPETITION;
+  private CodeMode getSelectedCodeMode() {
+    CodeMode selectedCodeMode = codeModeChooser.get();
+    return selectedCodeMode != null ? selectedCodeMode : CodeMode.COMPETITION;
   }
 
   private void applyCompetitionDefaults() {

@@ -64,6 +64,13 @@ wpi.java.debugJni = false
 // Set this to true to enable desktop support.
 def includeDesktopSupport = true
 
+repositories {
+    maven {
+        name = "GymSimGuiLocal"
+        url = uri("/Users/cjbrandi/GymSimGui/build/local-maven")
+    }
+}
+
 // Configuration for AdvantageKit
 task(replayWatch, type: JavaExec) {
     mainClass = "org.littletonrobotics.junction.ReplayWatch"
@@ -110,6 +117,7 @@ test {
 // sim extensions be disabled.
 wpi.sim.addGui().defaultEnabled = false
 wpi.sim.addDriverstation()
+wpi.sim.addDep("GymSimGui", "org.cjbrandi.halsim", "gym_simgui").defaultEnabled = false
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib

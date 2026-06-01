@@ -8,7 +8,7 @@ Use this to map robot behavior to code paths before editing.
 - GradleRIO 2026 project with AdvantageKit logging.
 - CTRE Phoenix 6, REVLib, PathPlannerLib, AdvantageKit, and PhotonVision vendordeps are present.
 - Toolchain snapshot from this checkout: GradleRIO `2026.2.1`, Phoenix 6 `26.1.3`, REVLib `2026.0.5`, PathPlannerLib `2026.1.2`, AdvantageKit `26.0.2`.
-- `Robot.java` stays thin; `RobotContainer` constructs subsystems, controls, autos, and named commands.
+- `Robot.java` stays thin; `RobotContainer` constructs subsystems, controls, autos, code-mode selection, and named commands.
 - Hardware code follows an IO pattern:
   - subsystem owns behavior and logging
   - `*IO` defines hardware interface
@@ -19,11 +19,11 @@ Use this to map robot behavior to code paths before editing.
 
 | Physical area | Code to inspect |
 |---|---|
-| Robot composition, autos, bindings | `RobotContainer.java` |
+| Robot composition, autos, code mode | `RobotContainer.java` |
 | Drivebase, PathPlanner, odometry | `subsystems/drive/Drive.java`, `Module*`, `Gyro*`, `generated/TunerConstants.java` |
-| Driver control | `commands/DriveCommands.java`, `controls/CrazyModeBindings.java`, `RobotContainer.configureCompetitionBindings()` |
-| Intake deploy/roller | `commands/IntakeCommand.java`, `subsystems/intake/*`, `Constants.SubsystemConstants.Intake` |
-| Hotdogs/indexer/feed | `subsystems/indexer/*`, `RobotContainer` named commands and trigger bindings |
+| Driver control and bindings | `commands/DriveCommands.java`, `controls/CompBindings.java`, `controls/CrazyBindings.java`, `controls/DemoContainer.java` |
+| Intake deploy/roller | `commands/IntakeCommand.java`, `subsystems/intake/*`, `Constants.SubsystemConstants.Intake`, binding files |
+| Hotdogs/indexer/feed | `subsystems/indexer/*`, `RobotContainer` named commands, binding files |
 | Turret command surface | `subsystems/turret/Turret.java`, `TurretTargeting.java`, `GetAdjustedShot.java` |
 | Turret hardware | `turret_base/azimuth/*`, `turret_base/flywheels/*`, `turret_base/hood/*` |
 | Shot tuning | `src/main/deploy/shot_table.json`, `util/Distancer.java`, `GetAdjustedShot.java` |
@@ -42,15 +42,36 @@ Use this to map robot behavior to code paths before editing.
 ## Commands And Controls
 
 - `IntakeCommand` extends the intake and starts the roller. It does not run the indexer or hotdogs.
-- Teleop competition bindings use a driver/operator split.
-- `CrazyModeBindings` ports major actions to one controller.
-- Binding mode can only be applied while disabled.
+- `RobotContainer.CodeMode` is a dashboard-selected top-level control mode: `COMPETITION` or `DEMO`.
+- Code mode can only be applied while disabled. If the chooser changes while enabled, selected telemetry can change but applied controls do not.
+- `CompBindings` owns the normal driver/operator split.
+- `CrazyBindings` ports major actions to one driver controller.
+- `DemoContainer` is created lazily only when `Code Mode = Demo` is applied. It owns demo-only dashboard controls and its own binding chooser.
+- Demo binding mode defaults to crazy bindings and can switch back to competition bindings while disabled.
 - Turrets have default `TurretTargeting` commands in competition defaults.
 - `Turret.toggleTurretMode()` changes a static targeting mode used by both turrets.
 - Competition driver controller is port `0`; operator controller is port `1`.
 - Driver controls swerve, heading reset, and hub-facing drive lock.
 - Operator controls intake, retract, feed/shoot, unjam/reverse, and turret mode toggle.
-- `CRAZY` mode moves major actions to the driver controller only.
+- Crazy bindings move major actions to the driver controller only.
+- Demo mode does not create new mechanism behavior yet; it chooses between `CrazyBindings` and `CompBindings` and applies demo drive-speed limits.
+
+## Code Mode And Demo Dashboard
+
+| Dashboard key | Owner | Meaning |
+|---|---|---|
+| `Code Mode` | `RobotContainer` | Top-level chooser: `Competition` default, `Demo` option |
+| `Code Mode/Selected` | `RobotContainer` | Last selected top-level code mode |
+| `Code Mode/Applied` | `RobotContainer` | Active top-level code mode after disabled-only gate |
+| `Demo Mode/Bindings` | `DemoContainer` | Demo-only chooser: `Crazy` default, `Competition` option |
+| `Demo Mode/Bindings Selected` | `DemoContainer` | Last selected demo binding mode |
+| `Demo Mode/Bindings Applied` | `DemoContainer` | Active demo binding mode after disabled-only gate |
+| `Demo Mode/Max Speed MPS` | `DemoContainer` | Demo-only overall drive speed cap, default `2.0 m/s` |
+| `Demo Mode/Reduced Speed While Shooting MPS` | `DemoContainer` | Demo-only intake/feed drive cap, defaulting to the competition reduced speed |
+
+Demo dashboard entries should not appear during normal competition startup. They are initialized by `DemoContainer`, so they are published only after Demo mode is applied once. Once published, NetworkTables/SmartDashboard may keep showing them after switching back to Competition.
+
+Competition mode resets `Drive` to the physical max speed supplier and the fixed `Constants.SubsystemConstants.Drive.reducedSpeed`. Demo mode swaps in dashboard-backed suppliers. Demo tuning must not change competition behavior.
 
 ## Important Trigger Bindings
 
@@ -65,6 +86,8 @@ Use this to map robot behavior to code paths before editing.
 | Operator `B` held | Reverse intake and hotdog for unjam |
 | Operator `A` | Toggle shared turret targeting lock mode |
 | Robot in neutral zone | Both turrets target closer ferry target instead of hub |
+| Demo `Code Mode = Demo`, `Demo Mode/Bindings = Crazy` | Same major actions as crazy bindings on driver controller, with demo speed caps |
+| Demo `Code Mode = Demo`, `Demo Mode/Bindings = Competition` | Same driver/operator split as competition bindings, with demo speed caps |
 
 ## Autos
 
@@ -95,7 +118,9 @@ Use this to map robot behavior to code paths before editing.
 
 ## Code Gotchas
 
-- `Drive.getMaxLinearSpeedMetersPerSec()` reduces teleop speed to `2.5 m/s` while intake or feed is active.
+- `Drive.getMaxLinearSpeedMetersPerSec()` reduces teleop speed while intake or feed is active. In Competition this is fixed at `Constants.SubsystemConstants.Drive.reducedSpeed` (`2.5 m/s` in this checkout). In Demo it comes from `Demo Mode/Reduced Speed While Shooting MPS`.
+- Demo mode also caps non-intake/feed drive speed through `Demo Mode/Max Speed MPS`.
+- `DriveCommands.joystickDrive(...)` and `joystickDriveAtAngle(...)` have overloads that accept a max-linear-speed supplier. Existing competition call sites delegate to `drive::getMaxLinearSpeedMetersPerSec`; demo bindings pass dashboard-backed suppliers.
 - PathPlanner drive/rotation PID is currently `5.0, 0.0, 0.0`.
 - Drive code mass/MOI differs from PathPlanner settings; confirm which reflects the real robot before tuning autos.
 - `.auto` files report `"version": "2025.0"` in this 2026 project; confirm compatibility before assuming the file format is wrong.

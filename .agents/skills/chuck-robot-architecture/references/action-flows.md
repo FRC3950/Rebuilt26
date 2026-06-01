@@ -28,7 +28,7 @@ Code flow:
 1. `Indexer.startHotdog()` commands hotdog velocity.
 2. `Indexer.startIndexer()` commands indexer velocity.
 3. `Indexer.feedCommand()` requests forward feed until interrupted.
-4. `RobotContainer` and `CrazyModeBindings` bind shooting/feed triggers to request/stop forward feed.
+4. `CompBindings` and `CrazyBindings` bind shooting/feed triggers to request/stop forward feed. `DemoContainer` chooses which binding set is active in Demo mode.
 5. Positive indexer/hotdog output is applied only when both turret flywheels are within ready tolerance.
 
 No current real sensor tells the code where FUEL stopped.
@@ -109,10 +109,25 @@ For a turret that hits a limit, first verify the disabled zero switch behavior a
 
 ## Control Mode Switching
 
-Competition and CRAZY bindings are separate `EventLoop`s. The dashboard-selected binding mode only applies while the robot is disabled. If a student changes the chooser while enabled and controls do not change, that is expected.
+`RobotContainer` owns the top-level `Code Mode` chooser:
 
-For control symptoms, identify the active binding mode first. A button that works in CRAZY may be on the operator controller in competition mode.
+- `Competition` is the default and uses normal `CompBindings`.
+- `Demo` lazily creates `DemoContainer`.
+
+Top-level code mode changes only apply while the robot is disabled. If a student changes `Code Mode` while enabled and controls do not change, that is expected.
+
+Inside Demo mode, `DemoContainer` owns a separate `Demo Mode/Bindings` chooser:
+
+- `Crazy` is the default demo binding mode.
+- `Competition` switches Demo back to the normal driver/operator binding layout.
+- Demo binding changes also apply only while disabled.
+
+For control symptoms, identify both `Code Mode/Applied` and, if in Demo, `Demo Mode/Bindings Applied`. A button that works in Demo/Crazy may be on the operator controller in Competition or Demo/Competition.
+
+Demo dashboard values are initialized only after Demo mode is applied once. They may remain visible after switching back to Competition because SmartDashboard entries are not reliably removed.
 
 ## Drive Speed Reduction During Game Actions
 
 Drive speed is intentionally reduced while the intake is active or while the indexer/hotdog are feeding forward. If drivers report that the robot "gets slow" when intaking or shooting, inspect `Intake.isIntaking()`, `Indexer.isFeedingForward()`, and `Drive.getMaxLinearSpeedMetersPerSec()` before changing swerve tuning.
+
+In Competition mode, this reduction is fixed by `Constants.SubsystemConstants.Drive.reducedSpeed` (`2.5 m/s` in this checkout). In Demo mode, `Demo Mode/Reduced Speed While Shooting MPS` adjusts that reduced speed. Demo also has `Demo Mode/Max Speed MPS` for the normal drive cap. Demo values are sanitized and capped at the physical drive max; the reduced-speed value is also capped by the demo max-speed value.

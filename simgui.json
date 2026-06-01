@@ -1,4 +1,11 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/AdvantageKit/RealOutputs/Alerts": "Alerts",
@@ -9,11 +16,25 @@
       "/SmartDashboard/Auto Choices: ": "String Chooser",
       "/SmartDashboard/Auto Winner Override": "String Chooser",
       "/SmartDashboard/Code Mode": "String Chooser",
+      "/SmartDashboard/Demo Mode/Bindings": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Fuel Sim/Reset Field Fuel": "Command",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/PhotonAlerts": "Alerts",
       "/SmartDashboard/Turret Mechanism": "Mechanism2d",
       "/SmartDashboard/Turret Subsystem": "Subsystem",
+      "/SmartDashboard/Turret/Left/Flywheel Fudge Down": "Command",
+      "/SmartDashboard/Turret/Left/Flywheel Fudge Up": "Command",
+      "/SmartDashboard/Turret/Left/ToF Fudge Down": "Command",
+      "/SmartDashboard/Turret/Left/ToF Fudge Up": "Command",
+      "/SmartDashboard/Turret/Left/Turn Trim Left": "Command",
+      "/SmartDashboard/Turret/Left/Turn Trim Right": "Command",
+      "/SmartDashboard/Turret/Right/Flywheel Fudge Down": "Command",
+      "/SmartDashboard/Turret/Right/Flywheel Fudge Up": "Command",
+      "/SmartDashboard/Turret/Right/ToF Fudge Down": "Command",
+      "/SmartDashboard/Turret/Right/ToF Fudge Up": "Command",
+      "/SmartDashboard/Turret/Right/Turn Trim Left": "Command",
+      "/SmartDashboard/Turret/Right/Turn Trim Right": "Command",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
     },
     "windows": {

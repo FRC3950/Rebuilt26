@@ -9,21 +9,21 @@ public class RobotContainerBindingModeTest {
   @Test
   void appliesWhenDisabledAndModeChanges() {
     assertTrue(
-        RobotContainer.shouldApplyBindingMode(
-            RobotContainer.BindingMode.CRAZY, RobotContainer.BindingMode.COMPETITION, true));
+        RobotContainer.shouldApplyCodeMode(
+            RobotContainer.CodeMode.DEMO, RobotContainer.CodeMode.COMPETITION, true));
   }
 
   @Test
   void doesNotApplyWhenEnabled() {
     assertFalse(
-        RobotContainer.shouldApplyBindingMode(
-            RobotContainer.BindingMode.CRAZY, RobotContainer.BindingMode.COMPETITION, false));
+        RobotContainer.shouldApplyCodeMode(
+            RobotContainer.CodeMode.DEMO, RobotContainer.CodeMode.COMPETITION, false));
   }
 
   @Test
   void doesNotApplyWhenAlreadyActive() {
     assertFalse(
-        RobotContainer.shouldApplyBindingMode(
-            RobotContainer.BindingMode.COMPETITION, RobotContainer.BindingMode.COMPETITION, true));
+        RobotContainer.shouldApplyCodeMode(
+            RobotContainer.CodeMode.COMPETITION, RobotContainer.CodeMode.COMPETITION, true));
   }
 }
