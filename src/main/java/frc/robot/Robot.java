@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.gymsim.GymSimRuntime;
 import frc.robot.util.BatteryLogger;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -28,6 +29,7 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private Command simulationCommand;
   private RobotContainer robotContainer;
+  private GymSimRuntime gymSimRuntime;
 
   public Robot() {
     // Record metadata
@@ -53,6 +55,10 @@ public class Robot extends LoggedRobot {
         break;
 
       case SIM:
+        String gymSimLogDir = System.getenv("GYMSIM_LOG_DIR");
+        if (gymSimLogDir != null && !gymSimLogDir.isBlank()) {
+          Logger.addDataReceiver(new WPILOGWriter(gymSimLogDir));
+        }
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
         break;
@@ -74,11 +80,15 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+    gymSimRuntime = GymSimRuntime.start(robotContainer);
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    if (gymSimRuntime != null) {
+      gymSimRuntime.periodic();
+    }
     robotContainer.checkMode();
 
     // Optionally switch the thread to high priority to improve loop

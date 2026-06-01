@@ -1,0 +1,35 @@
+name: demo-handheld-tag-targeting
+timeout_s: 20
+robot:
+  alliance: blue1
+steps:
+  - disable
+  - enable: teleop
+  - invoke: { expression: "robotSimulationControls.enableDemoMode()" }
+  - invoke: { expression: "robotSimulationControls.setHandheldTagTargetingEnabled(true)" }
+  - invoke: { expression: "robotSimulationControls.setTargetTagId(2)" }
+  - invoke: { expression: "robotSimulationControls.setPose(1.0, 2.0, 0.0)" }
+  - invoke: { expression: "robotSimulationControls.setHandheldTagObservation(2, 0.0, 3.0)" }
+  - wait_seconds: 0.3
+  - invoke: { expression: "robotSimulationControls.recordHandheldTagState()" }
+  - log_marker: pose-a
+  - invoke: { expression: "robotSimulationControls.setPose(1.0, 2.0, 90.0)" }
+  - wait_seconds: 0.3
+  - invoke: { expression: "robotSimulationControls.recordHandheldTagState()" }
+  - log_marker: pose-b
+  - invoke: { expression: "robotSimulationControls.setPose(4.0, 2.0, 180.0)" }
+  - joystick: { port: 0, axis: 1, value: -0.5 }
+  - wait_seconds: 0.3
+  - invoke: { expression: "robotSimulationControls.recordHandheldTagState()" }
+  - log_marker: pose-c
+assertions:
+  - log_exists: { key: GymSim/Active }
+  - log_exists: { key: GymSim/DemoHandheld/TargetValid }
+  - log_exists: { key: GymSim/DemoHandheld/TargetX }
+  - log_exists: { key: GymSim/DemoHandheld/TargetY }
+  - log_exists: { key: GymSim/DemoHandheld/LeftAzimuthDeg }
+  - log_exists: { key: GymSim/DemoHandheld/RightAzimuthDeg }
+  - log_exists: { key: GymSim/DemoHandheld/ForwardDirectionDeg }
+  - log_min: { key: GymSim/DemoHandheld/PoseFusionBlockedNumeric, value: 1.0 }
+  - log_min: { key: GymSim/DemoHandheld/TargetValidNumeric, value: 1.0 }
+  - no_driverstation_errors

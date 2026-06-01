@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -26,18 +27,24 @@ public class VisionIOLimelight implements VisionIO {
   private static final int MIN_POSE_ARRAY_LENGTH = 10;
   private static final int TAG_DATA_START_INDEX = 11;
   private static final int TAG_DATA_STRIDE = 7;
+  private static final int RAW_FIDUCIAL_STRIDE = 7;
+  private static final double CONNECTED_TIMEOUT_MS = 250.0;
 
   private final Supplier<Rotation2d> rotationSupplier;
   private final DoubleArrayPublisher orientationPublisher;
   private final double[] orientationRequest = new double[6];
   private final List<Integer> tagIds = new ArrayList<>(8);
   private final List<PoseObservation> poseObservations = new ArrayList<>(4);
+  private final List<RawFiducialObservation> rawFiducialObservations = new ArrayList<>(8);
+  private RawFiducialObservation[] cachedRawFiducialObservations = new RawFiducialObservation[0];
+  private long cachedRawFiducialsChangeMicros = Long.MIN_VALUE;
 
   private final DoubleSubscriber latencySubscriber;
   private final DoubleSubscriber txSubscriber;
   private final DoubleSubscriber tySubscriber;
   private final DoubleArraySubscriber megatag1Subscriber;
   private final DoubleArraySubscriber megatag2Subscriber;
+  private final DoubleArraySubscriber rawFiducialsSubscriber;
 
   /**
    * Creates a new VisionIOLimelight.
@@ -55,14 +62,14 @@ public class VisionIOLimelight implements VisionIO {
     megatag1Subscriber = table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[] {});
     megatag2Subscriber =
         table.getDoubleArrayTopic("botpose_orb_wpiblue").subscribe(new double[] {});
+    rawFiducialsSubscriber = table.getDoubleArrayTopic("rawfiducials").subscribe(new double[] {});
   }
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
     // Update connection status based on whether an update has been seen in the last
     // 250ms
-    inputs.connected =
-        ((RobotController.getFPGATime() - latencySubscriber.getLastChange()) / 1000) < 250;
+    inputs.connected = isRecentlyUpdated(latencySubscriber.getLastChange());
 
     // Update target observation
     inputs.latestTargetObservation =
@@ -96,6 +103,25 @@ public class VisionIOLimelight implements VisionIO {
     }
   }
 
+  @Override
+  public RawFiducialObservation[] getRawFiducialObservations() {
+    long lastChangeMicros = rawFiducialsSubscriber.getLastChange();
+    if (!isRecentlyUpdated(lastChangeMicros)) {
+      cachedRawFiducialsChangeMicros = lastChangeMicros;
+      cachedRawFiducialObservations = new RawFiducialObservation[0];
+      return cachedRawFiducialObservations;
+    }
+
+    if (lastChangeMicros != cachedRawFiducialsChangeMicros) {
+      rawFiducialObservations.clear();
+      addRawFiducialObservations(rawFiducialsSubscriber.get());
+      cachedRawFiducialsChangeMicros = lastChangeMicros;
+      cachedRawFiducialObservations =
+          rawFiducialObservations.toArray(new RawFiducialObservation[0]);
+    }
+    return cachedRawFiducialObservations;
+  }
+
   private boolean addPoseObservations(
       TimestampedDoubleArray[] rawSamples, PoseObservationType observationType) {
     boolean addedObservation = false;
@@ -121,6 +147,31 @@ public class VisionIOLimelight implements VisionIO {
       if (!tagIds.contains(tagId)) {
         tagIds.add(tagId);
       }
+    }
+  }
+
+  private static boolean isRecentlyUpdated(long lastChangeMicros) {
+    return ((RobotController.getFPGATime() - lastChangeMicros) / 1000.0) < CONNECTED_TIMEOUT_MS;
+  }
+
+  private void addRawFiducialObservations(double[] rawFiducials) {
+    if (rawFiducials.length % RAW_FIDUCIAL_STRIDE != 0) {
+      return;
+    }
+
+    double timestampSecs = Timer.getFPGATimestamp();
+    for (int i = 0; i < rawFiducials.length; i += RAW_FIDUCIAL_STRIDE) {
+      int tagId = (int) rawFiducials[i];
+      rawFiducialObservations.add(
+          new RawFiducialObservation(
+              tagId,
+              rawFiducials[i + 1],
+              rawFiducials[i + 2],
+              rawFiducials[i + 3],
+              rawFiducials[i + 4],
+              rawFiducials[i + 5],
+              rawFiducials[i + 6],
+              timestampSecs));
     }
   }
 

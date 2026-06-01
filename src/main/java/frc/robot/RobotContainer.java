@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.controls.CompBindings;
-import frc.robot.controls.DemoContainer;
+import frc.robot.controls.sim.RobotSimulationControls;
 import frc.robot.generated.TunerConstants;
 import frc.robot.sim.FuelSimCommand;
 import frc.robot.sim.FuelSimulationController;
@@ -85,6 +85,7 @@ public class RobotContainer {
   private final Intake intake;
   private final Indexer indexer;
   private final Command simulationCommand;
+  private final RobotSimulationControls robotSimulationControls;
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
 
@@ -167,6 +168,13 @@ public class RobotContainer {
     }
     turretVisualization = new TurretVisualization(turret1, turret2);
     fieldPublisher = new Field2dPublisher("Field", drive::getPose);
+    vision.setPoseFusionAllowedSupplier(
+        () ->
+            appliedCodeMode != CodeMode.DEMO
+                || demoContainer == null
+                || demoContainer.isVisionPoseFusionAllowed());
+    robotSimulationControls =
+        new RobotSimulationControls(() -> applyCodeMode(CodeMode.DEMO), () -> demoContainer);
     indexer.setForwardFeedAllowedSupplier(
         () ->
             Constants.currentMode != Constants.Mode.REAL
@@ -360,15 +368,17 @@ public class RobotContainer {
       case COMPETITION:
         drive.setMaxLinearSpeedSupplier(drive::getPhysicalMaxLinearSpeedMetersPerSec);
         drive.setReducedSpeedSupplier(() -> Constants.SubsystemConstants.Drive.reducedSpeed);
+        applyCompetitionDefaults();
         CommandScheduler.getInstance().setActiveButtonLoop(competitionButtonLoop);
         break;
       case DEMO:
         if (demoContainer == null) {
           demoContainer =
-              new DemoContainer(driver, operator, drive, intake, indexer, turret1, turret2);
+              new DemoContainer(driver, operator, drive, vision, intake, indexer, turret1, turret2);
         }
         drive.setMaxLinearSpeedSupplier(demoContainer::getMaxDriveSpeedMetersPerSec);
         drive.setReducedSpeedSupplier(demoContainer::getReducedSpeedMetersPerSec);
+        demoContainer.applyDefaults();
         demoContainer.applyCurrentBindingMode();
         break;
     }

@@ -164,6 +164,43 @@ public class DriveCommands {
   }
 
   /**
+   * Drive command where joystick-forward is aligned to a supplied field-relative direction.
+   *
+   * <p>If the direction supplier returns null, this falls back to normal field-relative controls.
+   */
+  public static Command joystickDriveWithForwardDirection(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Supplier<Rotation2d> forwardDirectionSupplier,
+      DoubleSupplier maxLinearSpeedSupplier) {
+    return Commands.run(
+        () -> {
+          Translation2d linearVelocity =
+              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+          Rotation2d forwardDirection = forwardDirectionSupplier.get();
+          if (forwardDirection != null) {
+            linearVelocity = linearVelocity.rotateBy(forwardDirection);
+          }
+
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+          omega = Math.copySign(omega * omega, omega);
+
+          double maxLinearSpeedMetersPerSec = maxLinearSpeedSupplier.getAsDouble();
+          ChassisSpeeds speeds =
+              new ChassisSpeeds(
+                  linearVelocity.getX() * maxLinearSpeedMetersPerSec,
+                  linearVelocity.getY() * maxLinearSpeedMetersPerSec,
+                  omega * maxLinearSpeedMetersPerSec / Drive.DRIVE_BASE_RADIUS);
+
+          drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+        },
+        drive);
+  }
+
+  /**
    * Measures the velocity feedforward constants for the drive motors.
    *
    * <p>This command should only be used in voltage control mode.

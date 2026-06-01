@@ -40,5 +40,20 @@ public interface VisionIO {
     PHOTONVISION
   }
 
+  /** Represents one raw AprilTag target reported by a camera. */
+  public static record RawFiducialObservation(
+      int tagId,
+      double txncDeg,
+      double tyncDeg,
+      double targetArea,
+      double distanceToCamera,
+      double distanceToRobot,
+      double ambiguity,
+      double timestampSecs) {}
+
+  public default RawFiducialObservation[] getRawFiducialObservations() {
+    return new RawFiducialObservation[0];
+  }
+
   public default void updateInputs(VisionIOInputs inputs) {}
 }

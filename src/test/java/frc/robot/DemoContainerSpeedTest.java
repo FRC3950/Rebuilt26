@@ -2,7 +2,6 @@ package frc.robot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import frc.robot.controls.DemoContainer;
 import org.junit.jupiter.api.Test;
 
 class DemoContainerSpeedTest {
