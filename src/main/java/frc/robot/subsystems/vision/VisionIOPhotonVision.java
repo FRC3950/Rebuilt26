@@ -12,16 +12,19 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /** IO implementation for real PhotonVision hardware. */
 public class VisionIOPhotonVision implements VisionIO {
   protected final PhotonCamera camera;
   protected final Transform3d robotToCamera;
+  private RawFiducialObservation[] rawFiducialObservations = new RawFiducialObservation[0];
 
   /**
    * Creates a new VisionIOPhotonVision.
@@ -41,6 +44,7 @@ public class VisionIOPhotonVision implements VisionIO {
     // Read new camera observations
     Set<Short> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new LinkedList<>();
+    List<RawFiducialObservation> rawFiducialObservations = new ArrayList<>();
     for (var result : camera.getAllUnreadResults()) {
       // Update latest target observation
       if (result.hasTargets()) {
@@ -50,6 +54,13 @@ public class VisionIOPhotonVision implements VisionIO {
                 Rotation2d.fromDegrees(result.getBestTarget().getPitch()));
       } else {
         inputs.latestTargetObservation = new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
+      }
+
+      for (PhotonTrackedTarget target : result.targets) {
+        if (target.getFiducialId() >= 0) {
+          rawFiducialObservations.add(
+              createRawFiducialObservation(target, robotToCamera, result.getTimestampSeconds()));
+        }
       }
 
       // Add pose observation
@@ -121,5 +132,27 @@ public class VisionIOPhotonVision implements VisionIO {
     for (int id : tagIds) {
       inputs.tagIds[i++] = id;
     }
+
+    this.rawFiducialObservations = rawFiducialObservations.toArray(new RawFiducialObservation[0]);
+  }
+
+  @Override
+  public RawFiducialObservation[] getRawFiducialObservations() {
+    return rawFiducialObservations;
+  }
+
+  static RawFiducialObservation createRawFiducialObservation(
+      PhotonTrackedTarget target, Transform3d robotToCamera, double timestampSecs) {
+    Transform3d cameraToTarget = target.getBestCameraToTarget();
+    Transform3d robotToTarget = robotToCamera.plus(cameraToTarget);
+    return new RawFiducialObservation(
+        target.getFiducialId(),
+        target.getYaw(),
+        target.getPitch(),
+        target.getArea(),
+        cameraToTarget.getTranslation().getNorm(),
+        robotToTarget.getTranslation().getNorm(),
+        target.getPoseAmbiguity(),
+        timestampSecs);
   }
 }

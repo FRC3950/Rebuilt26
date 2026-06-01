@@ -19,6 +19,111 @@
       "visible": true
     }
   },
+  "controllerRemapProfiles": [
+    {
+      "axisMappings": [
+        {
+          "enabled": true,
+          "sourceAxis": 0
+        },
+        {
+          "enabled": true,
+          "sourceAxis": 1
+        },
+        {
+          "enabled": true,
+          "sourceAxis": 5,
+          "triggerNormalize": true
+        },
+        {
+          "enabled": true,
+          "sourceAxis": 4,
+          "triggerNormalize": true
+        },
+        {
+          "enabled": true,
+          "sourceAxis": 2
+        },
+        {
+          "enabled": true,
+          "sourceAxis": 5
+        }
+      ],
+      "buttonMappings": [
+        {
+          "enabled": true
+        },
+        {
+          "enabled": true,
+          "sourceButton": 1
+        },
+        {
+          "enabled": true,
+          "sourceButton": 2
+        },
+        {
+          "enabled": true,
+          "sourceButton": 3
+        },
+        {
+          "enabled": true,
+          "sourceButton": 4
+        },
+        {
+          "enabled": true,
+          "sourceButton": 5
+        },
+        {
+          "enabled": true,
+          "sourceButton": 6
+        },
+        {
+          "enabled": true,
+          "sourceButton": 7
+        },
+        {
+          "enabled": true,
+          "sourceButton": 8
+        },
+        {
+          "enabled": true,
+          "sourceButton": 9
+        },
+        {
+          "enabled": true,
+          "sourceButton": 10
+        },
+        {
+          "enabled": true,
+          "sourceButton": 11
+        },
+        {
+          "enabled": true,
+          "sourceButton": 12
+        },
+        {
+          "enabled": true,
+          "sourceButton": 13
+        },
+        {
+          "enabled": true,
+          "sourceButton": 14
+        },
+        {
+          "enabled": true,
+          "sourceButton": 15
+        }
+      ],
+      "customRemap": true,
+      "povMappings": [
+        {
+          "enabled": true
+        }
+      ],
+      "sourceGuid": "030000005e040000130b000023050000",
+      "sourceName": "Xbox Wireless Controller"
+    }
+  ],
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -104,580 +209,103 @@
     {
       "axisMappings": [
         {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
-          "enabled": true,
-          "scale": 1.0
+          "enabled": true
         },
         {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
           "enabled": true,
-          "scale": 1.0,
           "sourceAxis": 1
         },
         {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
           "enabled": true,
-          "scale": 1.0,
           "sourceAxis": 5,
           "triggerNormalize": true
         },
         {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
           "enabled": true,
-          "scale": 1.0,
           "sourceAxis": 4,
           "triggerNormalize": true
         },
         {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
           "enabled": true,
-          "scale": 1.0,
           "sourceAxis": 2
         },
         {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
           "enabled": true,
-          "scale": 1.0,
           "sourceAxis": 5
-        },
-        {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
-          "scale": 1.0,
-          "sourceAxis": -1
-        },
-        {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
-          "scale": 1.0,
-          "sourceAxis": -1
-        },
-        {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
-          "scale": 1.0,
-          "sourceAxis": -1
-        },
-        {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
-          "scale": 1.0,
-          "sourceAxis": -1
-        },
-        {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
-          "scale": 1.0,
-          "sourceAxis": -1
-        },
-        {
-          "clampMax": 1.0,
-          "clampMin": -1.0,
-          "scale": 1.0,
-          "sourceAxis": -1
         }
       ],
       "buttonMappings": [
         {
-          "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "enabled": true
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 1,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 1
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 2,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 2
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 3,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 3
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 4,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 4
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 5,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 5
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 6,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 6
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 7,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 7
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 8,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 8
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 9,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 9
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 10,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 10
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 11,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 11
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 12,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 12
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 13,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 13
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 14,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 14
         },
         {
           "enabled": true,
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": 15,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
-        },
-        {
-          "povDirection": -1,
-          "sourceAxis": -1,
-          "sourceButton": -1,
-          "sourcePov": -1,
-          "threshold": 0.5
+          "sourceButton": 15
         }
       ],
       "customRemap": true,
       "guid": "030000005e040000130b000023050000",
-      "outputGamepadType": 20,
       "povMappings": [
         {
           "enabled": true
-        },
-        {
-          "sourcePov": -1
-        },
-        {
-          "sourcePov": -1
-        },
-        {
-          "sourcePov": -1
-        },
-        {
-          "sourcePov": -1
-        },
-        {
-          "sourcePov": -1
-        },
-        {
-          "sourcePov": -1
-        },
-        {
-          "sourcePov": -1
         }
-      ],
-      "profileEnabled": true
+      ]
     },
     {
       "guid": "Keyboard0"
