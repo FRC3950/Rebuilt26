@@ -177,27 +177,41 @@ public class DriveCommands {
       DoubleSupplier maxLinearSpeedSupplier) {
     return Commands.run(
         () -> {
-          Translation2d linearVelocity =
-              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-
-          Rotation2d forwardDirection = forwardDirectionSupplier.get();
-          if (forwardDirection != null) {
-            linearVelocity = linearVelocity.rotateBy(forwardDirection);
-          }
-
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
-          omega = Math.copySign(omega * omega, omega);
-
-          double maxLinearSpeedMetersPerSec = maxLinearSpeedSupplier.getAsDouble();
-          ChassisSpeeds speeds =
-              new ChassisSpeeds(
-                  linearVelocity.getX() * maxLinearSpeedMetersPerSec,
-                  linearVelocity.getY() * maxLinearSpeedMetersPerSec,
-                  omega * maxLinearSpeedMetersPerSec / Drive.DRIVE_BASE_RADIUS);
-
-          drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(speeds, drive.getRotation()));
+          drive.runVelocity(
+              calculateForwardDirectionSpeeds(
+                  xSupplier.getAsDouble(),
+                  ySupplier.getAsDouble(),
+                  omegaSupplier.getAsDouble(),
+                  AllianceFlipUtil.apply(drive.getRotation()),
+                  forwardDirectionSupplier.get(),
+                  maxLinearSpeedSupplier.getAsDouble()));
         },
         drive);
+  }
+
+  static ChassisSpeeds calculateForwardDirectionSpeeds(
+      double x,
+      double y,
+      double omegaInput,
+      Rotation2d driverRelativeRobotRotation,
+      Rotation2d forwardDirection,
+      double maxLinearSpeedMetersPerSec) {
+    Translation2d linearVelocity = getLinearVelocityFromJoysticks(x, y);
+
+    if (forwardDirection != null) {
+      linearVelocity = linearVelocity.rotateBy(forwardDirection);
+    }
+
+    double omega = MathUtil.applyDeadband(omegaInput, DEADBAND);
+    omega = Math.copySign(omega * omega, omega);
+
+    ChassisSpeeds speeds =
+        new ChassisSpeeds(
+            linearVelocity.getX() * maxLinearSpeedMetersPerSec,
+            linearVelocity.getY() * maxLinearSpeedMetersPerSec,
+            omega * maxLinearSpeedMetersPerSec / Drive.DRIVE_BASE_RADIUS);
+
+    return ChassisSpeeds.fromFieldRelativeSpeeds(speeds, driverRelativeRobotRotation);
   }
 
   /**
