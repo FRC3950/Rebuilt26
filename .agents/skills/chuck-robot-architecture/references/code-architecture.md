@@ -35,7 +35,7 @@ Use this to map robot behavior to code paths before editing.
 
 - `Drive`: four-module swerve, pose estimator, PathPlanner `AutoBuilder`, PathPlanner logging, SysId hooks, and vision measurement fusion.
 - `Intake`: pivot setpoint, roller velocity command, intake state logging, and simple extend/retract/on/off commands.
-- `Indexer`: two controlled outputs: indexer motor and hotdog motor. Forward feed can be requested while applied output is gated by turret flywheel readiness.
+- `Indexer`: two controlled outputs: indexer motor and hotdog motor. Forward feed can be requested while applied output is gated by turret flywheel readiness. Any forward hotdog command can auto-unjam on hotdog stator current by stopping the indexer and reversing the hotdog for `0.15 s`.
 - `Turret`: combines azimuth, hood, and flywheels. It clamps hood angle, applies per-turret flywheel/TOF/turn fudge factors, selects a safe azimuth wrap within limits, commands azimuth position plus velocity, and zeroes azimuth while disabled.
 - `Vision`: accepts pose observations from both cameras, rejects some impossible observations, and forwards accepted poses into drive odometry.
 
@@ -111,7 +111,7 @@ Competition mode resets `Drive` to the physical max speed supplier and the fixed
 ## Important Telemetry Names
 
 - Intake: `Intake/Current Speed`, `Intake/Pivot Position`, `Intake/Pivot Setpoint`, `Intake/Commanded Roller Speed`
-- Indexer: `Indexer/Indexer Speed`, `Indexer/Hotdog Speed`, `Indexer/Commanded Indexer Speed`, `Indexer/Commanded Hotdog Speed`, `Indexer/Forward Feed Requested`, `Indexer/Feeding Forward`
+- Indexer: `Indexer/Indexer Speed`, `Indexer/Hotdog Speed`, `Indexer/Commanded Indexer Speed`, `Indexer/Commanded Hotdog Speed`, `Indexer/Forward Feed Requested`, `Indexer/Feeding Forward`, `Indexer/Auto Unjam Active`, `Indexer/Hotdog Stall Current Exceeded`
 - Drive: `SwerveStates/Measured`, `SwerveStates/Setpoints`, `SwerveChassisSpeeds/Measured`, `SwerveChassisSpeeds/Setpoints`, `Odometry/Trajectory`, `Odometry/TrajectorySetpoint`
 - Vision: `Vision/Camera0/RobotPosesAccepted`, `Vision/Camera1/RobotPosesAccepted`, rejected-pose equivalents, and `Vision/Summary/*`
 - Turret values are logged through component keys such as `Turret/Left/Azimuth`, `Turret/Right/Flywheels`, plus `@AutoLogOutput` values from `Turret` such as commanded azimuth velocity, fudge factors, and flywheel-ready state.

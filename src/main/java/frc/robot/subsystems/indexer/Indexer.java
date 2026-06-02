@@ -6,6 +6,7 @@ package frc.robot.subsystems.indexer;
 
 import static frc.robot.Constants.SubsystemConstants.Indexer.*;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.BatteryLogger;
@@ -20,6 +21,10 @@ public class Indexer extends SubsystemBase {
   private BooleanSupplier forwardFeedAllowedSupplier = () -> true;
   private boolean forwardFeedRequested = false;
   private boolean forwardFeedGateLatched = false;
+  private boolean autoUnjamActive = false;
+  private double autoUnjamEndTimestampSecs = 0.0;
+  private double desiredIndexerSpeed = 0.0;
+  private double desiredHotdogSpeed = 0.0;
   private double commandedIndexerSpeed = 0.0;
   private double commandedHotdogSpeed = 0.0;
 
@@ -43,15 +48,20 @@ public class Indexer extends SubsystemBase {
     BatteryLogger.reportCurrentUsage("Indexer/Indexer", inputs.indexerSupplyCurrentAmps);
     BatteryLogger.reportCurrentUsage("Indexer/Hotdog", inputs.hotdogSupplyCurrentAmps);
 
+    updateAutoUnjamState();
+
     if (forwardFeedRequested) {
       applyForwardFeedRequest();
+    } else {
+      applyDesiredSpeeds();
     }
   }
 
   public void setIndexerSpeed(double speed) {
     forwardFeedRequested = false;
     forwardFeedGateLatched = false;
-    applyIndexerSpeed(speed);
+    desiredIndexerSpeed = speed;
+    applyDesiredSpeeds();
   }
 
   private void applyIndexerSpeed(double speed) {
@@ -75,7 +85,11 @@ public class Indexer extends SubsystemBase {
   public void setHotdogSpeed(double speed) {
     forwardFeedRequested = false;
     forwardFeedGateLatched = false;
-    applyHotdogSpeed(speed);
+    desiredHotdogSpeed = speed;
+    if (speed <= 0.0) {
+      autoUnjamActive = false;
+    }
+    applyDesiredSpeeds();
   }
 
   private void applyHotdogSpeed(double speed) {
@@ -154,8 +168,10 @@ public class Indexer extends SubsystemBase {
   public void stopForwardFeed() {
     forwardFeedRequested = false;
     forwardFeedGateLatched = false;
-    applyIndexerSpeed(0.0);
-    applyHotdogSpeed(0.0);
+    autoUnjamActive = false;
+    desiredIndexerSpeed = 0.0;
+    desiredHotdogSpeed = 0.0;
+    applyDesiredSpeeds();
   }
 
   private void applyForwardFeedRequest() {
@@ -164,11 +180,53 @@ public class Indexer extends SubsystemBase {
     }
 
     if (forwardFeedGateLatched) {
-      applyIndexerSpeed(indexerSpeed);
-      applyHotdogSpeed(hotdogSpeed);
+      desiredIndexerSpeed = indexerSpeed;
+      desiredHotdogSpeed = hotdogSpeed;
     } else {
-      applyIndexerSpeed(0.0);
-      applyHotdogSpeed(0.0);
+      desiredIndexerSpeed = 0.0;
+      desiredHotdogSpeed = 0.0;
     }
+
+    applyDesiredSpeeds();
+  }
+
+  private void applyDesiredSpeeds() {
+    if (shouldStartAutoUnjam()) {
+      autoUnjamActive = true;
+      autoUnjamEndTimestampSecs = Timer.getFPGATimestamp() + autoUnjamReverseSeconds;
+    }
+
+    if (autoUnjamActive) {
+      applyIndexerSpeed(0.0);
+      applyHotdogSpeed(unjamHotdog);
+    } else {
+      applyIndexerSpeed(desiredIndexerSpeed);
+      applyHotdogSpeed(desiredHotdogSpeed);
+    }
+  }
+
+  private void updateAutoUnjamState() {
+    if (autoUnjamActive && Timer.getFPGATimestamp() >= autoUnjamEndTimestampSecs) {
+      autoUnjamActive = false;
+    }
+  }
+
+  private boolean shouldStartAutoUnjam() {
+    return !autoUnjamActive && desiredHotdogSpeed > 0.0 && isHotdogStallCurrentExceeded();
+  }
+
+  @AutoLogOutput(key = "Indexer/Auto Unjam Active")
+  public boolean isAutoUnjamActive() {
+    return autoUnjamActive;
+  }
+
+  @AutoLogOutput(key = "Indexer/Hotdog Stall Current Threshold Amps")
+  public double getHotdogStallCurrentThresholdAmps() {
+    return autoUnjamHotdogStallCurrentAmps;
+  }
+
+  @AutoLogOutput(key = "Indexer/Hotdog Stall Current Exceeded")
+  public boolean isHotdogStallCurrentExceeded() {
+    return inputs.hotdogCurrentAmps >= autoUnjamHotdogStallCurrentAmps;
   }
 }

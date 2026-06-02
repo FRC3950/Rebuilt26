@@ -30,6 +30,7 @@ Code flow:
 3. `Indexer.feedCommand()` requests forward feed until interrupted.
 4. `CompBindings` and `CrazyBindings` bind shooting/feed triggers to request/stop forward feed. `DemoContainer` chooses which binding set is active in Demo mode.
 5. Positive indexer/hotdog output is applied only when both turret flywheels are within ready tolerance.
+6. If a forward hotdog command sees hotdog stator current at or above `42 A`, `Indexer` stops the indexer and reverses the hotdog for `0.15 s`, then resumes the still-requested forward command.
 
 No current real sensor tells the code where FUEL stopped.
 
