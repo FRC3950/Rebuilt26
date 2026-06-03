@@ -1,0 +1,16 @@
+name: ferry-shotmap-generated-moving-away
+timeout_s: 20
+robot:
+  alliance: blue1
+steps:
+  - disable
+  - enable: teleop
+  - schedule: { command: "robotSimulationControls.ferryShotMovingAwayValidationCommand(3.0, 5.9, 1.5)" }
+  - wait_command: { command: "robotSimulationControls.ferryShotMovingAwayValidationCommand(3.0, 5.9, 1.5)", timeout_s: 5 }
+  - invoke: { expression: "robotSimulationControls.recordFerryShotValidationState()" }
+assertions:
+  - command_finished: "robotSimulationControls.ferryShotMovingAwayValidationCommand(3.0, 5.9, 1.5)"
+  - log_exists: { key: GymSim/FerryShotMap/ClosestGroundDistanceMeters }
+  - log_min: { key: GymSim/FerryShotMap/PassedNumeric, value: 1.0 }
+  - log_max: { key: GymSim/FerryShotMap/AnyGroundContactOnBumpNumeric, value: 0.0 }
+  - no_driverstation_errors

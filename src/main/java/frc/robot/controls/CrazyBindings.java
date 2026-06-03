@@ -21,6 +21,7 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
+import frc.robot.util.ShotTableTarget;
 import java.util.function.DoubleSupplier;
 
 public final class CrazyBindings {
@@ -72,12 +73,14 @@ public final class CrazyBindings {
                 turret1,
                 drive,
                 robotToTurret1,
-                () -> getCloserFerryTarget(drive.getPose().getTranslation())),
+                () -> getCloserFerryTarget(drive.getPose().getTranslation()),
+                ShotTableTarget.FERRY),
             new TurretTargeting(
                 turret2,
                 drive,
                 robotToTurret2,
-                () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
+                () -> getCloserFerryTarget(drive.getPose().getTranslation()),
+                ShotTableTarget.FERRY)));
 
     driver.rightBumper(buttonLoop).onTrue(intake.retractCommand());
 

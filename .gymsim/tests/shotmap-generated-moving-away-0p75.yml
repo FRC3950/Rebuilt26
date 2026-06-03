@@ -1,0 +1,18 @@
+name: shotmap-generated-moving-away-0p75
+timeout_s: 20
+robot:
+  alliance: blue1
+steps:
+  - disable
+  - enable: teleop
+  - joystick: { port: 0, axis: 1, value: 0.593 }
+  - schedule: { command: "robotSimulationControls.generatedShotValidationCommand(0.809, 4.0346376, 0.0, 4, 2.5)" }
+  - wait_command: { command: "robotSimulationControls.generatedShotValidationCommand(0.809, 4.0346376, 0.0, 4, 2.5)", timeout_s: 4 }
+  - joystick: { port: 0, axis: 1, value: 0.0 }
+  - invoke: { expression: "robotSimulationControls.recordGeneratedShotValidationState()" }
+assertions:
+  - command_finished: "robotSimulationControls.generatedShotValidationCommand(0.809, 4.0346376, 0.0, 4, 2.5)"
+  - log_exists: { key: GymSim/Active }
+  - log_exists: { key: GymSim/ShotMap/BlueHubScore }
+  - log_min: { key: GymSim/ShotMap/BlueHubScore, value: 1.0 }
+  - no_driverstation_errors

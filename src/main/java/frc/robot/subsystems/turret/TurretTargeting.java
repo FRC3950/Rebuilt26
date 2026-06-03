@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.ShotTableTarget;
 import java.util.function.Supplier;
 
 /**
@@ -19,6 +20,7 @@ public class TurretTargeting extends Command {
   private final Drive drive;
   private final Translation2d robotToTurret;
   private final Supplier<Translation2d> targetOverrideSupplier;
+  private final ShotTableTarget shotTableTarget;
   private final boolean lockAzimuthToZero;
   private final GetAdjustedShot shotCalc = new GetAdjustedShot();
 
@@ -40,8 +42,26 @@ public class TurretTargeting extends Command {
       Turret turret,
       Drive drive,
       Translation2d robotToTurret,
+      Translation2d targetOverride,
+      ShotTableTarget shotTableTarget) {
+    this(turret, drive, robotToTurret, () -> targetOverride, shotTableTarget, false);
+  }
+
+  public TurretTargeting(
+      Turret turret,
+      Drive drive,
+      Translation2d robotToTurret,
       Supplier<Translation2d> targetOverrideSupplier) {
     this(turret, drive, robotToTurret, targetOverrideSupplier, false);
+  }
+
+  public TurretTargeting(
+      Turret turret,
+      Drive drive,
+      Translation2d robotToTurret,
+      Supplier<Translation2d> targetOverrideSupplier,
+      ShotTableTarget shotTableTarget) {
+    this(turret, drive, robotToTurret, targetOverrideSupplier, shotTableTarget, false);
   }
 
   private TurretTargeting(
@@ -50,10 +70,27 @@ public class TurretTargeting extends Command {
       Translation2d robotToTurret,
       Supplier<Translation2d> targetOverrideSupplier,
       boolean lockAzimuthToZero) {
+    this(
+        turret,
+        drive,
+        robotToTurret,
+        targetOverrideSupplier,
+        ShotTableTarget.HUB,
+        lockAzimuthToZero);
+  }
+
+  private TurretTargeting(
+      Turret turret,
+      Drive drive,
+      Translation2d robotToTurret,
+      Supplier<Translation2d> targetOverrideSupplier,
+      ShotTableTarget shotTableTarget,
+      boolean lockAzimuthToZero) {
     this.turret = turret;
     this.drive = drive;
     this.robotToTurret = robotToTurret;
     this.targetOverrideSupplier = targetOverrideSupplier;
+    this.shotTableTarget = shotTableTarget;
     this.lockAzimuthToZero = lockAzimuthToZero;
     addRequirements(turret);
   }
@@ -69,7 +106,12 @@ public class TurretTargeting extends Command {
             ? shotCalc.getParameters(
                 robotPose, fieldVelocity, robotToTurret, turret.getTofFudgeSec())
             : shotCalc.getParameters(
-                robotPose, fieldVelocity, targetOverride, robotToTurret, turret.getTofFudgeSec());
+                robotPose,
+                fieldVelocity,
+                targetOverride,
+                robotToTurret,
+                turret.getTofFudgeSec(),
+                shotTableTarget);
 
     if (params.isValid()) {
       if (Turret.getTargetingMode()) {

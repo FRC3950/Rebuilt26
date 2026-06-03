@@ -1,0 +1,2057 @@
+{
+  "version": 1,
+  "target": "HUB",
+  "mode": "final",
+  "units": {
+    "distance": "m",
+    "radialVelocity": "m/s",
+    "hood": "deg",
+    "flywheel": "rps",
+    "tof": "s",
+    "robustnessMargin": "m"
+  },
+  "distanceMeters": [
+    1.0,
+    1.25,
+    1.5,
+    1.75,
+    2.0,
+    2.25,
+    2.5,
+    2.75,
+    3.0,
+    3.25,
+    3.5,
+    3.75,
+    4.0,
+    4.25,
+    4.5,
+    4.75,
+    5.0,
+    5.25,
+    5.5,
+    5.75,
+    6.0,
+    6.25,
+    6.5,
+    6.75,
+    7.0
+  ],
+  "radialVelocityMetersPerSecond": [
+    -4.5,
+    -3.75,
+    -3.0,
+    -2.25,
+    -1.5,
+    -0.75,
+    0.0,
+    0.75,
+    1.5,
+    2.25,
+    3.0,
+    3.75,
+    4.5
+  ],
+  "points": [
+    [
+      {
+        "hoodDeg": 13.35,
+        "flywheelRps": 58.5,
+        "tofSec": 0.9620522234231355,
+        "robustnessMargin": 0.3461681510696696
+      },
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 53.0,
+        "tofSec": 0.774894053524478,
+        "robustnessMargin": 0.3707642514992543
+      },
+      {
+        "hoodDeg": 17.85,
+        "flywheelRps": 49.75,
+        "tofSec": 0.7853847710398694,
+        "robustnessMargin": 0.3774474910710083
+      },
+      {
+        "hoodDeg": 23.45000000000001,
+        "flywheelRps": 47.0,
+        "tofSec": 0.8051380104283455,
+        "robustnessMargin": 0.38253019269263344
+      },
+      {
+        "hoodDeg": 28.75000000000002,
+        "flywheelRps": 44.25,
+        "tofSec": 0.7870650661648632,
+        "robustnessMargin": 0.3891567690792489
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 41.25,
+        "tofSec": 0.6397865578385094,
+        "robustnessMargin": 0.2762983187869904
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 41.5,
+        "tofSec": 0.6529853276158313,
+        "robustnessMargin": -0.244595252116517
+      },
+      {
+        "hoodDeg": 28.850000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6380289909818445,
+        "robustnessMargin": -0.7703569951465821
+      },
+      {
+        "hoodDeg": 29.05000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6359577691658035,
+        "robustnessMargin": -1.2359017443750084
+      },
+      {
+        "hoodDeg": 29.350000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6361492334441644,
+        "robustnessMargin": -1.6956331082875606
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": -2.14816624349772
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -2.643990552990434
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -3.233462168778687
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.25,
+        "flywheelRps": 60.5,
+        "tofSec": 1.0155607374164193,
+        "robustnessMargin": 0.33608119606885856
+      },
+      {
+        "hoodDeg": 13.0,
+        "flywheelRps": 55.0,
+        "tofSec": 0.8425477756883423,
+        "robustnessMargin": 0.35910555680974765
+      },
+      {
+        "hoodDeg": 14.749999999999996,
+        "flywheelRps": 51.0,
+        "tofSec": 0.7454121516685724,
+        "robustnessMargin": 0.3702773519816487
+      },
+      {
+        "hoodDeg": 20.45000000000001,
+        "flywheelRps": 48.0,
+        "tofSec": 0.7780878740838939,
+        "robustnessMargin": 0.37410078890122866
+      },
+      {
+        "hoodDeg": 25.05000000000001,
+        "flywheelRps": 45.0,
+        "tofSec": 0.7491139446151305,
+        "robustnessMargin": 0.37851290889066
+      },
+      {
+        "hoodDeg": 29.75000000000002,
+        "flywheelRps": 42.25,
+        "tofSec": 0.7029301237967902,
+        "robustnessMargin": 0.37842204069749186
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 41.5,
+        "tofSec": 0.6529853276158313,
+        "robustnessMargin": 0.0054047478834828855
+      },
+      {
+        "hoodDeg": 28.850000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6380289909818445,
+        "robustnessMargin": -0.5203569951465821
+      },
+      {
+        "hoodDeg": 29.05000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6359577691658035,
+        "robustnessMargin": -0.9859017443750084
+      },
+      {
+        "hoodDeg": 29.350000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6361492334441644,
+        "robustnessMargin": -1.4456331082875606
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": -1.89816624349772
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -2.393990552990434
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -2.983462168778687
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.35,
+        "flywheelRps": 62.5,
+        "tofSec": 1.0717981719607526,
+        "robustnessMargin": 0.3199210867442168
+      },
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 57.0,
+        "tofSec": 0.9086902815063103,
+        "robustnessMargin": 0.34766288685716096
+      },
+      {
+        "hoodDeg": 15.349999999999998,
+        "flywheelRps": 53.0,
+        "tofSec": 0.8383705272616309,
+        "robustnessMargin": 0.36015442049197044
+      },
+      {
+        "hoodDeg": 20.45000000000001,
+        "flywheelRps": 50.0,
+        "tofSec": 0.8552464021091748,
+        "robustnessMargin": 0.3662598623234232
+      },
+      {
+        "hoodDeg": 24.450000000000003,
+        "flywheelRps": 46.75,
+        "tofSec": 0.8127170121797604,
+        "robustnessMargin": 0.37128074767641084
+      },
+      {
+        "hoodDeg": 29.35000000000001,
+        "flywheelRps": 44.0,
+        "tofSec": 0.7832322268673491,
+        "robustnessMargin": 0.377444667249071
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 41.5,
+        "tofSec": 0.6529853276158313,
+        "robustnessMargin": 0.2554047478834829
+      },
+      {
+        "hoodDeg": 28.850000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6380289909818445,
+        "robustnessMargin": -0.27035699514658207
+      },
+      {
+        "hoodDeg": 29.05000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6359577691658035,
+        "robustnessMargin": -0.7359017443750084
+      },
+      {
+        "hoodDeg": 29.350000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6361492334441644,
+        "robustnessMargin": -1.1956331082875606
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": -1.64816624349772
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -2.143990552990434
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -2.733462168778687
+      }
+    ],
+    [
+      {
+        "hoodDeg": 14.85,
+        "flywheelRps": 65.5,
+        "tofSec": 1.1867327371670846,
+        "robustnessMargin": 0.2991308349056865
+      },
+      {
+        "hoodDeg": 13.399999999999999,
+        "flywheelRps": 59.0,
+        "tofSec": 0.9753005849275678,
+        "robustnessMargin": 0.3356088034178526
+      },
+      {
+        "hoodDeg": 17.550000000000004,
+        "flywheelRps": 55.75,
+        "tofSec": 0.9806714769679618,
+        "robustnessMargin": 0.34423183359963794
+      },
+      {
+        "hoodDeg": 17.250000000000014,
+        "flywheelRps": 51.0,
+        "tofSec": 0.8143001932862002,
+        "robustnessMargin": 0.3601218537526705
+      },
+      {
+        "hoodDeg": 22.250000000000007,
+        "flywheelRps": 48.0,
+        "tofSec": 0.8164384458060855,
+        "robustnessMargin": 0.3647364293925528
+      },
+      {
+        "hoodDeg": 28.85,
+        "flywheelRps": 45.75,
+        "tofSec": 0.8488087530542331,
+        "robustnessMargin": 0.3704888641444968
+      },
+      {
+        "hoodDeg": 29.750000000000014,
+        "flywheelRps": 42.25,
+        "tofSec": 0.6985137408731537,
+        "robustnessMargin": 0.3528819069372897
+      },
+      {
+        "hoodDeg": 28.850000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6380289909818445,
+        "robustnessMargin": -0.02035699514658207
+      },
+      {
+        "hoodDeg": 29.05000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6359577691658035,
+        "robustnessMargin": -0.48590174437500844
+      },
+      {
+        "hoodDeg": 29.350000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6361492334441644,
+        "robustnessMargin": -0.9456331082875606
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": -1.39816624349772
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -1.893990552990434
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -2.483462168778687
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 66.0,
+        "tofSec": 1.1543612064565083,
+        "robustnessMargin": 0.29880019114107936
+      },
+      {
+        "hoodDeg": 13.25,
+        "flywheelRps": 60.75,
+        "tofSec": 1.0198313728707016,
+        "robustnessMargin": 0.3263864161025751
+      },
+      {
+        "hoodDeg": 13.699999999999998,
+        "flywheelRps": 56.25,
+        "tofSec": 0.8992136979156158,
+        "robustnessMargin": 0.33832486887121505
+      },
+      {
+        "hoodDeg": 18.250000000000007,
+        "flywheelRps": 53.0,
+        "tofSec": 0.9079238601149204,
+        "robustnessMargin": 0.34939191433452743
+      },
+      {
+        "hoodDeg": 22.95000000000001,
+        "flywheelRps": 50.0,
+        "tofSec": 0.9042865364963023,
+        "robustnessMargin": 0.3560412215503186
+      },
+      {
+        "hoodDeg": 29.45000000000001,
+        "flywheelRps": 48.0,
+        "tofSec": 0.942166103548562,
+        "robustnessMargin": 0.36223899111673363
+      },
+      {
+        "hoodDeg": 29.55000000000001,
+        "flywheelRps": 43.75,
+        "tofSec": 0.7713835048201453,
+        "robustnessMargin": 0.36216410683373645
+      },
+      {
+        "hoodDeg": 28.850000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6380289909818445,
+        "robustnessMargin": 0.22964300485341793
+      },
+      {
+        "hoodDeg": 29.05000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6359577691658035,
+        "robustnessMargin": -0.23590174437500844
+      },
+      {
+        "hoodDeg": 29.350000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6361492334441644,
+        "robustnessMargin": -0.6956331082875606
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": -1.14816624349772
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -1.643990552990434
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -2.233462168778687
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 67.75,
+        "tofSec": 1.1971414157556666,
+        "robustnessMargin": 0.29193205271389466
+      },
+      {
+        "hoodDeg": 15.25,
+        "flywheelRps": 63.5,
+        "tofSec": 1.1431445718144333,
+        "robustnessMargin": 0.3041503182195018
+      },
+      {
+        "hoodDeg": 14.049999999999997,
+        "flywheelRps": 58.0,
+        "tofSec": 0.960725208499705,
+        "robustnessMargin": 0.33432131380122243
+      },
+      {
+        "hoodDeg": 14.849999999999998,
+        "flywheelRps": 54.0,
+        "tofSec": 0.8550233008189043,
+        "robustnessMargin": 0.34636115642822984
+      },
+      {
+        "hoodDeg": 20.45000000000001,
+        "flywheelRps": 51.0,
+        "tofSec": 0.8870058927391535,
+        "robustnessMargin": 0.3500632014163547
+      },
+      {
+        "hoodDeg": 29.050000000000004,
+        "flywheelRps": 49.75,
+        "tofSec": 0.9965147190286646,
+        "robustnessMargin": 0.35247455254016025
+      },
+      {
+        "hoodDeg": 27.95000000000001,
+        "flywheelRps": 45.0,
+        "tofSec": 0.7986663997960117,
+        "robustnessMargin": 0.3570756517043585
+      },
+      {
+        "hoodDeg": 26.75000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.6506199768170913,
+        "robustnessMargin": 0.2591371715534563
+      },
+      {
+        "hoodDeg": 29.05000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6359577691658035,
+        "robustnessMargin": 0.014098255624991562
+      },
+      {
+        "hoodDeg": 29.350000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6361492334441644,
+        "robustnessMargin": -0.44563310828756064
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": -0.89816624349772
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -1.393990552990434
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -1.9834621687786869
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.25,
+        "flywheelRps": 69.5,
+        "tofSec": 1.242922251932101,
+        "robustnessMargin": 0.2788387192748085
+      },
+      {
+        "hoodDeg": 13.399999999999999,
+        "flywheelRps": 64.25,
+        "tofSec": 1.1153728950675499,
+        "robustnessMargin": 0.306355930611085
+      },
+      {
+        "hoodDeg": 14.35,
+        "flywheelRps": 59.75,
+        "tofSec": 1.0178074184665,
+        "robustnessMargin": 0.32388293303350757
+      },
+      {
+        "hoodDeg": 16.85000000000001,
+        "flywheelRps": 56.0,
+        "tofSec": 0.9684270617583948,
+        "robustnessMargin": 0.3343481418471401
+      },
+      {
+        "hoodDeg": 20.75,
+        "flywheelRps": 52.75,
+        "tofSec": 0.9512838909773605,
+        "robustnessMargin": 0.34260035602039274
+      },
+      {
+        "hoodDeg": 21.35000000000001,
+        "flywheelRps": 49.0,
+        "tofSec": 0.8309857332844912,
+        "robustnessMargin": 0.34899347433376704
+      },
+      {
+        "hoodDeg": 29.55000000000001,
+        "flywheelRps": 47.0,
+        "tofSec": 0.9038178847186797,
+        "robustnessMargin": 0.35274718950037043
+      },
+      {
+        "hoodDeg": 29.150000000000006,
+        "flywheelRps": 43.5,
+        "tofSec": 0.7474836336120657,
+        "robustnessMargin": 0.331996084032272
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6522641312206131,
+        "robustnessMargin": 0.25353060653434856
+      },
+      {
+        "hoodDeg": 29.350000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6361492334441644,
+        "robustnessMargin": -0.19563310828756064
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": -0.64816624349772
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -1.143990552990434
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -1.7334621687786869
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.399999999999999,
+        "flywheelRps": 71.25,
+        "tofSec": 1.287873286856136,
+        "robustnessMargin": 0.2677684533559641
+      },
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 65.75,
+        "tofSec": 1.14501851375611,
+        "robustnessMargin": 0.2972138242066156
+      },
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 61.0,
+        "tofSec": 1.019124788755667,
+        "robustnessMargin": 0.3177622663424504
+      },
+      {
+        "hoodDeg": 13.699999999999998,
+        "flywheelRps": 57.0,
+        "tofSec": 0.9181095946928195,
+        "robustnessMargin": 0.33275408017433206
+      },
+      {
+        "hoodDeg": 19.35000000000001,
+        "flywheelRps": 54.0,
+        "tofSec": 0.9607561547902029,
+        "robustnessMargin": 0.33468446659364526
+      },
+      {
+        "hoodDeg": 22.75,
+        "flywheelRps": 50.75,
+        "tofSec": 0.9221727328035548,
+        "robustnessMargin": 0.343328388524744
+      },
+      {
+        "hoodDeg": 27.45000000000001,
+        "flywheelRps": 48.0,
+        "tofSec": 0.9070965756063515,
+        "robustnessMargin": 0.3474847649774153
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 45.0,
+        "tofSec": 0.8262938764895023,
+        "robustnessMargin": 0.3457367372268978
+      },
+      {
+        "hoodDeg": 27.75000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.6706312608477827,
+        "robustnessMargin": 0.2569392980432106
+      },
+      {
+        "hoodDeg": 29.350000000000016,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6361492334441644,
+        "robustnessMargin": 0.05436689171243936
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": -0.39816624349772
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -0.893990552990434
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -1.4834621687786869
+      }
+    ],
+    [
+      {
+        "hoodDeg": 14.35,
+        "flywheelRps": 73.5,
+        "tofSec": 1.3646634158403042,
+        "robustnessMargin": 0.25451811633751964
+      },
+      {
+        "hoodDeg": 15.25,
+        "flywheelRps": 68.5,
+        "tofSec": 1.2672460018218243,
+        "robustnessMargin": 0.27730813956067246
+      },
+      {
+        "hoodDeg": 13.75,
+        "flywheelRps": 62.75,
+        "tofSec": 1.082433171726679,
+        "robustnessMargin": 0.30578444879606215
+      },
+      {
+        "hoodDeg": 16.15,
+        "flywheelRps": 59.0,
+        "tofSec": 1.037926802895678,
+        "robustnessMargin": 0.31928604463241106
+      },
+      {
+        "hoodDeg": 16.350000000000005,
+        "flywheelRps": 55.0,
+        "tofSec": 0.9218255318322611,
+        "robustnessMargin": 0.3324732242601076
+      },
+      {
+        "hoodDeg": 21.45000000000001,
+        "flywheelRps": 52.0,
+        "tofSec": 0.9374680877113343,
+        "robustnessMargin": 0.3364500168799105
+      },
+      {
+        "hoodDeg": 25.150000000000013,
+        "flywheelRps": 49.0,
+        "tofSec": 0.9028881327889091,
+        "robustnessMargin": 0.34168128065632386
+      },
+      {
+        "hoodDeg": 26.85000000000001,
+        "flywheelRps": 46.0,
+        "tofSec": 0.8157708605387489,
+        "robustnessMargin": 0.34144769170691847
+      },
+      {
+        "hoodDeg": 25.45000000000001,
+        "flywheelRps": 44.0,
+        "tofSec": 0.6864317841082572,
+        "robustnessMargin": 0.264402025916755
+      },
+      {
+        "hoodDeg": 29.45000000000001,
+        "flywheelRps": 42.0,
+        "tofSec": 0.656928847995596,
+        "robustnessMargin": 0.227598760333815
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": -0.14816624349772
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -0.643990552990434
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -1.2334621687786869
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.599999999999998,
+        "flywheelRps": 74.5,
+        "tofSec": 1.367348276313564,
+        "robustnessMargin": 0.24832753503003646
+      },
+      {
+        "hoodDeg": 13.299999999999999,
+        "flywheelRps": 69.0,
+        "tofSec": 1.2289318365200266,
+        "robustnessMargin": 0.2749528391238685
+      },
+      {
+        "hoodDeg": 14.95,
+        "flywheelRps": 64.75,
+        "tofSec": 1.1639579964440478,
+        "robustnessMargin": 0.29324510219398503
+      },
+      {
+        "hoodDeg": 13.749999999999998,
+        "flywheelRps": 60.0,
+        "tofSec": 1.005117768526979,
+        "robustnessMargin": 0.31670820220973095
+      },
+      {
+        "hoodDeg": 18.95000000000001,
+        "flywheelRps": 57.0,
+        "tofSec": 1.041472612609009,
+        "robustnessMargin": 0.3204749078677325
+      },
+      {
+        "hoodDeg": 17.85000000000001,
+        "flywheelRps": 53.0,
+        "tofSec": 0.8902163690439648,
+        "robustnessMargin": 0.3246271813906709
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 51.25,
+        "tofSec": 1.0205997379085956,
+        "robustnessMargin": 0.3352058864760501
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 47.75,
+        "tofSec": 0.9222532710971029,
+        "robustnessMargin": 0.33903573366338247
+      },
+      {
+        "hoodDeg": 24.650000000000006,
+        "flywheelRps": 45.0,
+        "tofSec": 0.7198340844804962,
+        "robustnessMargin": 0.28224509536596676
+      },
+      {
+        "hoodDeg": 27.750000000000007,
+        "flywheelRps": 43.0,
+        "tofSec": 0.6788634236023302,
+        "robustnessMargin": 0.2419636716504754
+      },
+      {
+        "hoodDeg": 29.65000000000002,
+        "flywheelRps": 41.75,
+        "tofSec": 0.6358004670941707,
+        "robustnessMargin": 0.10183375650227999
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -0.39399055299043395
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -0.9834621687786869
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.599999999999998,
+        "flywheelRps": 76.0,
+        "tofSec": 1.4007972457955677,
+        "robustnessMargin": 0.24031725787430824
+      },
+      {
+        "hoodDeg": 13.35,
+        "flywheelRps": 70.5,
+        "tofSec": 1.265446127581149,
+        "robustnessMargin": 0.26718481062411303
+      },
+      {
+        "hoodDeg": 13.549999999999999,
+        "flywheelRps": 65.75,
+        "tofSec": 1.1530174733167382,
+        "robustnessMargin": 0.2919071534430606
+      },
+      {
+        "hoodDeg": 15.949999999999998,
+        "flywheelRps": 62.0,
+        "tofSec": 1.113901301858285,
+        "robustnessMargin": 0.30247639663267867
+      },
+      {
+        "hoodDeg": 16.95000000000001,
+        "flywheelRps": 58.0,
+        "tofSec": 1.0246882468355638,
+        "robustnessMargin": 0.316106090976664
+      },
+      {
+        "hoodDeg": 21.45000000000001,
+        "flywheelRps": 55.0,
+        "tofSec": 1.030792085010806,
+        "robustnessMargin": 0.3228991458764545
+      },
+      {
+        "hoodDeg": 27.450000000000003,
+        "flywheelRps": 52.75,
+        "tofSec": 1.0648761676085121,
+        "robustnessMargin": 0.3275213254696334
+      },
+      {
+        "hoodDeg": 28.45000000000001,
+        "flywheelRps": 49.0,
+        "tofSec": 0.9538162375362245,
+        "robustnessMargin": 0.33479302665470234
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 46.0,
+        "tofSec": 0.8614521128570544,
+        "robustnessMargin": 0.32810349413650375
+      },
+      {
+        "hoodDeg": 26.35000000000001,
+        "flywheelRps": 44.0,
+        "tofSec": 0.7020220498335158,
+        "robustnessMargin": 0.25542302636094805
+      },
+      {
+        "hoodDeg": 29.35000000000001,
+        "flywheelRps": 42.25,
+        "tofSec": 0.6633231986639561,
+        "robustnessMargin": 0.2009077167570319
+      },
+      {
+        "hoodDeg": 29.250000000000007,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6345706471430101,
+        "robustnessMargin": -0.14399055299043395
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -0.7334621687786869
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.299999999999999,
+        "flywheelRps": 77.25,
+        "tofSec": 1.4200654614564385,
+        "robustnessMargin": 0.2322238073457643
+      },
+      {
+        "hoodDeg": 13.799999999999997,
+        "flywheelRps": 72.25,
+        "tofSec": 1.3178069288727832,
+        "robustnessMargin": 0.25766266288293105
+      },
+      {
+        "hoodDeg": 13.599999999999998,
+        "flywheelRps": 67.25,
+        "tofSec": 1.1909422287166143,
+        "robustnessMargin": 0.28298370286591545
+      },
+      {
+        "hoodDeg": 14.249999999999996,
+        "flywheelRps": 63.0,
+        "tofSec": 1.097599309207599,
+        "robustnessMargin": 0.2997664351902434
+      },
+      {
+        "hoodDeg": 18.95000000000001,
+        "flywheelRps": 60.0,
+        "tofSec": 1.1250525985910778,
+        "robustnessMargin": 0.3041441805739362
+      },
+      {
+        "hoodDeg": 19.45000000000001,
+        "flywheelRps": 56.0,
+        "tofSec": 1.018865469977092,
+        "robustnessMargin": 0.3184014322525619
+      },
+      {
+        "hoodDeg": 23.45000000000001,
+        "flywheelRps": 53.0,
+        "tofSec": 1.0038765956777609,
+        "robustnessMargin": 0.3237710353070131
+      },
+      {
+        "hoodDeg": 26.55000000000001,
+        "flywheelRps": 50.0,
+        "tofSec": 0.9570887354719423,
+        "robustnessMargin": 0.32824302326359245
+      },
+      {
+        "hoodDeg": 27.55000000000001,
+        "flywheelRps": 47.0,
+        "tofSec": 0.862368484674567,
+        "robustnessMargin": 0.32886021202567983
+      },
+      {
+        "hoodDeg": 25.45000000000001,
+        "flywheelRps": 45.0,
+        "tofSec": 0.7321309844880128,
+        "robustnessMargin": 0.26650073413300834
+      },
+      {
+        "hoodDeg": 28.85000000000001,
+        "flywheelRps": 43.0,
+        "tofSec": 0.6970458382492406,
+        "robustnessMargin": 0.23930167542243908
+      },
+      {
+        "hoodDeg": 29.45000000000001,
+        "flywheelRps": 42.0,
+        "tofSec": 0.6402612768079009,
+        "robustnessMargin": 0.09321523111992347
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -0.48346216877868686
+      }
+    ],
+    [
+      {
+        "hoodDeg": 14.35,
+        "flywheelRps": 79.5,
+        "tofSec": 1.4977084939972285,
+        "robustnessMargin": 0.21716827157915342
+      },
+      {
+        "hoodDeg": 13.85,
+        "flywheelRps": 73.75,
+        "tofSec": 1.3531965947179958,
+        "robustnessMargin": 0.24699625789222113
+      },
+      {
+        "hoodDeg": 13.75,
+        "flywheelRps": 68.75,
+        "tofSec": 1.2307594210638118,
+        "robustnessMargin": 0.2739480382861115
+      },
+      {
+        "hoodDeg": 15.35,
+        "flywheelRps": 64.75,
+        "tofSec": 1.169675877475696,
+        "robustnessMargin": 0.287591534113409
+      },
+      {
+        "hoodDeg": 17.45000000000001,
+        "flywheelRps": 61.0,
+        "tofSec": 1.1183957982236499,
+        "robustnessMargin": 0.29971195893626845
+      },
+      {
+        "hoodDeg": 16.049999999999997,
+        "flywheelRps": 57.0,
+        "tofSec": 0.9697617483893645,
+        "robustnessMargin": 0.3113428809595091
+      },
+      {
+        "hoodDeg": 21.35000000000001,
+        "flywheelRps": 54.0,
+        "tofSec": 0.9939081461236099,
+        "robustnessMargin": 0.3187401483920702
+      },
+      {
+        "hoodDeg": 24.45000000000001,
+        "flywheelRps": 51.0,
+        "tofSec": 0.953525506221725,
+        "robustnessMargin": 0.32367853482442666
+      },
+      {
+        "hoodDeg": 26.75000000000002,
+        "flywheelRps": 48.25,
+        "tofSec": 0.8947702278326407,
+        "robustnessMargin": 0.30824398781309315
+      },
+      {
+        "hoodDeg": 24.750000000000007,
+        "flywheelRps": 46.0,
+        "tofSec": 0.7627217333094488,
+        "robustnessMargin": 0.27563042793588677
+      },
+      {
+        "hoodDeg": 27.35000000000001,
+        "flywheelRps": 44.0,
+        "tofSec": 0.7179756190469164,
+        "robustnessMargin": 0.24560497702338369
+      },
+      {
+        "hoodDeg": 28.15000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.6577232816395022,
+        "robustnessMargin": 0.14920966154082604
+      },
+      {
+        "hoodDeg": 27.65000000000002,
+        "flywheelRps": 42.75,
+        "tofSec": 0.634811203584814,
+        "robustnessMargin": -0.23346216877868686
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 80.0,
+        "tofSec": 1.4737711453002589,
+        "robustnessMargin": 0.21603720428465545
+      },
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 74.75,
+        "tofSec": 1.3552202410234673,
+        "robustnessMargin": 0.24410648663410184
+      },
+      {
+        "hoodDeg": 15.049999999999999,
+        "flywheelRps": 70.75,
+        "tofSec": 1.3113899980504677,
+        "robustnessMargin": 0.2601830075161673
+      },
+      {
+        "hoodDeg": 14.849999999999998,
+        "flywheelRps": 66.0,
+        "tofSec": 1.188187859097152,
+        "robustnessMargin": 0.2814632420346759
+      },
+      {
+        "hoodDeg": 15.549999999999997,
+        "flywheelRps": 62.0,
+        "tofSec": 1.0996681849362209,
+        "robustnessMargin": 0.29707430017676595
+      },
+      {
+        "hoodDeg": 22.95000000000001,
+        "flywheelRps": 60.0,
+        "tofSec": 1.201790041190246,
+        "robustnessMargin": 0.29795821895388874
+      },
+      {
+        "hoodDeg": 24.05000000000001,
+        "flywheelRps": 56.0,
+        "tofSec": 1.1050072825587334,
+        "robustnessMargin": 0.30964309482134
+      },
+      {
+        "hoodDeg": 28.15000000000002,
+        "flywheelRps": 53.25,
+        "tofSec": 1.0866524049808322,
+        "robustnessMargin": 0.3176097227169197
+      },
+      {
+        "hoodDeg": 29.050000000000004,
+        "flywheelRps": 49.75,
+        "tofSec": 0.9835839868698377,
+        "robustnessMargin": 0.32201393652792243
+      },
+      {
+        "hoodDeg": 24.250000000000007,
+        "flywheelRps": 47.0,
+        "tofSec": 0.7944413367887033,
+        "robustnessMargin": 0.28333267508907367
+      },
+      {
+        "hoodDeg": 26.150000000000013,
+        "flywheelRps": 45.0,
+        "tofSec": 0.7411617957677956,
+        "robustnessMargin": 0.25075405781871973
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 43.0,
+        "tofSec": 0.7109217707753063,
+        "robustnessMargin": 0.23343508124809587
+      },
+      {
+        "hoodDeg": 27.750000000000014,
+        "flywheelRps": 42.75,
+        "tofSec": 0.6378423032878286,
+        "robustnessMargin": 0.0073581445477155505
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.25,
+        "flywheelRps": 81.5,
+        "tofSec": 1.509813114866773,
+        "robustnessMargin": 0.20769595314567768
+      },
+      {
+        "hoodDeg": 13.75,
+        "flywheelRps": 76.5,
+        "tofSec": 1.4116600354063569,
+        "robustnessMargin": 0.22971746447961872
+      },
+      {
+        "hoodDeg": 16.150000000000002,
+        "flywheelRps": 72.75,
+        "tofSec": 1.385430517546625,
+        "robustnessMargin": 0.24377216130925516
+      },
+      {
+        "hoodDeg": 13.299999999999999,
+        "flywheelRps": 67.0,
+        "tofSec": 1.1723922621272906,
+        "robustnessMargin": 0.27969134810756335
+      },
+      {
+        "hoodDeg": 13.0,
+        "flywheelRps": 63.0,
+        "tofSec": 1.0601103592687082,
+        "robustnessMargin": 0.2842004669965239
+      },
+      {
+        "hoodDeg": 18.650000000000013,
+        "flywheelRps": 60.0,
+        "tofSec": 1.1138216575227824,
+        "robustnessMargin": 0.2985212230986014
+      },
+      {
+        "hoodDeg": 26.05000000000002,
+        "flywheelRps": 58.25,
+        "tofSec": 1.2041456192957418,
+        "robustnessMargin": 0.30077280982857113
+      },
+      {
+        "hoodDeg": 26.05000000000001,
+        "flywheelRps": 54.0,
+        "tofSec": 1.075718462756373,
+        "robustnessMargin": 0.3118213073635414
+      },
+      {
+        "hoodDeg": 28.750000000000014,
+        "flywheelRps": 51.0,
+        "tofSec": 1.0201448600306318,
+        "robustnessMargin": 0.3183086444787482
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 48.0,
+        "tofSec": 0.9302854937282659,
+        "robustnessMargin": 0.31863031444061685
+      },
+      {
+        "hoodDeg": 25.150000000000013,
+        "flywheelRps": 46.0,
+        "tofSec": 0.7651392771026345,
+        "robustnessMargin": 0.25631079004825574
+      },
+      {
+        "hoodDeg": 28.250000000000007,
+        "flywheelRps": 44.0,
+        "tofSec": 0.7301741243452822,
+        "robustnessMargin": 0.23545385732654145
+      },
+      {
+        "hoodDeg": 28.150000000000013,
+        "flywheelRps": 43.0,
+        "tofSec": 0.6655367353856373,
+        "robustnessMargin": 0.1271592052110555
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 82.75,
+        "tofSec": 1.531709809556919,
+        "robustnessMargin": 0.19835258738816952
+      },
+      {
+        "hoodDeg": 13.45,
+        "flywheelRps": 77.75,
+        "tofSec": 1.430674275140106,
+        "robustnessMargin": 0.2261507804118703
+      },
+      {
+        "hoodDeg": 13.25,
+        "flywheelRps": 72.75,
+        "tofSec": 1.309887438137502,
+        "robustnessMargin": 0.24822855187776716
+      },
+      {
+        "hoodDeg": 14.75,
+        "flywheelRps": 68.75,
+        "tofSec": 1.2520031559971923,
+        "robustnessMargin": 0.266987163167848
+      },
+      {
+        "hoodDeg": 15.75,
+        "flywheelRps": 64.75,
+        "tofSec": 1.174744489038451,
+        "robustnessMargin": 0.28243757756660726
+      },
+      {
+        "hoodDeg": 16.550000000000008,
+        "flywheelRps": 61.0,
+        "tofSec": 1.092546480861151,
+        "robustnessMargin": 0.2956073894311735
+      },
+      {
+        "hoodDeg": 21.150000000000013,
+        "flywheelRps": 58.0,
+        "tofSec": 1.1066117263438568,
+        "robustnessMargin": 0.30108919813472257
+      },
+      {
+        "hoodDeg": 24.650000000000013,
+        "flywheelRps": 55.0,
+        "tofSec": 1.0814972256765079,
+        "robustnessMargin": 0.30629717661770206
+      },
+      {
+        "hoodDeg": 27.250000000000007,
+        "flywheelRps": 52.0,
+        "tofSec": 1.0286453863397373,
+        "robustnessMargin": 0.31225952744518937
+      },
+      {
+        "hoodDeg": 27.85000000000001,
+        "flywheelRps": 49.0,
+        "tofSec": 0.934228998820502,
+        "robustnessMargin": 0.314402738994517
+      },
+      {
+        "hoodDeg": 24.35000000000001,
+        "flywheelRps": 47.0,
+        "tofSec": 0.7905968083625524,
+        "robustnessMargin": 0.2602381247409391
+      },
+      {
+        "hoodDeg": 26.85000000000001,
+        "flywheelRps": 45.0,
+        "tofSec": 0.7493870779012136,
+        "robustnessMargin": 0.23635100161319622
+      },
+      {
+        "hoodDeg": 27.25000000000002,
+        "flywheelRps": 43.75,
+        "tofSec": 0.6880368742582397,
+        "robustnessMargin": 0.16278573560675147
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.599999999999998,
+        "flywheelRps": 84.5,
+        "tofSec": 1.5823670200349025,
+        "robustnessMargin": 0.18949880817736586
+      },
+      {
+        "hoodDeg": 13.699999999999998,
+        "flywheelRps": 79.25,
+        "tofSec": 1.4699225005458478,
+        "robustnessMargin": 0.21678977936798072
+      },
+      {
+        "hoodDeg": 13.499999999999998,
+        "flywheelRps": 74.25,
+        "tofSec": 1.3503182089262378,
+        "robustnessMargin": 0.24219229723259827
+      },
+      {
+        "hoodDeg": 14.349999999999998,
+        "flywheelRps": 70.0,
+        "tofSec": 1.2710869274088759,
+        "robustnessMargin": 0.2607093360156534
+      },
+      {
+        "hoodDeg": 15.349999999999998,
+        "flywheelRps": 66.0,
+        "tofSec": 1.195828017511758,
+        "robustnessMargin": 0.2760682527338507
+      },
+      {
+        "hoodDeg": 18.85,
+        "flywheelRps": 62.75,
+        "tofSec": 1.1908813089128232,
+        "robustnessMargin": 0.28342630840756255
+      },
+      {
+        "hoodDeg": 19.35000000000001,
+        "flywheelRps": 59.0,
+        "tofSec": 1.096801097338627,
+        "robustnessMargin": 0.29679414194946085
+      },
+      {
+        "hoodDeg": 23.05000000000001,
+        "flywheelRps": 56.0,
+        "tofSec": 1.0815681450309098,
+        "robustnessMargin": 0.30171982558995003
+      },
+      {
+        "hoodDeg": 25.750000000000014,
+        "flywheelRps": 53.0,
+        "tofSec": 1.0349915401849297,
+        "robustnessMargin": 0.30791486283828506
+      },
+      {
+        "hoodDeg": 25.85000000000001,
+        "flywheelRps": 50.0,
+        "tofSec": 0.9347717227342254,
+        "robustnessMargin": 0.3003945776320056
+      },
+      {
+        "hoodDeg": 23.650000000000006,
+        "flywheelRps": 48.0,
+        "tofSec": 0.8156919644327797,
+        "robustnessMargin": 0.2625569545286539
+      },
+      {
+        "hoodDeg": 25.650000000000013,
+        "flywheelRps": 46.0,
+        "tofSec": 0.7693740780612448,
+        "robustnessMargin": 0.2381136949333702
+      },
+      {
+        "hoodDeg": 29.150000000000013,
+        "flywheelRps": 44.0,
+        "tofSec": 0.7410972319174624,
+        "robustnessMargin": 0.2258123335682698
+      }
+    ],
+    [
+      {
+        "hoodDeg": 14.45,
+        "flywheelRps": 86.5,
+        "tofSec": 1.6477858575184228,
+        "robustnessMargin": 0.17063249956716087
+      },
+      {
+        "hoodDeg": 13.95,
+        "flywheelRps": 80.75,
+        "tofSec": 1.508838485362426,
+        "robustnessMargin": 0.20622875138139163
+      },
+      {
+        "hoodDeg": 13.85,
+        "flywheelRps": 75.75,
+        "tofSec": 1.3930239393129775,
+        "robustnessMargin": 0.23274815624399858
+      },
+      {
+        "hoodDeg": 13.2,
+        "flywheelRps": 71.0,
+        "tofSec": 1.2636906633309557,
+        "robustnessMargin": 0.25824401748030956
+      },
+      {
+        "hoodDeg": 13.399999999999999,
+        "flywheelRps": 67.0,
+        "tofSec": 1.170032284094301,
+        "robustnessMargin": 0.2761005680333617
+      },
+      {
+        "hoodDeg": 18.45000000000001,
+        "flywheelRps": 64.0,
+        "tofSec": 1.2140131524818873,
+        "robustnessMargin": 0.2765120514809154
+      },
+      {
+        "hoodDeg": 16.65000000000001,
+        "flywheelRps": 60.0,
+        "tofSec": 1.0629797509523105,
+        "robustnessMargin": 0.28629288257312036
+      },
+      {
+        "hoodDeg": 21.250000000000014,
+        "flywheelRps": 57.0,
+        "tofSec": 1.075227826615238,
+        "robustnessMargin": 0.2985960779438668
+      },
+      {
+        "hoodDeg": 23.85000000000001,
+        "flywheelRps": 54.0,
+        "tofSec": 1.031919132234136,
+        "robustnessMargin": 0.3034097452800304
+      },
+      {
+        "hoodDeg": 25.75000000000002,
+        "flywheelRps": 51.25,
+        "tofSec": 0.974343486815728,
+        "robustnessMargin": 0.288211197813824
+      },
+      {
+        "hoodDeg": 23.150000000000013,
+        "flywheelRps": 49.0,
+        "tofSec": 0.8429862992106872,
+        "robustnessMargin": 0.26511669993746656
+      },
+      {
+        "hoodDeg": 24.55000000000001,
+        "flywheelRps": 47.0,
+        "tofSec": 0.7886180253472206,
+        "robustnessMargin": 0.23947288215120333
+      },
+      {
+        "hoodDeg": 27.55000000000001,
+        "flywheelRps": 45.0,
+        "tofSec": 0.7568597721006336,
+        "robustnessMargin": 0.22353278695416945
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.0,
+        "flywheelRps": 86.75,
+        "tofSec": 1.6108647423830793,
+        "robustnessMargin": 0.1736281893831051
+      },
+      {
+        "hoodDeg": 15.85,
+        "flywheelRps": 83.5,
+        "tofSec": 1.6189949815977023,
+        "robustnessMargin": 0.18270315500609113
+      },
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 76.75,
+        "tofSec": 1.3942368431936298,
+        "robustnessMargin": 0.23106648590466827
+      },
+      {
+        "hoodDeg": 15.249999999999998,
+        "flywheelRps": 73.0,
+        "tofSec": 1.363364857495104,
+        "robustnessMargin": 0.24129520461703047
+      },
+      {
+        "hoodDeg": 15.75,
+        "flywheelRps": 68.75,
+        "tofSec": 1.2721017061542932,
+        "robustnessMargin": 0.26130255303234806
+      },
+      {
+        "hoodDeg": 17.150000000000013,
+        "flywheelRps": 65.0,
+        "tofSec": 1.209390063569832,
+        "robustnessMargin": 0.2735249025060562
+      },
+      {
+        "hoodDeg": 23.95000000000001,
+        "flywheelRps": 63.0,
+        "tofSec": 1.2956481059641645,
+        "robustnessMargin": 0.2751363042020949
+      },
+      {
+        "hoodDeg": 18.85000000000001,
+        "flywheelRps": 58.0,
+        "tofSec": 1.0529256045066968,
+        "robustnessMargin": 0.28346376723623434
+      },
+      {
+        "hoodDeg": 21.55000000000001,
+        "flywheelRps": 55.0,
+        "tofSec": 1.017740948976976,
+        "robustnessMargin": 0.2893303786473491
+      },
+      {
+        "hoodDeg": 29.050000000000004,
+        "flywheelRps": 52.75,
+        "tofSec": 1.0746407251415222,
+        "robustnessMargin": 0.30117401807688227
+      },
+      {
+        "hoodDeg": 22.750000000000007,
+        "flywheelRps": 50.0,
+        "tofSec": 0.8706332319743638,
+        "robustnessMargin": 0.2663089954359621
+      },
+      {
+        "hoodDeg": 23.750000000000007,
+        "flywheelRps": 48.0,
+        "tofSec": 0.8117588785083708,
+        "robustnessMargin": 0.24012971463582167
+      },
+      {
+        "hoodDeg": 26.150000000000013,
+        "flywheelRps": 46.0,
+        "tofSec": 0.7731552616820798,
+        "robustnessMargin": 0.22382150845912152
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.299999999999999,
+        "flywheelRps": 88.25,
+        "tofSec": 1.6499343561188495,
+        "robustnessMargin": 0.1667094691311175
+      },
+      {
+        "hoodDeg": 13.299999999999999,
+        "flywheelRps": 83.0,
+        "tofSec": 1.537615324212659,
+        "robustnessMargin": 0.19228233003178063
+      },
+      {
+        "hoodDeg": 13.0,
+        "flywheelRps": 78.0,
+        "tofSec": 1.4183954826890723,
+        "robustnessMargin": 0.22064754968917244
+      },
+      {
+        "hoodDeg": 14.449999999999998,
+        "flywheelRps": 74.0,
+        "tofSec": 1.3650191115601589,
+        "robustnessMargin": 0.24005595349950992
+      },
+      {
+        "hoodDeg": 15.549999999999997,
+        "flywheelRps": 70.0,
+        "tofSec": 1.2965440375959774,
+        "robustnessMargin": 0.2545010311715852
+      },
+      {
+        "hoodDeg": 15.549999999999997,
+        "flywheelRps": 66.0,
+        "tofSec": 1.1955252423243456,
+        "robustnessMargin": 0.2720654809939176
+      },
+      {
+        "hoodDeg": 20.150000000000013,
+        "flywheelRps": 63.0,
+        "tofSec": 1.2201417377168429,
+        "robustnessMargin": 0.2751382949115375
+      },
+      {
+        "hoodDeg": 23.650000000000013,
+        "flywheelRps": 60.0,
+        "tofSec": 1.204791498933986,
+        "robustnessMargin": 0.28350581358499793
+      },
+      {
+        "hoodDeg": 28.85,
+        "flywheelRps": 57.75,
+        "tofSec": 1.2246601580539471,
+        "robustnessMargin": 0.2889383388374305
+      },
+      {
+        "hoodDeg": 29.05000000000001,
+        "flywheelRps": 54.0,
+        "tofSec": 1.112778394705779,
+        "robustnessMargin": 0.29796110594793523
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 51.0,
+        "tofSec": 1.0257778460040372,
+        "robustnessMargin": 0.292650812199835
+      },
+      {
+        "hoodDeg": 22.95000000000001,
+        "flywheelRps": 49.0,
+        "tofSec": 0.8328746957896154,
+        "robustnessMargin": 0.24213604111942955
+      },
+      {
+        "hoodDeg": 24.95000000000001,
+        "flywheelRps": 47.0,
+        "tofSec": 0.7906432264701346,
+        "robustnessMargin": 0.22351480818585268
+      }
+    ],
+    [
+      {
+        "hoodDeg": 14.45,
+        "flywheelRps": 90.5,
+        "tofSec": 1.7287076858688484,
+        "robustnessMargin": 0.15165454089762287
+      },
+      {
+        "hoodDeg": 13.2,
+        "flywheelRps": 84.25,
+        "tofSec": 1.5605022585207886,
+        "robustnessMargin": 0.18633917883644857
+      },
+      {
+        "hoodDeg": 13.95,
+        "flywheelRps": 79.75,
+        "tofSec": 1.482303727635458,
+        "robustnessMargin": 0.21176487248361875
+      },
+      {
+        "hoodDeg": 13.599999999999998,
+        "flywheelRps": 75.0,
+        "tofSec": 1.364379080612629,
+        "robustnessMargin": 0.23404300433134972
+      },
+      {
+        "hoodDeg": 14.449999999999998,
+        "flywheelRps": 71.0,
+        "tofSec": 1.2915549249297753,
+        "robustnessMargin": 0.2522905536702882
+      },
+      {
+        "hoodDeg": 13.299999999999999,
+        "flywheelRps": 67.0,
+        "tofSec": 1.1619707256465917,
+        "robustnessMargin": 0.2570974010104794
+      },
+      {
+        "hoodDeg": 18.85000000000001,
+        "flywheelRps": 64.0,
+        "tofSec": 1.21755926123286,
+        "robustnessMargin": 0.2724642154819983
+      },
+      {
+        "hoodDeg": 22.55000000000001,
+        "flywheelRps": 61.0,
+        "tofSec": 1.2108213617982464,
+        "robustnessMargin": 0.2790288941319603
+      },
+      {
+        "hoodDeg": 25.650000000000013,
+        "flywheelRps": 58.0,
+        "tofSec": 1.1799439624665413,
+        "robustnessMargin": 0.28547119953566247
+      },
+      {
+        "hoodDeg": 28.05000000000001,
+        "flywheelRps": 55.0,
+        "tofSec": 1.1273705887131547,
+        "robustnessMargin": 0.29194693110061953
+      },
+      {
+        "hoodDeg": 29.05000000000001,
+        "flywheelRps": 52.0,
+        "tofSec": 1.0457793214116935,
+        "robustnessMargin": 0.29713147193274336
+      },
+      {
+        "hoodDeg": 22.250000000000007,
+        "flywheelRps": 50.0,
+        "tofSec": 0.8543371126918187,
+        "robustnessMargin": 0.2406220825861003
+      },
+      {
+        "hoodDeg": 23.95000000000001,
+        "flywheelRps": 48.0,
+        "tofSec": 0.809786231215735,
+        "robustnessMargin": 0.22167715385937514
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.499999999999998,
+        "flywheelRps": 91.0,
+        "tofSec": 1.710549163279912,
+        "robustnessMargin": 0.15076525372592053
+      },
+      {
+        "hoodDeg": 13.549999999999999,
+        "flywheelRps": 85.75,
+        "tofSec": 1.6012969026795585,
+        "robustnessMargin": 0.1756816303102453
+      },
+      {
+        "hoodDeg": 13.35,
+        "flywheelRps": 80.75,
+        "tofSec": 1.4866086485013488,
+        "robustnessMargin": 0.20743167685370212
+      },
+      {
+        "hoodDeg": 14.85,
+        "flywheelRps": 76.75,
+        "tofSec": 1.436463119263826,
+        "robustnessMargin": 0.22349828826961327
+      },
+      {
+        "hoodDeg": 13.0,
+        "flywheelRps": 72.0,
+        "tofSec": 1.2755763283422288,
+        "robustnessMargin": 0.25105114890746405
+      },
+      {
+        "hoodDeg": 17.750000000000007,
+        "flywheelRps": 69.0,
+        "tofSec": 1.3208726666644264,
+        "robustnessMargin": 0.2513570585893308
+      },
+      {
+        "hoodDeg": 17.35000000000001,
+        "flywheelRps": 65.0,
+        "tofSec": 1.2085808390671382,
+        "robustnessMargin": 0.2691629919346554
+      },
+      {
+        "hoodDeg": 21.45000000000001,
+        "flywheelRps": 62.0,
+        "tofSec": 1.2154636338652178,
+        "robustnessMargin": 0.27518828440191934
+      },
+      {
+        "hoodDeg": 24.55000000000001,
+        "flywheelRps": 59.0,
+        "tofSec": 1.1883830609095067,
+        "robustnessMargin": 0.28132612233322574
+      },
+      {
+        "hoodDeg": 26.95000000000001,
+        "flywheelRps": 56.0,
+        "tofSec": 1.1391227290655532,
+        "robustnessMargin": 0.2880596064430292
+      },
+      {
+        "hoodDeg": 27.95000000000001,
+        "flywheelRps": 53.0,
+        "tofSec": 1.0600421254885073,
+        "robustnessMargin": 0.2932953107099263
+      },
+      {
+        "hoodDeg": 21.650000000000013,
+        "flywheelRps": 51.0,
+        "tofSec": 0.8763839081967297,
+        "robustnessMargin": 0.23928683085982394
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 48.0,
+        "tofSec": 0.913489981513802,
+        "robustnessMargin": 0.2525261986485563
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 92.0,
+        "tofSec": 1.7180569306946936,
+        "robustnessMargin": 0.142987447005559
+      },
+      {
+        "hoodDeg": 13.0,
+        "flywheelRps": 86.75,
+        "tofSec": 1.605366704664141,
+        "robustnessMargin": 0.17213849791873903
+      },
+      {
+        "hoodDeg": 13.299999999999999,
+        "flywheelRps": 82.0,
+        "tofSec": 1.5113010190251894,
+        "robustnessMargin": 0.20009740066928794
+      },
+      {
+        "hoodDeg": 14.749999999999998,
+        "flywheelRps": 78.0,
+        "tofSec": 1.4609834431549313,
+        "robustnessMargin": 0.21484409656438386
+      },
+      {
+        "hoodDeg": 15.25,
+        "flywheelRps": 73.75,
+        "tofSec": 1.3747821833823817,
+        "robustnessMargin": 0.2340750327678207
+      },
+      {
+        "hoodDeg": 16.85000000000001,
+        "flywheelRps": 70.0,
+        "tofSec": 1.3230524760375704,
+        "robustnessMargin": 0.24920860261101518
+      },
+      {
+        "hoodDeg": 14.949999999999998,
+        "flywheelRps": 66.0,
+        "tofSec": 1.1749541933480692,
+        "robustnessMargin": 0.2627394116157391
+      },
+      {
+        "hoodDeg": 23.25,
+        "flywheelRps": 63.75,
+        "tofSec": 1.2963787845194363,
+        "robustnessMargin": 0.2639637678088582
+      },
+      {
+        "hoodDeg": 23.55000000000001,
+        "flywheelRps": 60.0,
+        "tofSec": 1.1973562116310283,
+        "robustnessMargin": 0.27687729238857406
+      },
+      {
+        "hoodDeg": 25.95000000000001,
+        "flywheelRps": 57.0,
+        "tofSec": 1.1512028600558986,
+        "robustnessMargin": 0.28402304362875475
+      },
+      {
+        "hoodDeg": 26.750000000000007,
+        "flywheelRps": 54.0,
+        "tofSec": 1.0712001022384354,
+        "robustnessMargin": 0.2890001013580137
+      },
+      {
+        "hoodDeg": 21.150000000000013,
+        "flywheelRps": 52.0,
+        "tofSec": 0.8992237101783608,
+        "robustnessMargin": 0.23961380460917825
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 49.0,
+        "tofSec": 0.9482825345675081,
+        "robustnessMargin": 0.27109660396264745
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.45,
+        "flywheelRps": 93.5,
+        "tofSec": 1.7578803942503256,
+        "robustnessMargin": 0.13508993563124738
+      },
+      {
+        "hoodDeg": 13.0,
+        "flywheelRps": 88.0,
+        "tofSec": 1.6303844232418858,
+        "robustnessMargin": 0.16846998902812205
+      },
+      {
+        "hoodDeg": 13.2,
+        "flywheelRps": 83.25,
+        "tofSec": 1.5342504124577903,
+        "robustnessMargin": 0.19037056263639185
+      },
+      {
+        "hoodDeg": 13.45,
+        "flywheelRps": 78.75,
+        "tofSec": 1.4414041510342195,
+        "robustnessMargin": 0.21461445311602434
+      },
+      {
+        "hoodDeg": 15.249999999999998,
+        "flywheelRps": 75.0,
+        "tofSec": 1.402687870472608,
+        "robustnessMargin": 0.22848670211248168
+      },
+      {
+        "hoodDeg": 15.749999999999998,
+        "flywheelRps": 71.0,
+        "tofSec": 1.319177600804114,
+        "robustnessMargin": 0.24586760716198386
+      },
+      {
+        "hoodDeg": 19.85000000000001,
+        "flywheelRps": 68.0,
+        "tofSec": 1.3387003470918528,
+        "robustnessMargin": 0.2513642575196626
+      },
+      {
+        "hoodDeg": 18.750000000000007,
+        "flywheelRps": 64.0,
+        "tofSec": 1.209684638416008,
+        "robustnessMargin": 0.26739343363904267
+      },
+      {
+        "hoodDeg": 22.35000000000001,
+        "flywheelRps": 61.0,
+        "tofSec": 1.2012572253684752,
+        "robustnessMargin": 0.27271234022122526
+      },
+      {
+        "hoodDeg": 24.85000000000001,
+        "flywheelRps": 58.0,
+        "tofSec": 1.1603179541876354,
+        "robustnessMargin": 0.28040050585141385
+      },
+      {
+        "hoodDeg": 25.35000000000001,
+        "flywheelRps": 55.0,
+        "tofSec": 1.0773506221423443,
+        "robustnessMargin": 0.28545787194433236
+      },
+      {
+        "hoodDeg": 20.750000000000007,
+        "flywheelRps": 53.0,
+        "tofSec": 0.9229515661628154,
+        "robustnessMargin": 0.23802546253094858
+      },
+      {
+        "hoodDeg": 29.850000000000016,
+        "flywheelRps": 50.0,
+        "tofSec": 0.9818433784892036,
+        "robustnessMargin": 0.2824294158199705
+      }
+    ],
+    [
+      {
+        "hoodDeg": 13.1,
+        "flywheelRps": 94.5,
+        "tofSec": 1.7664013175773854,
+        "robustnessMargin": 0.13323577409091447
+      },
+      {
+        "hoodDeg": 15.149999999999999,
+        "flywheelRps": 90.75,
+        "tofSec": 1.7481925958320252,
+        "robustnessMargin": 0.1466114266005376
+      },
+      {
+        "hoodDeg": 13.25,
+        "flywheelRps": 84.5,
+        "tofSec": 1.561289404549666,
+        "robustnessMargin": 0.1875722271223279
+      },
+      {
+        "hoodDeg": 13.399999999999999,
+        "flywheelRps": 80.0,
+        "tofSec": 1.466431937692368,
+        "robustnessMargin": 0.20839421126405222
+      },
+      {
+        "hoodDeg": 14.449999999999998,
+        "flywheelRps": 76.0,
+        "tofSec": 1.4035603121133318,
+        "robustnessMargin": 0.22668046421369992
+      },
+      {
+        "hoodDeg": 14.449999999999998,
+        "flywheelRps": 72.0,
+        "tofSec": 1.3086424763611957,
+        "robustnessMargin": 0.24333411291361307
+      },
+      {
+        "hoodDeg": 18.95000000000001,
+        "flywheelRps": 69.0,
+        "tofSec": 1.3427317990354233,
+        "robustnessMargin": 0.24629199734565033
+      },
+      {
+        "hoodDeg": 16.65000000000001,
+        "flywheelRps": 65.0,
+        "tofSec": 1.1863155009837838,
+        "robustnessMargin": 0.2587543017798679
+      },
+      {
+        "hoodDeg": 21.150000000000013,
+        "flywheelRps": 62.0,
+        "tofSec": 1.2036199028555914,
+        "robustnessMargin": 0.26938651902151944
+      },
+      {
+        "hoodDeg": 23.650000000000013,
+        "flywheelRps": 59.0,
+        "tofSec": 1.1662047810782283,
+        "robustnessMargin": 0.2755552296901489
+      },
+      {
+        "hoodDeg": 23.95000000000001,
+        "flywheelRps": 56.0,
+        "tofSec": 1.081615340228188,
+        "robustnessMargin": 0.2749849657986245
+      },
+      {
+        "hoodDeg": 20.35000000000001,
+        "flywheelRps": 54.0,
+        "tofSec": 0.9456455448040155,
+        "robustnessMargin": 0.23605393482961157
+      },
+      {
+        "hoodDeg": 29.750000000000014,
+        "flywheelRps": 51.0,
+        "tofSec": 1.012927556606607,
+        "robustnessMargin": 0.2842517189048741
+      }
+    ]
+  ]
+}

@@ -275,11 +275,11 @@ public final class Constants {
     }
 
     public static Translation2d getLeftFerryTarget() {
-      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 3, hubGuy.getY() + 2));
+      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 2.5, hubGuy.getY() + 1.8));
     }
 
     public static Translation2d getRightFerryTarget() {
-      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 3, hubGuy.getY() - 2));
+      return AllianceFlipUtil.apply(new Translation2d(hubGuy.getX() - 2.5, hubGuy.getY() - 1.8));
     }
 
     public static boolean isRobotInNeutralZone(double robotXMeters) {
@@ -307,6 +307,8 @@ public final class Constants {
       public static final double OUTTAKE_WAVE_SPACING_METERS = 0.17;
       public static final double EFFECTIVE_FLYWHEEL_RADIUS_METERS = Units.inchesToMeters(2.0);
       public static final double EXIT_VELOCITY_SCALE = 1.0;
+      public static final double SHOTMAP_EXIT_VELOCITY_SCALE = EXIT_VELOCITY_SCALE * 0.45;
+      public static final double SHOTMAP_LAUNCH_ANGLE_OFFSET_DEG = 35.0;
       // From AScope Assets/Robot_Chuck Norris/config.json component zeroedPosition z = -0.325.
       public static final double TURRET_COMPONENT_Z_OFFSET_METERS = 0.325;
       public static final double TURRET_LAUNCH_HEIGHT_METERS =

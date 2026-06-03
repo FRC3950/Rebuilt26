@@ -22,6 +22,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -46,8 +47,11 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -91,6 +95,9 @@ public class Drive extends SubsystemBase {
   private final BooleanSupplier feedActiveSupplier;
   private DoubleSupplier maxLinearSpeedSupplier = this::getPhysicalMaxLinearSpeedMetersPerSec;
   private DoubleSupplier reducedSpeedSupplier = () -> SubsystemConstants.Drive.reducedSpeed;
+  private BiFunction<Pose2d, ChassisSpeeds, SimDynamicsResult> simDynamics =
+      (pose, speeds) -> new SimDynamicsResult(pose, new Pose3d(pose), false);
+  private Pose3d lastSimTerrainPose = new Pose3d();
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
@@ -223,6 +230,27 @@ public class Drive extends SubsystemBase {
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+    }
+
+    if (Constants.currentMode == Mode.SIM) {
+      Pose2d currentPose = getPose();
+      SimDynamicsResult simDynamicsResult =
+          simDynamics.apply(currentPose, getFieldRelativeSpeeds());
+      Pose2d constrainedPose = simDynamicsResult.correctedPose();
+      if (!constrainedPose.equals(currentPose)) {
+        setPose(constrainedPose);
+      }
+      Logger.recordOutput("Drive/SimPoseCollisionCorrected", !constrainedPose.equals(currentPose));
+      Logger.recordOutput("Drive/SimRampOverrideActive", simDynamicsResult.poseOverridden());
+      Pose3d simTerrainPose = simDynamicsResult.visualPose();
+      lastSimTerrainPose = simTerrainPose;
+      Logger.recordOutput("Drive/SimTerrainPose", simTerrainPose);
+      Logger.recordOutput("Odometry/Robot3d", simTerrainPose);
+      Logger.recordOutput("Drive/SimTerrainHeightMeters", simTerrainPose.getZ());
+      Logger.recordOutput(
+          "Drive/SimTerrainPitchDeg", Math.toDegrees(simTerrainPose.getRotation().getY()));
+      Logger.recordOutput(
+          "Drive/SimTerrainRollDeg", Math.toDegrees(simTerrainPose.getRotation().getX()));
     }
 
     // Update gyro alert
@@ -424,6 +452,34 @@ public class Drive extends SubsystemBase {
     this.reducedSpeedSupplier = reducedSpeedSupplier;
   }
 
+  public void setSimPoseConstraint(UnaryOperator<Pose2d> simPoseConstraint) {
+    UnaryOperator<Pose2d> safeConstraint =
+        simPoseConstraint != null ? simPoseConstraint : UnaryOperator.identity();
+    this.simDynamics =
+        (pose, speeds) -> {
+          Pose2d constrainedPose = safeConstraint.apply(pose);
+          return new SimDynamicsResult(constrainedPose, new Pose3d(constrainedPose), false);
+        };
+  }
+
+  public void setSimTerrainPoseSupplier(Function<Pose2d, Pose3d> simTerrainPoseSupplier) {
+    Function<Pose2d, Pose3d> safeTerrainSupplier =
+        simTerrainPoseSupplier != null ? simTerrainPoseSupplier : Pose3d::new;
+    this.simDynamics =
+        (pose, speeds) -> new SimDynamicsResult(pose, safeTerrainSupplier.apply(pose), false);
+  }
+
+  public void setSimDynamics(BiFunction<Pose2d, ChassisSpeeds, SimDynamicsResult> simDynamics) {
+    this.simDynamics =
+        simDynamics != null
+            ? simDynamics
+            : (pose, speeds) -> new SimDynamicsResult(pose, new Pose3d(pose), false);
+  }
+
+  public Pose3d getLastSimTerrainPose() {
+    return lastSimTerrainPose;
+  }
+
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return getMaxLinearSpeedMetersPerSec() / DRIVE_BASE_RADIUS;
@@ -441,5 +497,12 @@ public class Drive extends SubsystemBase {
 
   static Rotation2d getRotationCharacterizationHeading(Translation2d moduleTranslation) {
     return moduleTranslation.getAngle().plus(Rotation2d.kCCW_90deg);
+  }
+
+  public record SimDynamicsResult(Pose2d correctedPose, Pose3d visualPose, boolean poseOverridden) {
+    public SimDynamicsResult {
+      correctedPose = correctedPose != null ? correctedPose : Pose2d.kZero;
+      visualPose = visualPose != null ? visualPose : new Pose3d(correctedPose);
+    }
   }
 }

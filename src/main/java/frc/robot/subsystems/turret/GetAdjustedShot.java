@@ -6,16 +6,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
-import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.Distancer;
-import java.util.List;
+import frc.robot.util.ShotLookup;
+import frc.robot.util.ShotTableTarget;
 import org.littletonrobotics.junction.Logger;
 
 public class GetAdjustedShot {
-  private static final int LOOKAHEAD_ITERATIONS = 10;
   private static final double SHOT_EXTRA_LATENCY_SECS = 0.05;
   private static boolean lastReportedValid = true;
   private static String lastReportedInvalidReason = "";
@@ -23,7 +21,17 @@ public class GetAdjustedShot {
   private double previousTangentialVelocityMetersPerSec = 0.0;
   private double previousTimestampSec = Double.NaN;
 
-  public GetAdjustedShot() {}
+  private final ShotLookup hubShotLookup;
+  private final ShotLookup ferryShotLookup;
+
+  public GetAdjustedShot() {
+    this(ShotLookup.fromDeploy(ShotTableTarget.HUB), ShotLookup.fromDeploy(ShotTableTarget.FERRY));
+  }
+
+  GetAdjustedShot(ShotLookup hubShotLookup, ShotLookup ferryShotLookup) {
+    this.hubShotLookup = hubShotLookup;
+    this.ferryShotLookup = ferryShotLookup;
+  }
 
   public record ShootingParameters(
       boolean isValid,
@@ -44,28 +52,6 @@ public class GetAdjustedShot {
         lastReportedInvalidReason = invalidReason;
       }
       return isValid;
-    }
-  }
-
-  private static double minDistance;
-  private static double maxDistance;
-  private static final List<Distancer.Row> shotRows;
-
-  private static final InterpolatingTreeMap<Double, Distancer> shotMap =
-      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Distancer::interpolate);
-
-  static {
-    shotRows = Distancer.loadRowsFromDeploy("shot_table.json");
-    if (shotRows.isEmpty()) {
-      minDistance = 0.0;
-      maxDistance = 0.0;
-    } else {
-      minDistance = shotRows.get(0).d;
-      maxDistance = shotRows.get(shotRows.size() - 1).d;
-    }
-
-    for (var r : shotRows) {
-      shotMap.put(r.d, new Distancer(r.hoodDeg, r.rps, r.tof));
     }
   }
 
@@ -105,47 +91,47 @@ public class GetAdjustedShot {
       Translation2d target,
       Translation2d robotToTurret,
       double tofFudgeSec) {
+    return getParameters(
+        robotPose, fieldVelocity, target, robotToTurret, tofFudgeSec, ShotTableTarget.HUB);
+  }
+
+  public ShootingParameters getParameters(
+      Pose2d robotPose,
+      ChassisSpeeds fieldVelocity,
+      Translation2d target,
+      Translation2d robotToTurret,
+      double tofFudgeSec,
+      ShotTableTarget shotTableTarget) {
     Pose2d turretPosition = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
-
-    Distancer initialShot = getShotForDistance(turretToTargetDistance);
-    if (initialShot == null) {
-      return new ShootingParameters(
-          false, turretPosition.getRotation(), 0.0, 0.0, 0.0, "shot table is empty");
-    }
-
     Translation2d turretVelocityField =
         getTurretFieldVelocity(robotPose, fieldVelocity, robotToTurret);
-    Translation2d lookaheadTurretTranslation = turretPosition.getTranslation();
-    double lookaheadDistance = turretToTargetDistance;
+    double radialVelocityMetersPerSec =
+        getRadialComponent(target.minus(turretPosition.getTranslation()), turretVelocityField);
 
-    for (int i = 0; i < LOOKAHEAD_ITERATIONS; i++) {
-      Distancer shotForDistance = getShotForDistance(lookaheadDistance);
-      if (shotForDistance == null) {
-        return new ShootingParameters(
-            false, turretPosition.getRotation(), 0.0, 0.0, 0.0, "shot table is empty");
-      }
-
-      double timeOfFlightSecs = getAdjustedTimeOfFlightSecs(shotForDistance, tofFudgeSec);
-      lookaheadTurretTranslation =
-          turretPosition
-              .getTranslation()
-              .plus(
-                  new Translation2d(
-                      turretVelocityField.getX() * timeOfFlightSecs,
-                      turretVelocityField.getY() * timeOfFlightSecs));
-      lookaheadDistance = target.getDistance(lookaheadTurretTranslation);
-    }
-
-    Distancer interpolatedShot = getShotForDistance(lookaheadDistance);
+    Distancer interpolatedShot =
+        getShotFor(shotTableTarget, turretToTargetDistance, radialVelocityMetersPerSec);
     if (interpolatedShot == null) {
       return new ShootingParameters(
-          false, turretPosition.getRotation(), 0.0, 0.0, 0.0, "shot table is empty");
+          false,
+          turretPosition.getRotation(),
+          0.0,
+          0.0,
+          0.0,
+          shotTableTarget.fileTargetName() + " shot table is empty");
     }
+
+    double timeOfFlightSecs = getAdjustedTimeOfFlightSecs(interpolatedShot, tofFudgeSec);
+    Translation2d lookaheadTurretTranslation =
+        turretPosition
+            .getTranslation()
+            .plus(
+                new Translation2d(
+                    turretVelocityField.getX() * timeOfFlightSecs,
+                    turretVelocityField.getY() * timeOfFlightSecs));
 
     Rotation2d turretAngleField = target.minus(lookaheadTurretTranslation).getAngle();
     Rotation2d turretAngleRobot = turretAngleField.minus(robotPose.getRotation());
-    double timeOfFlightSecs = getAdjustedTimeOfFlightSecs(interpolatedShot, tofFudgeSec);
     double turretVelocity =
         calculateTurretVelocity(
             target.minus(lookaheadTurretTranslation),
@@ -224,30 +210,29 @@ public class GetAdjustedShot {
     return vector.dot(tangentDirection);
   }
 
+  private static double getRadialComponent(Translation2d turretToTarget, Translation2d vector) {
+    double distanceMeters = turretToTarget.getNorm();
+    if (distanceMeters <= 0.0) {
+      return 0.0;
+    }
+
+    Translation2d targetDirection = turretToTarget.div(distanceMeters);
+    return vector.dot(targetDirection);
+  }
+
   private static double getAdjustedTimeOfFlightSecs(Distancer shot, double tofFudgeSec) {
     return Math.max(0.0, shot.tofSec() + SHOT_EXTRA_LATENCY_SECS + tofFudgeSec);
   }
 
-  private static Distancer getShotForDistance(double distance) {
-    if (shotRows.isEmpty()) {
+  private Distancer getShotFor(
+      ShotTableTarget target, double distanceMeters, double radialVelocityMetersPerSec) {
+    ShotLookup shotLookup = target == ShotTableTarget.FERRY ? ferryShotLookup : hubShotLookup;
+    if (shotLookup.isEmpty()) {
       return null;
     }
-    if (shotRows.size() == 1) {
-      return Distancer.fromRow(shotRows.get(0));
+    if (target == ShotTableTarget.FERRY) {
+      return shotLookup.getShotClamped(distanceMeters, radialVelocityMetersPerSec);
     }
-    if (distance < minDistance) {
-      return interpolateBetweenRows(shotRows.get(0), shotRows.get(1), distance);
-    }
-    if (distance > maxDistance) {
-      return interpolateBetweenRows(
-          shotRows.get(shotRows.size() - 2), shotRows.get(shotRows.size() - 1), distance);
-    }
-    return shotMap.get(distance);
-  }
-
-  private static Distancer interpolateBetweenRows(
-      Distancer.Row start, Distancer.Row end, double distance) {
-    double t = (distance - start.d) / (end.d - start.d);
-    return Distancer.fromRow(start).interpolate(Distancer.fromRow(end), t);
+    return shotLookup.getShot(distanceMeters, radialVelocityMetersPerSec);
   }
 }

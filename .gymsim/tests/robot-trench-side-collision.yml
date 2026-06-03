@@ -1,0 +1,19 @@
+name: robot-trench-side-collision
+timeout_s: 12
+robot:
+  alliance: blue1
+steps:
+  - enable: teleop
+  - schedule: { command: "robotSimulationControls.trenchSideCollisionValidationCommand()" }
+  - wait_command: { command: "robotSimulationControls.trenchSideCollisionValidationCommand()", timeout_s: 6 }
+assertions:
+  - log_exists: { key: GymSim/Active }
+  - command_finished: "robotSimulationControls.trenchSideCollisionValidationCommand()"
+  - log_min: { key: GymSim/TrenchCollision/SamplesTotal, value: 4 }
+  - log_min: { key: GymSim/TrenchCollision/SamplesPassed, value: 4 }
+  - log_min: { key: GymSim/TrenchCollision/AllPassedNumeric, value: 1.0 }
+  - log_min: { key: GymSim/TrenchCollision/Side0/PassedNumeric, value: 1.0 }
+  - log_min: { key: GymSim/TrenchCollision/Side1/PassedNumeric, value: 1.0 }
+  - log_min: { key: GymSim/TrenchCollision/Side2/PassedNumeric, value: 1.0 }
+  - log_min: { key: GymSim/TrenchCollision/Side3/PassedNumeric, value: 1.0 }
+  - no_driverstation_errors

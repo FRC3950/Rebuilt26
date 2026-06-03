@@ -17,6 +17,7 @@ import static frc.robot.Constants.SimConstants.Fuel.SHOOT_BALLS_PER_SECOND_PER_T
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
 import java.util.Arrays;
@@ -49,6 +50,8 @@ public class FuelSimulationController {
   private final double[] shotAccumulators;
   private double outtakeAccumulator = 0.0;
   private int currentFuelCapacity = 0;
+  private int spawnedFuelCount = 0;
+  private boolean unlimitedFuelCapacity = false;
 
   public FuelSimulationController(
       Supplier<Pose2d> robotPoseSupplier,
@@ -116,8 +119,10 @@ public class FuelSimulationController {
 
   public void initializeSimulation() {
     fuelSim.stop();
+    fuelSim.setDeleteScoredFuel(unlimitedFuelCapacity);
     resetFieldFuel(spawnStartingFuelOnInitialize);
     currentFuelCapacity = 0;
+    spawnedFuelCount = 0;
     outtakeAccumulator = 0.0;
     Arrays.fill(shotAccumulators, 0.0);
     fuelSim.start();
@@ -126,6 +131,10 @@ public class FuelSimulationController {
 
   public void resetFieldFuelToStartingConfiguration() {
     resetFieldFuel(true);
+  }
+
+  public void clearFieldFuelForSim() {
+    resetFieldFuel(false);
   }
 
   private void resetFieldFuel(boolean spawnStartingFuel) {
@@ -158,10 +167,40 @@ public class FuelSimulationController {
     return currentFuelCapacity;
   }
 
+  public void setStoredFuelForSim(int storedFuel) {
+    currentFuelCapacity = Math.max(0, Math.min(MAX_FUEL_CAPACITY, storedFuel));
+    logState();
+  }
+
+  public void setUnlimitedFuelCapacityForSim(boolean unlimitedFuelCapacity) {
+    if (unlimitedFuelCapacity && !this.unlimitedFuelCapacity) {
+      fuelSim.clearFuel();
+    }
+    this.unlimitedFuelCapacity = unlimitedFuelCapacity;
+    fuelSim.setDeleteScoredFuel(unlimitedFuelCapacity);
+    logState();
+  }
+
+  public boolean isUnlimitedFuelCapacityForSim() {
+    return unlimitedFuelCapacity;
+  }
+
+  public int getSpawnedFuelCountForSim() {
+    return spawnedFuelCount;
+  }
+
+  public int getFieldFuelCountForSim() {
+    return fuelSim.getFuelCount();
+  }
+
+  public List<Translation3d> getFieldFuelPositionsForSim() {
+    return fuelSim.getFuelPositionsSnapshot();
+  }
+
   private boolean canIntakeFuel() {
     return intakeRollerSpeedSupplier.getAsDouble() > 0.0
         && intakeDownSupplier.getAsBoolean()
-        && currentFuelCapacity < MAX_FUEL_CAPACITY;
+        && (unlimitedFuelCapacity || currentFuelCapacity < MAX_FUEL_CAPACITY);
   }
 
   private void storeFuel() {
@@ -178,7 +217,7 @@ public class FuelSimulationController {
 
     for (int i = 0; i < turretSources.size(); i++) {
       shotAccumulators[i] += SHOOT_BALLS_PER_SECOND_PER_TURRET * Constants.loopPeriodSecs;
-      while (shotAccumulators[i] >= 1.0 && currentFuelCapacity > 0) {
+      while (shotAccumulators[i] >= 1.0 && hasFuelAvailable()) {
         TurretSimSource turretSource = turretSources.get(i);
         var launch =
             launchCalculator.calculateTurretLaunch(
@@ -188,12 +227,12 @@ public class FuelSimulationController {
                 turretSource.azimuthDegSupplier().getAsDouble(),
                 turretSource.hoodAngleDegSupplier().getAsDouble(),
                 turretSource.flywheelRpsSupplier().getAsDouble());
-        fuelSim.spawnFuel(launch.position(), launch.velocity());
-        currentFuelCapacity--;
+        spawnSimFuel(launch.position(), launch.velocity());
+        consumeFuelIfLimited();
         shotAccumulators[i] -= 1.0;
       }
 
-      if (currentFuelCapacity == 0) {
+      if (!hasFuelAvailable()) {
         shotAccumulators[i] = 0.0;
       }
     }
@@ -206,13 +245,8 @@ public class FuelSimulationController {
     }
 
     outtakeAccumulator += OUTTAKE_BALLS_PER_SECOND * Constants.loopPeriodSecs;
-    while (outtakeAccumulator >= 1.0 && currentFuelCapacity > 0) {
-      int waveBallCount =
-          Math.min(
-              currentFuelCapacity,
-              Math.max(
-                  OUTTAKE_WAVE_MIN_BALLS,
-                  Math.min(OUTTAKE_WAVE_MAX_BALLS, outtakeWaveSizeSupplier.getAsInt())));
+    while (outtakeAccumulator >= 1.0 && hasFuelAvailable()) {
+      int waveBallCount = getOuttakeWaveBallCount();
       for (int i = 0; i < waveBallCount; i++) {
         double lateralOffsetMeters = (i - (waveBallCount - 1) / 2.0) * OUTTAKE_WAVE_SPACING_METERS;
         var launch =
@@ -222,13 +256,13 @@ public class FuelSimulationController {
                 FuelSim.FUEL_RADIUS,
                 OUTTAKE_SPEED_METERS_PER_SECOND,
                 lateralOffsetMeters);
-        fuelSim.spawnFuel(launch.position(), launch.velocity());
-        currentFuelCapacity--;
+        spawnSimFuel(launch.position(), launch.velocity());
+        consumeFuelIfLimited();
       }
       outtakeAccumulator -= 1.0;
     }
 
-    if (currentFuelCapacity == 0) {
+    if (!hasFuelAvailable()) {
       outtakeAccumulator = 0.0;
     }
   }
@@ -236,12 +270,40 @@ public class FuelSimulationController {
   private boolean canOuttakeFuel() {
     return intakeRollerSpeedSupplier.getAsDouble() < 0.0
         && intakeDownSupplier.getAsBoolean()
-        && currentFuelCapacity > 0;
+        && hasFuelAvailable();
+  }
+
+  private boolean hasFuelAvailable() {
+    return unlimitedFuelCapacity || currentFuelCapacity > 0;
+  }
+
+  private void consumeFuelIfLimited() {
+    if (!unlimitedFuelCapacity) {
+      currentFuelCapacity--;
+    }
+  }
+
+  private void spawnSimFuel(Translation3d position, Translation3d velocity) {
+    fuelSim.spawnFuel(position, velocity);
+    spawnedFuelCount++;
+  }
+
+  private int getOuttakeWaveBallCount() {
+    int requestedWaveBallCount =
+        Math.max(
+            OUTTAKE_WAVE_MIN_BALLS,
+            Math.min(OUTTAKE_WAVE_MAX_BALLS, outtakeWaveSizeSupplier.getAsInt()));
+    return unlimitedFuelCapacity
+        ? requestedWaveBallCount
+        : Math.min(currentFuelCapacity, requestedWaveBallCount);
   }
 
   private void logState() {
     Logger.recordOutput("FuelSim/StoredFuel", currentFuelCapacity);
+    Logger.recordOutput("FuelSim/SpawnedFuelCount", spawnedFuelCount);
+    Logger.recordOutput("FuelSim/FieldFuelCount", fuelSim.getFuelCount());
     Logger.recordOutput("FuelSim/MaxFuelCapacity", MAX_FUEL_CAPACITY);
+    Logger.recordOutput("FuelSim/UnlimitedFuelCapacity", unlimitedFuelCapacity);
     Logger.recordOutput("FuelSim/ShootingActive", shootingSupplier.getAsBoolean());
     Logger.recordOutput("FuelSim/OuttakeActive", canOuttakeFuel());
     Logger.recordOutput("FuelSim/BlueHubScore", FuelSim.Hub.BLUE_HUB.getScore());

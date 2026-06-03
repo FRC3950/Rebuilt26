@@ -5,6 +5,10 @@ This reference is the field-layout mental map for `REBUILT`. Use it when Codex n
 ## Field Skeleton
 
 - The carpeted field is about `8.07 m` wide by `16.54 m` long.
+- The welded-perimeter drawing reference dimensions are `651.22 in` long by `317.688 in`
+  wide. The AprilTag sheet defines the origin at the blue alliance station side, with
+  `+X` toward the red alliance station, `+Y` away from the scoring table, and `+Z`
+  upward from the carpet.
 - The long sides are guardrails.
 - Each short end is an alliance end bounded by that alliance's `ALLIANCE WALL`, `OUTPOST`, and `TOWER WALL`.
 - The field is mirrored left-to-right between alliances.
@@ -16,7 +20,7 @@ This reference is the field-layout mental map for `REBUILT`. Use it when Codex n
 - `OUTPOST`: alliance-side structure associated with human-player interaction
 - `DEPOT`: field-side source location for collecting `FUEL`
 - `BUMPS`: raised terrain features that constrain approach paths
-- `TRENCHES`: lane-defining field features that shape routing and defense
+- `TRENCHES`: lane-defining field features with low ground hardware and a raised solid bar
 
 ## Mental Map
 
@@ -46,9 +50,27 @@ Between the two alliance zones:
 - Each `HUB` is centered between two `BUMPS`.
 - Each `HUB` sits `158.6 in` (`~4.03 m`) from its alliance wall, so it is forward of the deepest alliance-end structures and close to the transition into midfield.
 - Each `HUB` faces the `NEUTRAL ZONE`; processed `FUEL` exits the base of the hub back into the neutral area.
+- The hub assembly drawing gives a `47.00 in` base width and `72.000 +/- .500 in`
+  vertical height. Its AprilTags are at `44.25 in` Z.
 - The `ALLIANCE ZONE` surrounds the alliance's `TOWER` and `DEPOT`, meaning climbing and depot-side collection happen in the same general end-of-field region.
 - The `NEUTRAL ZONE` is bounded by `BUMPS`, `TRENCHES`, `HUBS`, and guardrails, so midfield traffic is naturally structured by these obstacles rather than being one open rectangle.
 - The `ROBOT STARTING LINE` is in front of the alliance `HUB` and two `BUMPS`, making autonomous starting geometry immediately relevant to early shots and early traversal choices.
+
+## Drawing-Derived Field Element Geometry
+
+- `BUMP` (`GE-26100`) is a triangular terrain profile. The field drawing gives a
+  `48.93 in` bounding-triangle length, `24.47 in` from one end to the virtual peak,
+  `44.40 in` width, `6.56 in` virtual peak height, a `15.0 deg` ramp angle, and
+  about `0.61 in` edge height. The drawing shows triangular profiles in both the
+  length and width directions, so simulation should treat this as traversable peaked
+  terrain that changes robot height, pitch, and roll, not as a hard wall.
+- `TRENCH` (`GE-26200`) is not a floor-to-ceiling obstacle. It is assembled from
+  `GE-26201 Trench Hinged Assy` and `GE-26202 Trench Fixed Assy`. The controlled
+  welded-perimeter dimensions show hinged trenches measured closed and locked,
+  `50.34 +2.00/-2.00 in` from side reference, `73.00 +1.00/-1.00 in` spans, and
+  `22.25 +/- .25 in` to the raised solid bar. Trench AprilTags are at `35.00 in` Z.
+  Robot collision/pathing should leave the under-bar lane traversable unless a
+  separate robot-height model proves a specific robot cannot clear it.
 
 ## Named Areas And Lines
 

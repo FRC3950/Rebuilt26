@@ -1,0 +1,16 @@
+name: shotmap-generated-sweep
+timeout_s: 35
+robot:
+  alliance: blue1
+steps:
+  - disable
+  - enable: teleop
+  - schedule: { command: "robotSimulationControls.generatedShotMapSweepValidationCommand()" }
+  - wait_seconds: 10.0
+  - invoke: { expression: "robotSimulationControls.recordGeneratedShotValidationState()" }
+assertions:
+  - log_exists: { key: GymSim/Active }
+  - log_exists: { key: GymSim/ShotMap/SweepPassedNumeric }
+  - log_min: { key: GymSim/ShotMap/SweepPassedNumeric, value: 1.0 }
+  - log_min: { key: GymSim/ShotMap/SweepSamplesPassed, value: 3.0 }
+  - no_driverstation_errors

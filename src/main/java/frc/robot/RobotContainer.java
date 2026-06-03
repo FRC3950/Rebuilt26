@@ -33,9 +33,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.controls.CompBindings;
 import frc.robot.controls.sim.RobotSimulationControls;
+import frc.robot.controls.sim.RobotSimulationSetup;
 import frc.robot.generated.TunerConstants;
-import frc.robot.sim.FuelSimCommand;
-import frc.robot.sim.FuelSimulationController;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -173,37 +172,25 @@ public class RobotContainer {
             appliedCodeMode != CodeMode.DEMO
                 || demoContainer == null
                 || demoContainer.isVisionPoseFusionAllowed());
-    robotSimulationControls =
-        new RobotSimulationControls(() -> applyCodeMode(CodeMode.DEMO), () -> demoContainer);
     indexer.setForwardFeedAllowedSupplier(
         () ->
             Constants.currentMode != Constants.Mode.REAL
                 || (turret1.isFlywheelReadyForFeed() && turret2.isFlywheelReadyForFeed()));
 
     if (Constants.currentMode == Constants.Mode.SIM) {
-      FuelSimulationController fuelSimulationController =
-          new FuelSimulationController(
-              drive::getPose,
-              drive::getFieldRelativeSpeeds,
-              intake::getCommandedRollerSpeed,
-              intake::isPivotCommandedDown,
-              indexer::isFeedingForward,
-              new FuelSimulationController.TurretSimSource(
-                  robotToTurret1,
-                  turret1::getCommandedAzimuthDeg,
-                  turret1::getCommandedHoodAngleDeg,
-                  turret1::getCommandedFlywheelRps),
-              new FuelSimulationController.TurretSimSource(
-                  robotToTurret2,
-                  turret2::getCommandedAzimuthDeg,
-                  turret2::getCommandedHoodAngleDeg,
-                  turret2::getCommandedFlywheelRps));
-      simulationCommand = new FuelSimCommand(fuelSimulationController);
-      SmartDashboard.putData(
-          "Fuel Sim/Reset Field Fuel",
-          Commands.runOnce(fuelSimulationController::resetFieldFuelToStartingConfiguration)
-              .ignoringDisable(true));
+      RobotSimulationSetup.Runtime simulationRuntime =
+          RobotSimulationSetup.create(
+              () -> applyCodeMode(CodeMode.DEMO),
+              () -> demoContainer,
+              drive,
+              intake,
+              indexer,
+              turret1,
+              turret2);
+      robotSimulationControls = simulationRuntime.controls();
+      simulationCommand = simulationRuntime.command();
     } else {
+      robotSimulationControls = null;
       simulationCommand = null;
     }
 

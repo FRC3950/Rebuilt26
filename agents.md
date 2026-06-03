@@ -406,6 +406,15 @@ When making code changes, aim for:
 - Tests (if present) pass (`./gradlew test`)
 - If simulation is used, ensure sim still runs (`./gradlew simulateJava` or project-specific sim task)
 
+### 14.1 GymSim validation is the default for Rebuilt26 robot behavior
+- For Rebuilt26 changes that affect commands, subsystems, controls, autonomous behavior, shot maps, targeting, intake/indexer/shooter flow, vision pose use, drive behavior, or any other robot behavior, run an applicable GymSim scenario before saying the work is complete.
+- Do not finish with only compile/unit-test evidence when GymSim can validate the behavior. Use an existing scenario in `.gymsim/tests/` when it covers the change; otherwise add a focused scenario and run it.
+- Standard command shape:
+  - `export PATH="/Users/cjbrandi/GymSim/bin:$PATH"`
+  - `gymsim run .gymsim/tests/<scenario>.yml`
+- If no GymSim scenario can reasonably validate the change, say that explicitly in the response and provide the exact reason. Do not present the work as fully validated in that case.
+- For shot-map changes, always include generated-table validation with `.gymsim/tests/shotmap-generated-sample.yml` or a more specific shot-map scenario.
+
 If asked to provide instructions, default to these GradleRIO patterns unless the repo differs.
 
 ---

@@ -20,6 +20,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -34,13 +35,39 @@ public class FuelSim {
   protected static final double NET_COR = 0.2; // coefficient of restitution with the net
   protected static final double ROBOT_COR = 0.1; // coefficient of restitution with a robot
   public static final double FUEL_RADIUS = 0.075;
-  protected static final double FIELD_LENGTH = 16.51;
-  protected static final double FIELD_WIDTH = 8.04;
-  protected static final double TRENCH_WIDTH = 1.265;
-  protected static final double TRENCH_BLOCK_WIDTH = 0.305;
-  protected static final double TRENCH_HEIGHT = 0.565;
-  protected static final double TRENCH_BAR_HEIGHT = 0.102;
-  protected static final double TRENCH_BAR_WIDTH = 0.152;
+  protected static final double FIELD_LENGTH = edu.wpi.first.math.util.Units.inchesToMeters(651.22);
+  protected static final double FIELD_WIDTH = edu.wpi.first.math.util.Units.inchesToMeters(317.688);
+  protected static final double BUMP_LENGTH = edu.wpi.first.math.util.Units.inchesToMeters(48.93);
+  protected static final double BUMP_HALF_LENGTH =
+      edu.wpi.first.math.util.Units.inchesToMeters(24.47);
+  protected static final double BUMP_HEIGHT = edu.wpi.first.math.util.Units.inchesToMeters(6.56);
+  protected static final double BUMP_WIDTH = edu.wpi.first.math.util.Units.inchesToMeters(44.40);
+  protected static final double BLUE_BUMP_PEAK_X =
+      edu.wpi.first.math.util.Units.inchesToMeters(182.11);
+  protected static final double RED_BUMP_PEAK_X = FIELD_LENGTH - BLUE_BUMP_PEAK_X;
+  protected static final double BLUE_BUMP_MIN_X = BLUE_BUMP_PEAK_X - BUMP_HALF_LENGTH;
+  protected static final double BLUE_BUMP_MAX_X = BLUE_BUMP_MIN_X + BUMP_LENGTH;
+  protected static final double RED_BUMP_MIN_X = RED_BUMP_PEAK_X - BUMP_HALF_LENGTH;
+  protected static final double RED_BUMP_MAX_X = RED_BUMP_MIN_X + BUMP_LENGTH;
+  protected static final double LOWER_BUMP_CENTER_Y = 2.50;
+  protected static final double UPPER_BUMP_CENTER_Y = FIELD_WIDTH - LOWER_BUMP_CENTER_Y;
+  protected static final double LOWER_BUMP_MIN_Y = LOWER_BUMP_CENTER_Y - BUMP_WIDTH / 2.0;
+  protected static final double LOWER_BUMP_MAX_Y = LOWER_BUMP_CENTER_Y + BUMP_WIDTH / 2.0;
+  protected static final double UPPER_BUMP_MIN_Y = UPPER_BUMP_CENTER_Y - BUMP_WIDTH / 2.0;
+  protected static final double UPPER_BUMP_MAX_Y = UPPER_BUMP_CENTER_Y + BUMP_WIDTH / 2.0;
+  protected static final double TRENCH_WIDTH = edu.wpi.first.math.util.Units.inchesToMeters(50.34);
+  protected static final double TRENCH_BLOCK_WIDTH =
+      edu.wpi.first.math.util.Units.inchesToMeters(12.00);
+  protected static final double LOWER_TRENCH_SIDE_MIN_Y = TRENCH_WIDTH;
+  protected static final double LOWER_TRENCH_SIDE_MAX_Y = TRENCH_WIDTH + TRENCH_BLOCK_WIDTH;
+  protected static final double UPPER_TRENCH_SIDE_MIN_Y =
+      FIELD_WIDTH - TRENCH_WIDTH - TRENCH_BLOCK_WIDTH;
+  protected static final double UPPER_TRENCH_SIDE_MAX_Y = FIELD_WIDTH - TRENCH_WIDTH;
+  protected static final double TRENCH_HEIGHT = edu.wpi.first.math.util.Units.inchesToMeters(22.25);
+  protected static final double TRENCH_BAR_HEIGHT =
+      edu.wpi.first.math.util.Units.inchesToMeters(12.75);
+  protected static final double TRENCH_BAR_WIDTH =
+      edu.wpi.first.math.util.Units.inchesToMeters(6.00);
   protected static final double FRICTION =
       0.31; // proportion of horizontal vel to lose per sec while on ground
   protected static final double FUEL_MASS = 0.448 * 0.45392; // kgs
@@ -52,54 +79,57 @@ public class FuelSim {
 
   protected static final Translation3d[] FIELD_XZ_LINE_STARTS = {
     new Translation3d(0, 0, 0),
-    new Translation3d(3.96, 1.57, 0),
-    new Translation3d(3.96, FIELD_WIDTH / 2 + 0.60, 0),
-    new Translation3d(4.61, 1.57, 0.165),
-    new Translation3d(4.61, FIELD_WIDTH / 2 + 0.60, 0.165),
-    new Translation3d(FIELD_LENGTH - 5.18, 1.57, 0),
-    new Translation3d(FIELD_LENGTH - 5.18, FIELD_WIDTH / 2 + 0.60, 0),
-    new Translation3d(FIELD_LENGTH - 4.61, 1.57, 0.165),
-    new Translation3d(FIELD_LENGTH - 4.61, FIELD_WIDTH / 2 + 0.60, 0.165),
-    new Translation3d(3.96, TRENCH_WIDTH, TRENCH_HEIGHT),
-    new Translation3d(3.96, FIELD_WIDTH - 1.57, TRENCH_HEIGHT),
-    new Translation3d(FIELD_LENGTH - 5.18, TRENCH_WIDTH, TRENCH_HEIGHT),
-    new Translation3d(FIELD_LENGTH - 5.18, FIELD_WIDTH - 1.57, TRENCH_HEIGHT),
-    new Translation3d(4.61 - TRENCH_BAR_WIDTH / 2, 0, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
+    new Translation3d(BLUE_BUMP_MIN_X, LOWER_BUMP_MIN_Y, 0),
+    new Translation3d(BLUE_BUMP_MIN_X, UPPER_BUMP_MIN_Y, 0),
+    new Translation3d(BLUE_BUMP_PEAK_X, LOWER_BUMP_MIN_Y, BUMP_HEIGHT),
+    new Translation3d(BLUE_BUMP_PEAK_X, UPPER_BUMP_MIN_Y, BUMP_HEIGHT),
+    new Translation3d(RED_BUMP_MIN_X, LOWER_BUMP_MIN_Y, 0),
+    new Translation3d(RED_BUMP_MIN_X, UPPER_BUMP_MIN_Y, 0),
+    new Translation3d(RED_BUMP_PEAK_X, LOWER_BUMP_MIN_Y, BUMP_HEIGHT),
+    new Translation3d(RED_BUMP_PEAK_X, UPPER_BUMP_MIN_Y, BUMP_HEIGHT),
+    new Translation3d(BLUE_BUMP_MIN_X, LOWER_TRENCH_SIDE_MIN_Y, TRENCH_HEIGHT),
+    new Translation3d(BLUE_BUMP_MIN_X, UPPER_TRENCH_SIDE_MIN_Y, TRENCH_HEIGHT),
+    new Translation3d(RED_BUMP_MIN_X, LOWER_TRENCH_SIDE_MIN_Y, TRENCH_HEIGHT),
+    new Translation3d(RED_BUMP_MIN_X, UPPER_TRENCH_SIDE_MIN_Y, TRENCH_HEIGHT),
     new Translation3d(
-        4.61 - TRENCH_BAR_WIDTH / 2, FIELD_WIDTH - 1.57, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
+        BLUE_BUMP_PEAK_X - TRENCH_BAR_WIDTH / 2, 0, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
     new Translation3d(
-        FIELD_LENGTH - 4.61 - TRENCH_BAR_WIDTH / 2, 0, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
+        BLUE_BUMP_PEAK_X - TRENCH_BAR_WIDTH / 2,
+        UPPER_TRENCH_SIDE_MIN_Y,
+        TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
+    new Translation3d(RED_BUMP_PEAK_X - TRENCH_BAR_WIDTH / 2, 0, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
     new Translation3d(
-        FIELD_LENGTH - 4.61 - TRENCH_BAR_WIDTH / 2,
-        FIELD_WIDTH - 1.57,
+        RED_BUMP_PEAK_X - TRENCH_BAR_WIDTH / 2,
+        UPPER_TRENCH_SIDE_MIN_Y,
         TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
   };
 
   protected static final Translation3d[] FIELD_XZ_LINE_ENDS = {
     new Translation3d(FIELD_LENGTH, FIELD_WIDTH, 0),
-    new Translation3d(4.61, FIELD_WIDTH / 2 - 0.60, 0.165),
-    new Translation3d(4.61, FIELD_WIDTH - 1.57, 0.165),
-    new Translation3d(5.18, FIELD_WIDTH / 2 - 0.60, 0),
-    new Translation3d(5.18, FIELD_WIDTH - 1.57, 0),
-    new Translation3d(FIELD_LENGTH - 4.61, FIELD_WIDTH / 2 - 0.60, 0.165),
-    new Translation3d(FIELD_LENGTH - 4.61, FIELD_WIDTH - 1.57, 0.165),
-    new Translation3d(FIELD_LENGTH - 3.96, FIELD_WIDTH / 2 - 0.60, 0),
-    new Translation3d(FIELD_LENGTH - 3.96, FIELD_WIDTH - 1.57, 0),
-    new Translation3d(5.18, TRENCH_WIDTH + TRENCH_BLOCK_WIDTH, TRENCH_HEIGHT),
-    new Translation3d(5.18, FIELD_WIDTH - 1.57 + TRENCH_BLOCK_WIDTH, TRENCH_HEIGHT),
-    new Translation3d(FIELD_LENGTH - 3.96, TRENCH_WIDTH + TRENCH_BLOCK_WIDTH, TRENCH_HEIGHT),
-    new Translation3d(FIELD_LENGTH - 3.96, FIELD_WIDTH - 1.57 + TRENCH_BLOCK_WIDTH, TRENCH_HEIGHT),
+    new Translation3d(BLUE_BUMP_PEAK_X, LOWER_BUMP_MAX_Y, BUMP_HEIGHT),
+    new Translation3d(BLUE_BUMP_PEAK_X, UPPER_BUMP_MAX_Y, BUMP_HEIGHT),
+    new Translation3d(BLUE_BUMP_MAX_X, LOWER_BUMP_MAX_Y, 0),
+    new Translation3d(BLUE_BUMP_MAX_X, UPPER_BUMP_MAX_Y, 0),
+    new Translation3d(RED_BUMP_PEAK_X, LOWER_BUMP_MAX_Y, BUMP_HEIGHT),
+    new Translation3d(RED_BUMP_PEAK_X, UPPER_BUMP_MAX_Y, BUMP_HEIGHT),
+    new Translation3d(RED_BUMP_MAX_X, LOWER_BUMP_MAX_Y, 0),
+    new Translation3d(RED_BUMP_MAX_X, UPPER_BUMP_MAX_Y, 0),
+    new Translation3d(BLUE_BUMP_MAX_X, LOWER_TRENCH_SIDE_MAX_Y, TRENCH_HEIGHT),
+    new Translation3d(BLUE_BUMP_MAX_X, UPPER_TRENCH_SIDE_MAX_Y, TRENCH_HEIGHT),
+    new Translation3d(RED_BUMP_MAX_X, LOWER_TRENCH_SIDE_MAX_Y, TRENCH_HEIGHT),
+    new Translation3d(RED_BUMP_MAX_X, UPPER_TRENCH_SIDE_MAX_Y, TRENCH_HEIGHT),
     new Translation3d(
-        4.61 + TRENCH_BAR_WIDTH / 2,
-        TRENCH_WIDTH + TRENCH_BLOCK_WIDTH,
-        TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
-    new Translation3d(4.61 + TRENCH_BAR_WIDTH / 2, FIELD_WIDTH, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
-    new Translation3d(
-        FIELD_LENGTH - 4.61 + TRENCH_BAR_WIDTH / 2,
-        TRENCH_WIDTH + TRENCH_BLOCK_WIDTH,
+        BLUE_BUMP_PEAK_X + TRENCH_BAR_WIDTH / 2,
+        LOWER_TRENCH_SIDE_MAX_Y,
         TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
     new Translation3d(
-        FIELD_LENGTH - 4.61 + TRENCH_BAR_WIDTH / 2, FIELD_WIDTH, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
+        BLUE_BUMP_PEAK_X + TRENCH_BAR_WIDTH / 2, FIELD_WIDTH, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
+    new Translation3d(
+        RED_BUMP_PEAK_X + TRENCH_BAR_WIDTH / 2,
+        LOWER_TRENCH_SIDE_MAX_Y,
+        TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
+    new Translation3d(
+        RED_BUMP_PEAK_X + TRENCH_BAR_WIDTH / 2, FIELD_WIDTH, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT),
   };
 
   protected static class Fuel {
@@ -115,7 +145,7 @@ public class FuelSim {
       this(pos, new Translation3d());
     }
 
-    protected void update(boolean simulateAirResistance, int subticks) {
+    protected boolean update(boolean simulateAirResistance, int subticks) {
       pos = pos.plus(vel.times(PERIOD / subticks));
       if (pos.getZ() > FUEL_RADIUS) {
         Translation3d Fg = GRAVITY.times(FUEL_MASS);
@@ -136,7 +166,7 @@ public class FuelSim {
         vel = vel.times(1 - FRICTION * PERIOD / subticks);
         // pos = new Translation3d(pos.getX(), pos.getY(), FUEL_RADIUS);
       }
-      handleFieldCollisions(subticks);
+      return handleFieldCollisions(subticks);
     }
 
     protected void handleXZLineCollision(Translation3d lineStart, Translation3d lineEnd) {
@@ -166,7 +196,7 @@ public class FuelSim {
       vel = vel.minus(normal.times((1 + FIELD_COR) * vel.dot(normal)));
     }
 
-    protected void handleFieldCollisions(int subticks) {
+    protected boolean handleFieldCollisions(int subticks) {
       // floor and bumps
       for (int i = 0; i < FIELD_XZ_LINE_STARTS.length; i++) {
         handleXZLineCollision(FIELD_XZ_LINE_STARTS[i], FIELD_XZ_LINE_ENDS[i]);
@@ -190,14 +220,15 @@ public class FuelSim {
       }
 
       // hubs
-      handleHubCollisions(Hub.BLUE_HUB, subticks);
-      handleHubCollisions(Hub.RED_HUB, subticks);
+      boolean scored = handleHubCollisions(Hub.BLUE_HUB, subticks);
+      scored = handleHubCollisions(Hub.RED_HUB, subticks) || scored;
 
       handleTrenchCollisions();
+      return scored;
     }
 
-    protected void handleHubCollisions(Hub hub, int subticks) {
-      hub.handleHubInteraction(this, subticks);
+    protected boolean handleHubCollisions(Hub hub, int subticks) {
+      boolean scored = hub.handleHubInteraction(this, subticks);
       hub.fuelCollideSide(this);
 
       double netCollision = hub.fuelHitNet(this);
@@ -205,51 +236,54 @@ public class FuelSim {
         pos = pos.plus(new Translation3d(netCollision, 0, 0));
         vel = new Translation3d(-vel.getX() * NET_COR, vel.getY() * NET_COR, vel.getZ());
       }
+      return scored;
     }
 
     protected void handleTrenchCollisions() {
       fuelCollideRectangle(
           this,
-          new Translation3d(3.96, TRENCH_WIDTH, 0),
-          new Translation3d(5.18, TRENCH_WIDTH + TRENCH_BLOCK_WIDTH, TRENCH_HEIGHT));
+          new Translation3d(BLUE_BUMP_MIN_X, LOWER_TRENCH_SIDE_MIN_Y, 0),
+          new Translation3d(BLUE_BUMP_MAX_X, LOWER_TRENCH_SIDE_MAX_Y, TRENCH_HEIGHT));
       fuelCollideRectangle(
           this,
-          new Translation3d(3.96, FIELD_WIDTH - 1.57, 0),
-          new Translation3d(5.18, FIELD_WIDTH - 1.57 + TRENCH_BLOCK_WIDTH, TRENCH_HEIGHT));
+          new Translation3d(BLUE_BUMP_MIN_X, UPPER_TRENCH_SIDE_MIN_Y, 0),
+          new Translation3d(BLUE_BUMP_MAX_X, UPPER_TRENCH_SIDE_MAX_Y, TRENCH_HEIGHT));
       fuelCollideRectangle(
           this,
-          new Translation3d(FIELD_LENGTH - 5.18, TRENCH_WIDTH, 0),
-          new Translation3d(FIELD_LENGTH - 3.96, TRENCH_WIDTH + TRENCH_BLOCK_WIDTH, TRENCH_HEIGHT));
+          new Translation3d(RED_BUMP_MIN_X, LOWER_TRENCH_SIDE_MIN_Y, 0),
+          new Translation3d(RED_BUMP_MAX_X, LOWER_TRENCH_SIDE_MAX_Y, TRENCH_HEIGHT));
       fuelCollideRectangle(
           this,
-          new Translation3d(FIELD_LENGTH - 5.18, FIELD_WIDTH - 1.57, 0),
+          new Translation3d(RED_BUMP_MIN_X, UPPER_TRENCH_SIDE_MIN_Y, 0),
+          new Translation3d(RED_BUMP_MAX_X, UPPER_TRENCH_SIDE_MAX_Y, TRENCH_HEIGHT));
+      fuelCollideRectangle(
+          this,
+          new Translation3d(BLUE_BUMP_PEAK_X - TRENCH_BAR_WIDTH / 2, 0, TRENCH_HEIGHT),
           new Translation3d(
-              FIELD_LENGTH - 3.96, FIELD_WIDTH - 1.57 + TRENCH_BLOCK_WIDTH, TRENCH_HEIGHT));
-      fuelCollideRectangle(
-          this,
-          new Translation3d(4.61 - TRENCH_BAR_WIDTH / 2, 0, TRENCH_HEIGHT),
-          new Translation3d(
-              4.61 + TRENCH_BAR_WIDTH / 2,
-              TRENCH_WIDTH + TRENCH_BLOCK_WIDTH,
-              TRENCH_HEIGHT + TRENCH_BAR_HEIGHT));
-      fuelCollideRectangle(
-          this,
-          new Translation3d(4.61 - TRENCH_BAR_WIDTH / 2, FIELD_WIDTH - 1.57, TRENCH_HEIGHT),
-          new Translation3d(
-              4.61 + TRENCH_BAR_WIDTH / 2, FIELD_WIDTH, TRENCH_HEIGHT + TRENCH_BAR_HEIGHT));
-      fuelCollideRectangle(
-          this,
-          new Translation3d(FIELD_LENGTH - 4.61 - TRENCH_BAR_WIDTH / 2, 0, TRENCH_HEIGHT),
-          new Translation3d(
-              FIELD_LENGTH - 4.61 + TRENCH_BAR_WIDTH / 2,
-              TRENCH_WIDTH + TRENCH_BLOCK_WIDTH,
+              BLUE_BUMP_PEAK_X + TRENCH_BAR_WIDTH / 2,
+              LOWER_TRENCH_SIDE_MAX_Y,
               TRENCH_HEIGHT + TRENCH_BAR_HEIGHT));
       fuelCollideRectangle(
           this,
           new Translation3d(
-              FIELD_LENGTH - 4.61 - TRENCH_BAR_WIDTH / 2, FIELD_WIDTH - 1.57, TRENCH_HEIGHT),
+              BLUE_BUMP_PEAK_X - TRENCH_BAR_WIDTH / 2, UPPER_TRENCH_SIDE_MIN_Y, TRENCH_HEIGHT),
           new Translation3d(
-              FIELD_LENGTH - 4.61 + TRENCH_BAR_WIDTH / 2,
+              BLUE_BUMP_PEAK_X + TRENCH_BAR_WIDTH / 2,
+              FIELD_WIDTH,
+              TRENCH_HEIGHT + TRENCH_BAR_HEIGHT));
+      fuelCollideRectangle(
+          this,
+          new Translation3d(RED_BUMP_PEAK_X - TRENCH_BAR_WIDTH / 2, 0, TRENCH_HEIGHT),
+          new Translation3d(
+              RED_BUMP_PEAK_X + TRENCH_BAR_WIDTH / 2,
+              LOWER_TRENCH_SIDE_MAX_Y,
+              TRENCH_HEIGHT + TRENCH_BAR_HEIGHT));
+      fuelCollideRectangle(
+          this,
+          new Translation3d(
+              RED_BUMP_PEAK_X - TRENCH_BAR_WIDTH / 2, UPPER_TRENCH_SIDE_MIN_Y, TRENCH_HEIGHT),
+          new Translation3d(
+              RED_BUMP_PEAK_X + TRENCH_BAR_WIDTH / 2,
               FIELD_WIDTH,
               TRENCH_HEIGHT + TRENCH_BAR_HEIGHT));
     }
@@ -338,6 +372,7 @@ public class FuelSim {
   protected int subticks = 5;
   protected double loggingFreqHz = 10;
   protected Timer loggingTimer = new Timer();
+  private boolean deleteScoredFuel = false;
 
   /**
    * Creates a new instance of FuelSim
@@ -367,6 +402,22 @@ public class FuelSim {
   /** Clears the field of fuel */
   public void clearFuel() {
     fuels.clear();
+  }
+
+  public int getFuelCount() {
+    return fuels.size();
+  }
+
+  public List<Translation3d> getFuelPositionsSnapshot() {
+    ArrayList<Translation3d> positions = new ArrayList<>(fuels.size());
+    for (Fuel fuel : fuels) {
+      positions.add(fuel.pos);
+    }
+    return List.copyOf(positions);
+  }
+
+  public void setDeleteScoredFuel(boolean deleteScoredFuel) {
+    this.deleteScoredFuel = deleteScoredFuel;
   }
 
   /** Spawns fuel in the neutral zone and depots */
@@ -516,8 +567,13 @@ public class FuelSim {
   /** Run the simulation forward 1 time step (0.02s) */
   public void stepSim() {
     for (int i = 0; i < subticks; i++) {
-      for (Fuel fuel : fuels) {
-        fuel.update(this.simulateAirResistance, this.subticks);
+      for (int fuelIndex = 0; fuelIndex < fuels.size(); fuelIndex++) {
+        Fuel fuel = fuels.get(fuelIndex);
+        boolean scored = fuel.update(this.simulateAirResistance, this.subticks);
+        if (deleteScoredFuel && scored) {
+          fuels.remove(fuelIndex);
+          fuelIndex--;
+        }
       }
 
       handleFuelCollisions(fuels);
@@ -830,19 +886,25 @@ public class FuelSim {
   public static class Hub {
     public static final Hub BLUE_HUB =
         new Hub(
-            new Translation2d(4.61, FIELD_WIDTH / 2),
-            new Translation3d(5.3, FIELD_WIDTH / 2, 0.89),
+            new Translation2d(BLUE_BUMP_PEAK_X, FIELD_WIDTH / 2),
+            new Translation3d(
+                BLUE_BUMP_PEAK_X + edu.wpi.first.math.util.Units.inchesToMeters(27.00),
+                FIELD_WIDTH / 2,
+                0.89),
             1);
     public static final Hub RED_HUB =
         new Hub(
-            new Translation2d(FIELD_LENGTH - 4.61, FIELD_WIDTH / 2),
-            new Translation3d(FIELD_LENGTH - 5.3, FIELD_WIDTH / 2, 0.89),
+            new Translation2d(RED_BUMP_PEAK_X, FIELD_WIDTH / 2),
+            new Translation3d(
+                RED_BUMP_PEAK_X - edu.wpi.first.math.util.Units.inchesToMeters(27.00),
+                FIELD_WIDTH / 2,
+                0.89),
             -1);
 
     protected static final double ENTRY_HEIGHT = 1.83;
     protected static final double ENTRY_RADIUS = 0.56;
 
-    protected static final double SIDE = 1.2;
+    protected static final double SIDE = edu.wpi.first.math.util.Units.inchesToMeters(47.00);
 
     protected static final double NET_HEIGHT_MAX = 3.057;
     protected static final double NET_HEIGHT_MIN = 1.5;
@@ -861,12 +923,14 @@ public class FuelSim {
       this.exitVelXMult = exitVelXMult;
     }
 
-    protected void handleHubInteraction(Fuel fuel, int subticks) {
+    protected boolean handleHubInteraction(Fuel fuel, int subticks) {
       if (didFuelScore(fuel, subticks)) {
         fuel.pos = exit;
         fuel.vel = getDispersalVelocity();
         score++;
+        return true;
       }
+      return false;
     }
 
     protected boolean didFuelScore(Fuel fuel, int subticks) {

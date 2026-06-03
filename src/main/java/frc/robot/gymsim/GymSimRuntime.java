@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.JoystickSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -55,6 +56,10 @@ public final class GymSimRuntime {
   }
 
   public static GymSimRuntime start(Object robotContainer) {
+    if (Constants.currentMode != Constants.Mode.SIM) {
+      return null;
+    }
+
     String runDir = System.getenv("GYMSIM_RUN_DIR");
     if (runDir == null || runDir.isBlank()) {
       return null;

@@ -1,0 +1,15 @@
+name: fuel-sim-unlimited-capacity
+timeout_s: 8
+robot:
+  alliance: blue1
+steps:
+  - enable: teleop
+  - schedule: { command: "robotSimulationControls.unlimitedFuelCapacityValidationCommand(1.0)" }
+  - wait_command: { command: "robotSimulationControls.unlimitedFuelCapacityValidationCommand(1.0)", timeout_s: 3 }
+  - invoke: { expression: "robotSimulationControls.recordFuelSimulationState()" }
+assertions:
+  - command_finished: "robotSimulationControls.unlimitedFuelCapacityValidationCommand(1.0)"
+  - log_exists: { key: GymSim/Active }
+  - log_final: { key: GymSim/FuelSim/StoredFuel, value: 0 }
+  - log_min: { key: GymSim/FuelSim/UnlimitedFuelCapacity, value: 1.0 }
+  - log_min: { key: GymSim/FuelSim/SpawnedFuelCount, value: 1 }

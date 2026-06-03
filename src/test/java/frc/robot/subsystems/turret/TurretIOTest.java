@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.turret.turret_base.azimuth.Azimuth;
 import frc.robot.subsystems.turret.turret_base.azimuth.AzimuthIO;
 import frc.robot.subsystems.turret.turret_base.flywheels.Flywheels;
@@ -108,6 +109,24 @@ class TurretIOTest {
         10.0 + Units.radiansToDegrees(turretVelocityRadPerSec) * 0.02,
         azimuthIO.requestedAngleDeg,
         1e-9);
+  }
+
+  @Test
+  void autoTargetUsesSharedDashboardFlywheelScale() {
+    FakeFlywheelsIO leftFlywheelsIO = new FakeFlywheelsIO();
+    FakeFlywheelsIO rightFlywheelsIO = new FakeFlywheelsIO();
+    Turret leftTurret = createTestTurret(new FakeAzimuthIO(), leftFlywheelsIO);
+    Turret rightTurret = createTestTurret(new FakeAzimuthIO(), rightFlywheelsIO);
+    SmartDashboard.putNumber(Turret.FLYWHEEL_SCALE_DASHBOARD_KEY, 1.08);
+    var shotParameters =
+        new GetAdjustedShot.ShootingParameters(
+            true, Rotation2d.fromDegrees(10.0), 0.0, 20.0, 60.0, "");
+
+    leftTurret.runAutoTarget(shotParameters);
+    rightTurret.runAutoTarget(shotParameters);
+
+    assertEquals(64.8, leftFlywheelsIO.requestedRps, 1e-9);
+    assertEquals(64.8, rightFlywheelsIO.requestedRps, 1e-9);
   }
 
   @Test

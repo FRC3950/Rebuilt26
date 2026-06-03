@@ -110,6 +110,44 @@ test {
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
 }
 
+sourceSets {
+    shotmap {
+        java.srcDir 'src/shotmap/java'
+        resources.srcDir 'src/shotmap/resources'
+        compileClasspath += sourceSets.main.output + configurations.compileClasspath
+        runtimeClasspath += output + compileClasspath + sourceSets.main.runtimeClasspath
+    }
+    test {
+        java.srcDir 'src/shotmapTest/java'
+        compileClasspath += sourceSets.shotmap.output
+        runtimeClasspath += sourceSets.shotmap.output
+    }
+}
+
+configurations {
+    shotmapImplementation.extendsFrom implementation
+    shotmapRuntimeOnly.extendsFrom runtimeOnly
+}
+
+tasks.register('generateShotMap', JavaExec) {
+    group = 'shotmap'
+    description = 'Generate a HUB shot map, validate it with GymSim, then publish the requested output.'
+    classpath = sourceSets.shotmap.runtimeClasspath
+    mainClass = 'frc.robot.shotmap.ShotMapGeneratorCli'
+    doFirst {
+        def mode = project.findProperty('shotMapMode') ?: 'preview'
+        def target = project.findProperty('shotMapTarget') ?: 'hub'
+        def targetFilename = target.toString().equalsIgnoreCase('ferry') ? 'ferry_shot_table_2d.json' : 'shot_table_2d.json'
+        def output = project.findProperty('shotMapOutput') ?: layout.buildDirectory.file("shotmap/${mode}/${target}/${targetFilename}").get().asFile.path
+        def diagnostics = project.findProperty('shotMapDiagnostics') ?: layout.buildDirectory.dir("shotmap/${mode}/${target}/diagnostics").get().asFile.path
+        def flywheelScale = project.findProperty('shotMapFlywheelScale') ?: '1.0'
+        def stagingOutput = project.findProperty('shotMapStagingOutput') ?: layout.buildDirectory.file("shotmap/${mode}/${target}/staged_${targetFilename}").get().asFile.path
+        def defaultGymSimScenario = target.toString().equalsIgnoreCase('ferry') ? '.gymsim/tests/ferry-shotmap-generated.yml' : '.gymsim/tests/shotmap-generated-sweep.yml'
+        def gymsimScenario = project.findProperty('shotMapGymSimScenario') ?: defaultGymSimScenario
+        args '--target', target, '--mode', mode, '--output', output, '--diagnostics', diagnostics, '--flywheel-scale', flywheelScale, '--staging-output', stagingOutput, '--gymsim-scenario', gymsimScenario
+    }
+}
+
 // Simulation configuration (e.g. environment variables).
 //
 // The sim GUI is *disabled* by default to support running

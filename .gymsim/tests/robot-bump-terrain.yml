@@ -1,0 +1,15 @@
+name: robot-bump-terrain
+timeout_s: 12
+robot:
+  alliance: blue1
+steps:
+  - invoke: { expression: "robotSimulationControls.setPose(3.75, 2.50, 0.0)" }
+  - enable: teleop
+  - wait_seconds: 0.1
+  - invoke: { expression: "robotSimulationControls.recordRobotTerrainState()" }
+assertions:
+  - log_exists: { key: GymSim/Active }
+  - log_min: { key: GymSim/RobotTerrain/OdometryX, value: 3.6 }
+  - log_min: { key: GymSim/RobotTerrain/OdometryY, value: 2.4 }
+  - log_min: { key: Drive/SimTerrainHeightMeters, value: 0.01 }
+  - no_driverstation_errors

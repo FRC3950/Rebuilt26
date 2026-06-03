@@ -42,6 +42,73 @@ class FuelSimulationControllerTest {
   }
 
   @Test
+  void unlimitedCapacityClearsFuelWithoutIncreasingStoredCount() {
+    TestContext context = new TestContext(() -> 1);
+    context.controller.initializeSimulation();
+    context.controller.setUnlimitedFuelCapacityForSim(true);
+    context.intakeDown.value = true;
+    context.intakeRollerSpeed.value = 40.0;
+
+    for (int i = 0; i < MAX_FUEL_CAPACITY + 2; i++) {
+      spawnFuelInIntake(context, 0.0);
+      context.controller.stepSimulation();
+    }
+
+    assertEquals(MAX_FUEL_CAPACITY, context.controller.getCurrentFuelCapacity());
+    assertEquals(0, context.fuelSim.fuels.size());
+  }
+
+  @Test
+  void enablingUnlimitedCapacityClearsFuelAlreadyOnField() {
+    TestContext context = new TestContext(() -> 1);
+    context.controller.initializeSimulation();
+    context.fuelSim.spawnFuel(
+        new Translation3d(1.0, 1.0, FuelSim.FUEL_RADIUS), new Translation3d());
+    context.fuelSim.spawnFuel(
+        new Translation3d(2.0, 2.0, FuelSim.FUEL_RADIUS), new Translation3d());
+
+    context.controller.setUnlimitedFuelCapacityForSim(true);
+
+    assertEquals(0, context.controller.getFieldFuelCountForSim());
+  }
+
+  @Test
+  void scoredFuelIsDeletedWhenUnlimitedCapacityIsEnabled() {
+    TestContext context = new TestContext(() -> 1);
+    context.controller.initializeSimulation();
+    context.controller.setUnlimitedFuelCapacityForSim(true);
+    FuelSim.Hub.BLUE_HUB.resetScore();
+    context.fuelSim.spawnFuel(
+        new Translation3d(
+            FuelSim.Hub.BLUE_HUB.center.getX(),
+            FuelSim.Hub.BLUE_HUB.center.getY(),
+            FuelSim.Hub.ENTRY_HEIGHT + 0.001),
+        new Translation3d(0.0, 0.0, -1.0));
+
+    context.controller.stepSimulation();
+
+    assertEquals(1, FuelSim.Hub.BLUE_HUB.getScore());
+    assertEquals(0, context.controller.getFieldFuelCountForSim());
+  }
+
+  @Test
+  void unlimitedCapacityShootingDoesNotDrainStoredFuel() {
+    TestContext context = new TestContext(() -> 1);
+    context.controller.initializeSimulation();
+    context.controller.setStoredFuelForSim(1);
+    context.controller.setUnlimitedFuelCapacityForSim(true);
+    context.shooting.value = true;
+
+    int spawnCountBeforeShooting = context.fuelSim.spawnCount;
+    for (int i = 0; i < 13; i++) {
+      context.controller.stepSimulation();
+    }
+
+    assertEquals(1, context.controller.getCurrentFuelCapacity());
+    assertTrue(context.fuelSim.spawnCount - spawnCountBeforeShooting >= 2);
+  }
+
+  @Test
   void dualTurretShootingDrainsSharedCapacityAtDoubleRate() {
     TestContext context = new TestContext(() -> 1);
     context.controller.initializeSimulation();
@@ -103,6 +170,22 @@ class FuelSimulationControllerTest {
   }
 
   @Test
+  void commandAppliesUnlimitedCapacitySupplierBeforeSteppingSimulation() {
+    TestContext context = new TestContext(() -> 1);
+    FuelSimCommand command = new FuelSimCommand(context.controller, () -> true);
+    context.shooting.value = true;
+
+    command.initialize();
+    int spawnCountBeforeShooting = context.fuelSim.spawnCount;
+    for (int i = 0; i < 13; i++) {
+      command.execute();
+    }
+
+    assertEquals(0, context.controller.getCurrentFuelCapacity());
+    assertTrue(context.fuelSim.spawnCount - spawnCountBeforeShooting >= 2);
+  }
+
+  @Test
   void resetFieldFuelRestoresStartingLayoutAndHubScoresWithoutClearingStorage() {
     TestContext context = new TestContext(() -> 1);
     context.controller.initializeSimulation();
@@ -121,6 +204,18 @@ class FuelSimulationControllerTest {
     assertTrue(context.fuelSim.fuels.size() > 0);
     assertEquals(0, FuelSim.Hub.BLUE_HUB.getScore());
     assertEquals(0, FuelSim.Hub.RED_HUB.getScore());
+  }
+
+  @Test
+  void simStoredFuelSetterClampsToCapacityLimits() {
+    TestContext context = new TestContext(() -> 1);
+    context.controller.initializeSimulation();
+
+    context.controller.setStoredFuelForSim(MAX_FUEL_CAPACITY + 5);
+    assertEquals(MAX_FUEL_CAPACITY, context.controller.getCurrentFuelCapacity());
+
+    context.controller.setStoredFuelForSim(-1);
+    assertEquals(0, context.controller.getCurrentFuelCapacity());
   }
 
   @Test

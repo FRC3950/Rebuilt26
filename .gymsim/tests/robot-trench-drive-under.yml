@@ -1,0 +1,16 @@
+name: robot-trench-drive-under
+timeout_s: 12
+robot:
+  alliance: blue1
+steps:
+  - invoke: { expression: "robotSimulationControls.setPose(4.62, 0.65, 0.0)" }
+  - enable: teleop
+  - wait_seconds: 0.1
+  - invoke: { expression: "robotSimulationControls.recordRobotTerrainState()" }
+assertions:
+  - log_exists: { key: GymSim/Active }
+  - log_min: { key: GymSim/RobotTerrain/OdometryX, value: 4.5 }
+  - log_min: { key: GymSim/RobotTerrain/OdometryY, value: 0.64 }
+  - log_max: { key: GymSim/RobotTerrain/OdometryY, value: 0.75 }
+  - log_max: { key: GymSim/RobotTerrain/HeightMeters, value: 0.001 }
+  - no_driverstation_errors

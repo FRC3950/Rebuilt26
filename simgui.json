@@ -23,6 +23,8 @@
       "/SmartDashboard/PhotonAlerts": "Alerts",
       "/SmartDashboard/Turret Mechanism": "Mechanism2d",
       "/SmartDashboard/Turret Subsystem": "Subsystem",
+      "/SmartDashboard/Turret/Flywheel Scale Down": "Command",
+      "/SmartDashboard/Turret/Flywheel Scale Up": "Command",
       "/SmartDashboard/Turret/Left/Flywheel Fudge Down": "Command",
       "/SmartDashboard/Turret/Left/Flywheel Fudge Up": "Command",
       "/SmartDashboard/Turret/Left/ToF Fudge Down": "Command",

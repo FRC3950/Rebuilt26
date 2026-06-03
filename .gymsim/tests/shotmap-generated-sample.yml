@@ -1,0 +1,16 @@
+name: shotmap-generated-sample
+timeout_s: 20
+robot:
+  alliance: blue1
+steps:
+  - disable
+  - enable: teleop
+  - schedule: { command: "robotSimulationControls.generatedShotValidationCommand(1.63, 4.0346376, 0.0, 4, 2.5)" }
+  - wait_seconds: 3.0
+  - invoke: { expression: "robotSimulationControls.recordGeneratedShotValidationState()" }
+assertions:
+  - log_exists: { key: GymSim/Active }
+  - log_exists: { key: GymSim/ShotMap/StoredFuel }
+  - log_exists: { key: GymSim/ShotMap/BlueHubScore }
+  - log_min: { key: GymSim/ShotMap/BlueHubScore, value: 1.0 }
+  - no_driverstation_errors

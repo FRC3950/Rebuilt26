@@ -534,6 +534,10 @@ Known or likely gotchas from code/history:
 
 ## 11. BUILD, DEPLOY, AND SIMULATION (PROJECT-SPECIFIC ONLY)
 
+- Default validation policy:
+  - For robot behavior changes in Rebuilt26, GymSim validation is required before claiming the work is complete. Run an applicable `.gymsim/tests/*.yml` scenario after Java tests, or add a focused scenario when the existing ones do not cover the behavior.
+  - If GymSim cannot reasonably validate the change, say exactly why in the final response and do not describe the work as fully validated.
+  - Shot-map work should run `.gymsim/tests/shotmap-generated-sample.yml` or a more specific generated-shot scenario.
 - Canonical local commands:
   - `./gradlew build` - compile, run tests, generate `BuildConstants`, and run Spotless formatting via `compileJava` (`build.gradle:101`, `build.gradle:135`, `build.gradle:179`).
   - `./gradlew test` - run JUnit 5 tests (`build.gradle:94`, `build.gradle:101`).

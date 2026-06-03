@@ -1,12 +1,20 @@
 package frc.robot.sim;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.BooleanSupplier;
 
 public class FuelSimCommand extends Command {
   private final FuelSimulationController controller;
+  private final BooleanSupplier unlimitedFuelCapacitySupplier;
 
   public FuelSimCommand(FuelSimulationController controller) {
+    this(controller, () -> false);
+  }
+
+  public FuelSimCommand(
+      FuelSimulationController controller, BooleanSupplier unlimitedFuelCapacitySupplier) {
     this.controller = controller;
+    this.unlimitedFuelCapacitySupplier = unlimitedFuelCapacitySupplier;
   }
 
   @Override
@@ -16,6 +24,7 @@ public class FuelSimCommand extends Command {
 
   @Override
   public void execute() {
+    controller.setUnlimitedFuelCapacityForSim(unlimitedFuelCapacitySupplier.getAsBoolean());
     controller.stepSimulation();
   }
 

@@ -3,6 +3,8 @@ package frc.robot.sim;
 import static frc.robot.Constants.SimConstants.Fuel.EFFECTIVE_FLYWHEEL_RADIUS_METERS;
 import static frc.robot.Constants.SimConstants.Fuel.EXIT_VELOCITY_SCALE;
 import static frc.robot.Constants.SimConstants.Fuel.INTAKE_CENTER;
+import static frc.robot.Constants.SimConstants.Fuel.SHOTMAP_EXIT_VELOCITY_SCALE;
+import static frc.robot.Constants.SimConstants.Fuel.SHOTMAP_LAUNCH_ANGLE_OFFSET_DEG;
 import static frc.robot.Constants.SimConstants.Fuel.TURRET_LAUNCH_HEIGHT_METERS;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,6 +33,10 @@ public class FuelLaunchCalculator {
     }
 
     static LaunchCalibration fromShotTable() {
+      if (frc.robot.util.ShotTable2d.loadFromDeploy().isPresent()) {
+        return generatedShotMap();
+      }
+
       List<Distancer.Row> rows = Distancer.loadRowsFromDeploy("shot_table.json");
       if (rows.isEmpty()) {
         return identity();
@@ -81,12 +87,31 @@ public class FuelLaunchCalculator {
                   100.0, 2.0 * Math.PI * EFFECTIVE_FLYWHEEL_RADIUS_METERS * 100.0)));
     }
 
+    static LaunchCalibration generatedShotMap() {
+      return new LaunchCalibration(
+          List.of(
+              new CalibrationPoint(0.0, SHOTMAP_LAUNCH_ANGLE_OFFSET_DEG),
+              new CalibrationPoint(90.0, 90.0 + SHOTMAP_LAUNCH_ANGLE_OFFSET_DEG)),
+          List.of(
+              new CalibrationPoint(0.0, 0.0),
+              new CalibrationPoint(
+                  100.0, 2.0 * Math.PI * EFFECTIVE_FLYWHEEL_RADIUS_METERS * 100.0)));
+    }
+
     double launchAngleForHoodDeg(double hoodAngleDeg) {
       return interpolate(hoodAnglePoints, hoodAngleDeg);
     }
 
     double launchSpeedForFlywheelRps(double flywheelRps) {
-      return interpolate(flywheelSpeedPoints, flywheelRps) * EXIT_VELOCITY_SCALE;
+      return interpolate(flywheelSpeedPoints, flywheelRps)
+          * (isGeneratedShotMapCalibration() ? SHOTMAP_EXIT_VELOCITY_SCALE : EXIT_VELOCITY_SCALE);
+    }
+
+    private boolean isGeneratedShotMapCalibration() {
+      return hoodAnglePoints.size() == 2
+          && Math.abs(hoodAnglePoints.get(0).output() - SHOTMAP_LAUNCH_ANGLE_OFFSET_DEG) < 1e-9
+          && Math.abs(hoodAnglePoints.get(1).output() - (90.0 + SHOTMAP_LAUNCH_ANGLE_OFFSET_DEG))
+              < 1e-9;
     }
 
     private static List<CalibrationPoint> averageSamples(Map<Double, List<Double>> samples) {
