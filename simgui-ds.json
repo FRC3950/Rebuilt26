@@ -122,6 +122,585 @@
       ],
       "sourceGuid": "030000005e040000130b000023050000",
       "sourceName": "Xbox Wireless Controller"
+    },
+    {
+      "axisMappings": [
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "enabled": true,
+          "scale": 1.0
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "enabled": true,
+          "scale": 1.0,
+          "sourceAxis": 1
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "enabled": true,
+          "scale": 1.0,
+          "sourceAxis": 5,
+          "triggerNormalize": true
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "enabled": true,
+          "scale": 1.0,
+          "sourceAxis": 4,
+          "triggerNormalize": true
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "enabled": true,
+          "scale": 1.0,
+          "sourceAxis": 2
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "enabled": true,
+          "scale": 1.0,
+          "sourceAxis": 5
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "scale": 1.0,
+          "sourceAxis": -1
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "scale": 1.0,
+          "sourceAxis": -1
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "scale": 1.0,
+          "sourceAxis": -1
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "scale": 1.0,
+          "sourceAxis": -1
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "scale": 1.0,
+          "sourceAxis": -1
+        },
+        {
+          "clampMax": 1.0,
+          "clampMin": -1.0,
+          "scale": 1.0,
+          "sourceAxis": -1
+        }
+      ],
+      "buttonMappings": [
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 2,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 3,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 4,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 5,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 6,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 7,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 8,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 9,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 10,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 11,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 12,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 13,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 14,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "enabled": true,
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": 15,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        },
+        {
+          "povDirection": -1,
+          "sourceAxis": -1,
+          "sourceButton": -1,
+          "sourcePov": -1,
+          "threshold": 0.5
+        }
+      ],
+      "customRemap": true,
+      "outputGamepadType": 20,
+      "povMappings": [
+        {
+          "enabled": true
+        },
+        {
+          "sourcePov": -1
+        },
+        {
+          "sourcePov": -1
+        },
+        {
+          "sourcePov": -1
+        },
+        {
+          "sourcePov": -1
+        },
+        {
+          "sourcePov": -1
+        },
+        {
+          "sourcePov": -1
+        },
+        {
+          "sourcePov": -1
+        }
+      ],
+      "profileEnabled": true,
+      "sourceGuid": "030000005e040000130b000009050000",
+      "sourceName": "Xbox Wireless Controller"
     }
   ],
   "keyboardJoysticks": [
@@ -300,12 +879,13 @@
         }
       ],
       "customRemap": true,
-      "guid": "030000005e040000130b000023050000",
+      "guid": "030000005e040000130b000009050000",
       "povMappings": [
         {
           "enabled": true
         }
-      ]
+      ],
+      "useGamepad": true
     },
     {
       "guid": "Keyboard0"

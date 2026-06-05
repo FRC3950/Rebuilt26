@@ -208,6 +208,7 @@ public class RobotContainer {
     }
 
     NamedCommands.registerCommand("Extend Intake", intake.extendCommand());
+    NamedCommands.registerCommand("Retract Intake", intake.retractCommand());
     NamedCommands.registerCommand("Start Intake", intake.onIntake());
     NamedCommands.registerCommand("Stop Intake", intake.offIntake());
     NamedCommands.registerCommand("X Wheel Lock", Commands.runOnce(drive::stopWithX, drive));
