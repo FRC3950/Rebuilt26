@@ -9,9 +9,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.turret.turret_base.azimuth.Azimuth;
@@ -23,22 +21,17 @@ public class Turret extends SubsystemBase {
   private static final double ANGLE_WRAP_DEGREES = 360.0;
   private static final double TURRET_SETPOINT_LOOKAHEAD_SECS = 0.02;
   private static final double FLYWHEEL_READY_TOLERANCE_RPS = 2.5;
-  private static final double FLYWHEEL_FUDGE_STEP = 0.01;
-  private static final double TOF_FUDGE_STEP_SEC = 0.01;
-  private static final double TURN_TRIM_STEP_DEG = 0.5;
-  static final String FLYWHEEL_SCALE_DASHBOARD_KEY = "Turret/Flywheel Scale";
+  static final String FLYWHEEL_SCALE_DASHBOARD_KEY = TurretTuning.FLYWHEEL_SCALE_DASHBOARD_KEY;
 
   private final Hood hood;
   private final Flywheels flywheels;
   private final Azimuth azimuth;
+  private final TurretTuning tuning;
   private final String logKey;
   private final double minAzimuthControlAngleDeg;
   private final double maxAzimuthControlAngleDeg;
   private static boolean lockedIn = false;
-  private static double flywheelScaleFactor = 1.0;
   private boolean zeroSwitchClosedLastPoll = false;
-  private double tofFudgeSec = 0.0;
-  private double turnTrimDeg = 0.0;
 
   // private final Mechanism2d mechanism;
   // private final MechanismRoot2d mechRoot;
@@ -50,11 +43,13 @@ public class Turret extends SubsystemBase {
       Hood hood,
       Flywheels flywheels,
       double minAzimuthControlAngleDeg,
-      double maxAzimuthControlAngleDeg) {
+      double maxAzimuthControlAngleDeg,
+      TurretTuning tuning) {
     setName(name);
     this.azimuth = azimuth;
     this.hood = hood;
     this.flywheels = flywheels;
+    this.tuning = tuning;
     logKey = createLogKey(name);
     this.minAzimuthControlAngleDeg = minAzimuthControlAngleDeg;
     this.maxAzimuthControlAngleDeg = maxAzimuthControlAngleDeg;
@@ -91,7 +86,7 @@ public class Turret extends SubsystemBase {
     double turretVelocityDegPerSec = Units.radiansToDegrees(turretVelocityRadPerSec);
     double targetAzimuthDegrees =
         turretAngleRobot.getDegrees()
-            + turnTrimDeg
+            + tuning.getTurnTrimDeg()
             + turretVelocityDegPerSec * TURRET_SETPOINT_LOOKAHEAD_SECS;
     double setpointDegrees = selectSafeSetpointDegrees(targetAzimuthDegrees);
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
@@ -106,7 +101,7 @@ public class Turret extends SubsystemBase {
         params.turretAngle(),
         params.turretVelocity(),
         params.hoodAngleDeg(),
-        params.flywheelSpeed() * getDashboardFlywheelScaleFactor());
+        params.flywheelSpeed() * tuning.getFlywheelScaleFactor());
   }
 
   public void runZeroAzimuthTarget(GetAdjustedShot.ShootingParameters params) {
@@ -114,53 +109,31 @@ public class Turret extends SubsystemBase {
         Rotation2d.fromDegrees(-135),
         0.0,
         params.hoodAngleDeg(),
-        params.flywheelSpeed() * getDashboardFlywheelScaleFactor());
+        params.flywheelSpeed() * tuning.getFlywheelScaleFactor());
   }
 
   public Command increaseFlywheelFudgeFactor() {
-    return Commands.runOnce(
-            () ->
-                setFlywheelScaleFactor(
-                    Math.round(
-                            100.0 * getDashboardFlywheelScaleFactor() * (1.0 + FLYWHEEL_FUDGE_STEP))
-                        / 100.0))
-        .ignoringDisable(true)
-        .withName(getName() + " Flywheel Fudge Up");
+    return tuning.increaseFlywheelFudgeFactor();
   }
 
   public Command decreaseFlywheelFudgeFactor() {
-    return Commands.runOnce(
-            () ->
-                setFlywheelScaleFactor(
-                    Math.round(
-                            100.0 * getDashboardFlywheelScaleFactor() * (1.0 - FLYWHEEL_FUDGE_STEP))
-                        / 100.0))
-        .ignoringDisable(true)
-        .withName(getName() + " Flywheel Fudge Down");
+    return tuning.decreaseFlywheelFudgeFactor();
   }
 
   public Command increaseTofFudge() {
-    return Commands.runOnce(() -> tofFudgeSec += TOF_FUDGE_STEP_SEC)
-        .ignoringDisable(true)
-        .withName(getName() + " ToF Fudge Up");
+    return tuning.increaseTofFudge();
   }
 
   public Command decreaseTofFudge() {
-    return Commands.runOnce(() -> tofFudgeSec -= TOF_FUDGE_STEP_SEC)
-        .ignoringDisable(true)
-        .withName(getName() + " ToF Fudge Down");
+    return tuning.decreaseTofFudge();
   }
 
   public Command increaseTurnTrim() {
-    return Commands.runOnce(() -> turnTrimDeg += TURN_TRIM_STEP_DEG)
-        .ignoringDisable(true)
-        .withName(getName() + " Turn Trim Left");
+    return tuning.increaseTurnTrim();
   }
 
   public Command decreaseTurnTrim() {
-    return Commands.runOnce(() -> turnTrimDeg -= TURN_TRIM_STEP_DEG)
-        .ignoringDisable(true)
-        .withName(getName() + " Turn Trim Right");
+    return tuning.decreaseTurnTrim();
   }
 
   public static void toggleTurretMode() {
@@ -204,15 +177,15 @@ public class Turret extends SubsystemBase {
   }
 
   public double getFlywheelFudgeFactor() {
-    return getDashboardFlywheelScaleFactor();
+    return tuning.getFlywheelScaleFactor();
   }
 
   public double getTofFudgeSec() {
-    return tofFudgeSec;
+    return tuning.getTofFudgeSec();
   }
 
   public double getTurnTrimDeg() {
-    return turnTrimDeg;
+    return tuning.getTurnTrimDeg();
   }
 
   public double getCommandedAzimuthVelocityDegPerSec() {
@@ -265,29 +238,6 @@ public class Turret extends SubsystemBase {
     Logger.recordOutput(logKey + "/TurnTrimDeg", getTurnTrimDeg());
     Logger.recordOutput(logKey + "/IsTargetingLocked", isTargetingLocked());
     Logger.recordOutput(logKey + "/IsFlywheelReadyForFeed", isFlywheelReadyForFeed());
-  }
-
-  static void initializeFlywheelScaleDashboard() {
-    SmartDashboard.putNumber(FLYWHEEL_SCALE_DASHBOARD_KEY, flywheelScaleFactor);
-  }
-
-  private static double getDashboardFlywheelScaleFactor() {
-    double dashboardValue =
-        SmartDashboard.getNumber(FLYWHEEL_SCALE_DASHBOARD_KEY, flywheelScaleFactor);
-    flywheelScaleFactor = sanitizeFlywheelScaleFactor(dashboardValue, flywheelScaleFactor);
-    if (dashboardValue != flywheelScaleFactor) {
-      SmartDashboard.putNumber(FLYWHEEL_SCALE_DASHBOARD_KEY, flywheelScaleFactor);
-    }
-    return flywheelScaleFactor;
-  }
-
-  private static void setFlywheelScaleFactor(double scaleFactor) {
-    flywheelScaleFactor = sanitizeFlywheelScaleFactor(scaleFactor, 1.0);
-    SmartDashboard.putNumber(FLYWHEEL_SCALE_DASHBOARD_KEY, flywheelScaleFactor);
-  }
-
-  private static double sanitizeFlywheelScaleFactor(double scaleFactor, double fallback) {
-    return Double.isFinite(scaleFactor) && scaleFactor > 0.0 ? scaleFactor : fallback;
   }
 
   private static String createLogKey(String name) {

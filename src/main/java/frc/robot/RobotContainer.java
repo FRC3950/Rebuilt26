@@ -49,6 +49,7 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
+import frc.robot.subsystems.turret.TurretTuning;
 import frc.robot.subsystems.turret.TurretTuningDashboard;
 import frc.robot.subsystems.turret.TurretVisualization;
 import frc.robot.subsystems.turret.turret_base.azimuth.Azimuth;
@@ -76,6 +77,7 @@ public class RobotContainer {
   }
 
   private final Drive drive;
+  private final TurretTuning turretTuning = new TurretTuning();
   private final Turret turret1;
   private final Turret turret2;
   private final TurretVisualization turretVisualization;
@@ -222,7 +224,7 @@ public class RobotContainer {
             intake));
 
     SmartDashboard.putData("Turret Subsystem", turret1);
-    TurretTuningDashboard.register(turret1, turret2);
+    TurretTuningDashboard.register(turretTuning);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
 
     codeModeChooser = new LoggedDashboardChooser<>("Code Mode");
@@ -283,7 +285,8 @@ public class RobotContainer {
             "Turret/Left/Flywheels",
             new FlywheelsIOTalonFX(flywheelID, flywheelConfig, flywheelFollowerID, CANivore)),
         leftMinAzimuthControlAngle,
-        leftMaxAzimuthControlAngle);
+        leftMaxAzimuthControlAngle,
+        turretTuning);
   }
 
   private Turret createRealRightTurret() {
@@ -297,7 +300,8 @@ public class RobotContainer {
             "Turret/Right/Flywheels",
             new FlywheelsIOTalonFX(flywheelID2, flywheelConfig, flywheelFollowerID2, CANivore)),
         rightMinAzimuthControlAngle,
-        rightMaxAzimuthControlAngle);
+        rightMaxAzimuthControlAngle,
+        turretTuning);
   }
 
   private Hood createRealHood(String logKey, ServoChannel.ChannelId channelId) {
@@ -337,7 +341,8 @@ public class RobotContainer {
         new Hood("Turret/Left/Hood", new HoodIO() {}),
         new Flywheels("Turret/Left/Flywheels", new FlywheelsIO() {}),
         leftMinAzimuthControlAngle,
-        leftMaxAzimuthControlAngle);
+        leftMaxAzimuthControlAngle,
+        turretTuning);
   }
 
   private Turret createNoOpRightTurret() {
@@ -347,7 +352,8 @@ public class RobotContainer {
         new Hood("Turret/Right/Hood", new HoodIO() {}),
         new Flywheels("Turret/Right/Flywheels", new FlywheelsIO() {}),
         rightMinAzimuthControlAngle,
-        rightMaxAzimuthControlAngle);
+        rightMaxAzimuthControlAngle,
+        turretTuning);
   }
 
   private void applyCodeMode(CodeMode codeMode) {

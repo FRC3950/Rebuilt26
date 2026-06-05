@@ -130,6 +130,40 @@ class TurretIOTest {
   }
 
   @Test
+  void tofFudgeControlsUpdateSharedTuningForBothTurrets() {
+    TurretTuning tuning = new TurretTuning();
+    Turret leftTurret = createTestTurret(new FakeAzimuthIO(), tuning);
+    Turret rightTurret = createTestTurret(new FakeAzimuthIO(), tuning);
+
+    leftTurret.increaseTofFudge().initialize();
+
+    assertEquals(0.01, leftTurret.getTofFudgeSec(), 1e-9);
+    assertEquals(0.01, rightTurret.getTofFudgeSec(), 1e-9);
+
+    rightTurret.decreaseTofFudge().initialize();
+
+    assertEquals(0.0, leftTurret.getTofFudgeSec(), 1e-9);
+    assertEquals(0.0, rightTurret.getTofFudgeSec(), 1e-9);
+  }
+
+  @Test
+  void turnTrimControlsUpdateSharedTuningForBothTurrets() {
+    TurretTuning tuning = new TurretTuning();
+    FakeAzimuthIO rightAzimuthIO = new FakeAzimuthIO();
+    Turret leftTurret = createTestTurret(new FakeAzimuthIO(), tuning);
+    Turret rightTurret = createTestTurret(rightAzimuthIO, tuning);
+
+    leftTurret.increaseTurnTrim().initialize();
+    rightTurret.runAutoTarget(
+        new GetAdjustedShot.ShootingParameters(
+            true, Rotation2d.fromDegrees(10.0), 0.0, 20.0, 60.0, ""));
+
+    assertEquals(0.5, leftTurret.getTurnTrimDeg(), 1e-9);
+    assertEquals(0.5, rightTurret.getTurnTrimDeg(), 1e-9);
+    assertEquals(10.5, rightAzimuthIO.requestedAngleDeg, 1e-9);
+  }
+
+  @Test
   void flywheelReadyAllowsTwoPointFiveRpsErrorOnBothMotors() {
     FakeFlywheelsIO flywheelsIO = new FakeFlywheelsIO();
     Turret turret = createTestTurret(new FakeAzimuthIO(), flywheelsIO);
@@ -171,6 +205,10 @@ class TurretIOTest {
     return createTestTurret(azimuthIO, -180.0, 180.0);
   }
 
+  private static Turret createTestTurret(FakeAzimuthIO azimuthIO, TurretTuning tuning) {
+    return createTestTurret(azimuthIO, new FakeFlywheelsIO(), -180.0, 180.0, tuning);
+  }
+
   private static Turret createTestTurret(FakeAzimuthIO azimuthIO, FakeFlywheelsIO flywheelsIO) {
     return createTestTurret(azimuthIO, flywheelsIO, -180.0, 180.0);
   }
@@ -185,12 +223,23 @@ class TurretIOTest {
       FakeFlywheelsIO flywheelsIO,
       double minAzimuthDeg,
       double maxAzimuthDeg) {
+    return createTestTurret(
+        azimuthIO, flywheelsIO, minAzimuthDeg, maxAzimuthDeg, new TurretTuning());
+  }
+
+  private static Turret createTestTurret(
+      FakeAzimuthIO azimuthIO,
+      FakeFlywheelsIO flywheelsIO,
+      double minAzimuthDeg,
+      double maxAzimuthDeg,
+      TurretTuning tuning) {
     return new Turret(
         "TestTurret",
         new Azimuth("Test/Azimuth", azimuthIO),
         new Hood("Test/Hood", new FakeHoodIO()),
         new Flywheels("Test/Flywheels", flywheelsIO),
         minAzimuthDeg,
-        maxAzimuthDeg);
+        maxAzimuthDeg,
+        tuning);
   }
 }
