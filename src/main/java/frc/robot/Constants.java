@@ -214,7 +214,7 @@ public final class Constants {
       public static final double indexerSpeed = 55.0; // RPS
       public static final double hotdogSpeed = 70; // RPS
       public static final double unjamHotdog = -50;
-      public static final double autoUnjamHotdogStallCurrentAmps = 42.0;
+      public static final double autoUnjamHotdogStallCurrentAmps = 60.0;
       public static final double autoUnjamReverseSeconds = 0.15;
 
       public static final TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
