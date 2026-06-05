@@ -93,6 +93,7 @@ public final class CompBindings {
             Commands.runOnce(
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                 drive));
+    driver.x(buttonLoop).whileTrue(DriveCommands.xWheelLock(drive));
     driver
         .a(buttonLoop)
         .whileTrue(

@@ -102,6 +102,11 @@ public class DriveCommands {
         drive);
   }
 
+  /** Locks the swerve modules in an X arrangement while scheduled. */
+  public static Command xWheelLock(Drive drive) {
+    return Commands.run(drive::stopWithX, drive);
+  }
+
   /**
    * Field relative drive command using joystick for linear control and PID for angular control.
    * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
