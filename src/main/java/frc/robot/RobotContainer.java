@@ -20,7 +20,6 @@ import static frc.robot.Constants.SubsystemConstants.Turret.rightMinAzimuthContr
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1;
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -67,6 +66,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Field2dPublisher;
+import frc.robot.util.MirroringAutoChooser;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -93,7 +93,7 @@ public class RobotContainer {
   private static final int MIN_REV_CAN_ID = 0;
   private static final int MAX_REV_CAN_ID = 62;
 
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final MirroringAutoChooser autoChooser;
   private final LoggedDashboardChooser<CodeMode> codeModeChooser;
 
   private DemoContainer demoContainer = null;
@@ -236,7 +236,7 @@ public class RobotContainer {
 
     SmartDashboard.putData("Turret Subsystem", turret1);
     TurretTuningDashboard.register(turret1, turret2);
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
+    autoChooser = new MirroringAutoChooser("Auto Choices: ");
 
     codeModeChooser = new LoggedDashboardChooser<>("Code Mode");
     codeModeChooser.addDefaultOption("Competition", CodeMode.COMPETITION);
@@ -248,7 +248,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return autoChooser.getAutonomousCommand();
   }
 
   public Command getSimulationCommand() {
