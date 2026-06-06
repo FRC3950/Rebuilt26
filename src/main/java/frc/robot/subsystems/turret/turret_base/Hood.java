@@ -8,14 +8,19 @@ import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.config.ServoChannelConfig;
 import com.revrobotics.servohub.config.ServoHubConfig;
 import edu.wpi.first.math.MathUtil;
+import frc.robot.util.BatteryLogger;
+import org.littletonrobotics.junction.Logger;
 
 public class Hood {
+  private static final int POWER_STATUS_PERIOD_LOOPS = 5;
   private static ServoHub hoodServoHub;
 
   private final ServoChannel hoodServo;
   private final boolean invertPulseDirection;
   private double lastSetpointDeg = minHoodAngle;
   private double positionDeg = minHoodAngle;
+  private int pulseWidthUs = hoodAngleToPulseWidthUs(minHoodAngle, false);
+  private int refreshCounter = 0;
 
   public Hood(ServoChannel.ChannelId hoodChannelId) {
     hoodServo = getConfiguredHoodServoHub().getServoChannel(hoodChannelId);
@@ -25,9 +30,27 @@ public class Hood {
 
   public void setAngleDeg(double hoodAngleDeg) {
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
-    hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(clampedHoodAngleDeg, invertPulseDirection));
+    pulseWidthUs = hoodAngleToPulseWidthUs(clampedHoodAngleDeg, invertPulseDirection);
+    hoodServo.setPulseWidth(pulseWidthUs);
     lastSetpointDeg = clampedHoodAngleDeg;
     positionDeg = clampedHoodAngleDeg;
+  }
+
+  public void periodic(String logKey) {
+    Logger.recordOutput(logKey + "/PositionDeg", positionDeg);
+    Logger.recordOutput(logKey + "/PulseWidthUs", pulseWidthUs);
+    if (refreshCounter % POWER_STATUS_PERIOD_LOOPS == 0) {
+      ServoHub servoHub = getConfiguredHoodServoHub();
+      double channelCurrent = hoodServo.getCurrent();
+      Logger.recordOutput(logKey + "/HubDeviceVoltageVolts", servoHub.getDeviceVoltage());
+      Logger.recordOutput(logKey + "/HubDeviceCurrentAmps", servoHub.getDeviceCurrent());
+      Logger.recordOutput(logKey + "/ServoVoltageVolts", servoHub.getServoVoltage());
+      Logger.recordOutput(logKey + "/ChannelCurrentAmps", channelCurrent);
+      Logger.recordOutput(logKey + "/HubHasActiveFault", servoHub.hasActiveFault());
+      Logger.recordOutput(logKey + "/HubHasActiveWarning", servoHub.hasActiveWarning());
+      BatteryLogger.reportCurrentUsage(logKey, channelCurrent);
+    }
+    refreshCounter++;
   }
 
   public double getPositionDeg() {
@@ -41,10 +64,11 @@ public class Hood {
   private void initializeAtMinimum() {
     lastSetpointDeg = minHoodAngle;
     positionDeg = minHoodAngle;
+    pulseWidthUs = hoodAngleToPulseWidthUs(minHoodAngle, invertPulseDirection);
 
     hoodServo.setEnabled(true);
     hoodServo.setPowered(true);
-    hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(minHoodAngle, invertPulseDirection));
+    hoodServo.setPulseWidth(pulseWidthUs);
   }
 
   private static synchronized ServoHub getConfiguredHoodServoHub() {

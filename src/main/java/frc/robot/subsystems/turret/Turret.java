@@ -19,9 +19,12 @@ import frc.robot.subsystems.turret.turret_base.Azimuth;
 import frc.robot.subsystems.turret.turret_base.Flywheels;
 import frc.robot.subsystems.turret.turret_base.Hood;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
   private static final double ANGLE_WRAP_DEGREES = 360.0;
+  private static final double TURRET_SETPOINT_LOOKAHEAD_SECS = 0.02;
+  private static final double FLYWHEEL_READY_TOLERANCE_RPS = 2.5;
 
   private final Hood hood;
   private final Flywheels flywheels;
@@ -33,6 +36,7 @@ public class Turret extends SubsystemBase {
 
   private static boolean lockedIn = false;
   private boolean zeroSwitchClosedLastPoll = false;
+  private double turnTrimDeg = 0.0;
 
   // private final Mechanism2d mechanism;
   // private final MechanismRoot2d mechRoot;
@@ -75,21 +79,42 @@ public class Turret extends SubsystemBase {
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
-    double targetAzimuthDegrees = turretAngleRobot.getDegrees();
+    runSetpoints(turretAngleRobot, 0.0, hoodAngleDeg, flywheelSpeed);
+  }
+
+  private void runSetpoints(
+      Rotation2d turretAngleRobot,
+      double turretVelocityRadPerSec,
+      double hoodAngleDeg,
+      double flywheelSpeed) {
+    double turretVelocityDegPerSec = Units.radiansToDegrees(turretVelocityRadPerSec);
+    double targetAzimuthDegrees =
+        getVelocityCompensatedTargetDeg(turretAngleRobot, turretVelocityRadPerSec, turnTrimDeg);
     double setpointDegrees = selectSafeSetpointDegrees(targetAzimuthDegrees);
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
 
-    azimuth.setTargetAngleDeg(setpointDegrees);
+    azimuth.setTargetAngleDeg(setpointDegrees, turretVelocityDegPerSec);
     hood.setAngleDeg(clampedHoodAngleDeg);
     flywheels.setTargetRps(flywheelSpeed);
   }
 
   public void runAutoTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(params.turretAngle(), params.hoodAngleDeg(), params.flywheelSpeed());
+    runSetpoints(
+        params.turretAngle(),
+        params.turretVelocity(),
+        params.hoodAngleDeg(),
+        params.flywheelSpeed());
   }
 
   public void runZeroAzimuthTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(new Rotation2d(-135), params.hoodAngleDeg(), params.flywheelSpeed());
+    runSetpoints(Rotation2d.fromDegrees(-135), 0.0, params.hoodAngleDeg(), params.flywheelSpeed());
+  }
+
+  static double getVelocityCompensatedTargetDeg(
+      Rotation2d turretAngleRobot, double turretVelocityRadPerSec, double turnTrimDeg) {
+    return turretAngleRobot.getDegrees()
+        + turnTrimDeg
+        + Units.radiansToDegrees(turretVelocityRadPerSec) * TURRET_SETPOINT_LOOKAHEAD_SECS;
   }
 
   public static void toggleTurretMode() {
@@ -107,6 +132,11 @@ public class Turret extends SubsystemBase {
   @AutoLogOutput
   public double getCommandedAzimuthDeg() {
     return azimuth.getSetpointDeg();
+  }
+
+  @AutoLogOutput
+  public double getCommandedAzimuthVelocityDegPerSec() {
+    return azimuth.getVelocitySetpointDegPerSec();
   }
 
   @AutoLogOutput
@@ -139,13 +169,34 @@ public class Turret extends SubsystemBase {
     return getTargetingMode();
   }
 
+  @AutoLogOutput
+  public boolean isFlywheelReadyForFeed() {
+    return flywheels.isReadyForFeed(FLYWHEEL_READY_TOLERANCE_RPS);
+  }
+
   @Override
   public void periodic() {
+    String logKey = getLogKey();
+    azimuth.periodic(logKey + "/Azimuth");
+    hood.periodic(logKey + "/Hood");
+    flywheels.periodic(logKey + "/Flywheels");
+
     if (DriverStation.isDisabled() && turretZeroingCandi != null) {
       updateDisabledZeroing();
     } else {
       zeroSwitchClosedLastPoll = false;
     }
+    Logger.recordOutput(logKey + "/TurnTrimDeg", turnTrimDeg);
+  }
+
+  String getLogKey() {
+    if (getName().equals("Turret" + azimuthID)) {
+      return "Turret/Left";
+    }
+    if (getName().equals("Turret" + azimuthID2)) {
+      return "Turret/Right";
+    }
+    return "Turret/" + getName();
   }
 
   private void updateDisabledZeroing() {

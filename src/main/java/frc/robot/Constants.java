@@ -93,16 +93,14 @@ public final class Constants {
       public static final int HOOD_SERVO_CENTER_PULSE_US = 1500;
       public static final int HOOD_SERVO_MAX_PULSE_US = 2500;
 
-      // PID / Motion Magic Gains
-      public static final double azimuthKP = 50;
-      public static final double azimuthKS = 0;
+      // PID / position-voltage gains
+      public static final double azimuthKP = 8;
+      public static final double azimuthKD = 0.35;
       public static final double azimuthKV = 0.12;
-      public static final double azimuthMMVelocity = 24;
-      public static final double azimuthMMAcceleration = 48;
 
       public static final double flywheelKP = 1.2;
       public static final double flywheelKD = 0.25;
-      public static final double flywheelKV = 0.0925;
+      public static final double flywheelKV = 0.09275;
 
       public static final Translation2d robotToTurret1 =
           new Translation2d(Units.inchesToMeters(-7.25), Units.inchesToMeters(7.75));
@@ -126,17 +124,19 @@ public final class Constants {
         flywheelConfig.Slot0.kV = flywheelKV;
         flywheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         flywheelConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = .1;
-        flywheelConfig.CurrentLimits.StatorCurrentLimit = 60;
+        flywheelConfig.CurrentLimits.StatorCurrentLimit = 65;
         flywheelConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        flywheelConfig.CurrentLimits.SupplyCurrentLimit = 42;
+        flywheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        flywheelConfig.CurrentLimits.SupplyCurrentLowerLimit = 28;
+        flywheelConfig.CurrentLimits.SupplyCurrentLowerTime = 0.45;
       }
 
       private static void applyAzimuthConfig(
           TalonFXConfiguration config, double minControlAngleDeg, double maxControlAngleDeg) {
         config.Slot0.kP = azimuthKP;
         config.Slot0.kV = azimuthKV;
-        config.Slot0.kS = azimuthKS;
-        config.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity;
-        config.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
+        config.Slot0.kD = azimuthKD;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -149,8 +149,10 @@ public final class Constants {
             Units.degreesToRotations(
                     minControlAngleDeg - azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
                 * azimuthGearRatio;
-        config.CurrentLimits.StatorCurrentLimit = 60;
-        config.CurrentLimits.SupplyCurrentLimit = 25;
+        config.CurrentLimits.StatorCurrentLimit = 45;
+        config.CurrentLimits.SupplyCurrentLimit = 18;
+        config.CurrentLimits.SupplyCurrentLowerLimit = 12;
+        config.CurrentLimits.SupplyCurrentLowerTime = 0.35;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
       }
@@ -185,23 +187,23 @@ public final class Constants {
         pivotConfig.Slot0.kG = pivotKG;
         pivotConfig.MotionMagic.MotionMagicAcceleration = pivotMMAcceleration;
         pivotConfig.MotionMagic.MotionMagicCruiseVelocity = pivotMMVelocity;
-        pivotConfig.CurrentLimits.StatorCurrentLimit = 40;
-        pivotConfig.CurrentLimits.SupplyCurrentLimit = 20;
+        pivotConfig.CurrentLimits.StatorCurrentLimit = 30;
+        pivotConfig.CurrentLimits.SupplyCurrentLimit = 14;
         pivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        pivotConfig.CurrentLimits.SupplyCurrentLowerLimit = 60;
-        pivotConfig.CurrentLimits.SupplyCurrentLowerTime = 1;
+        pivotConfig.CurrentLimits.SupplyCurrentLowerLimit = 10;
+        pivotConfig.CurrentLimits.SupplyCurrentLowerTime = 0.35;
 
         // Intake Motor Config
         intakeConfig.Slot0.kP = intakeKP;
         intakeConfig.Slot0.kV = intakeKV;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        intakeConfig.CurrentLimits.StatorCurrentLimit = 60;
+        intakeConfig.CurrentLimits.StatorCurrentLimit = 50;
         intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         intakeConfig.CurrentLimits.SupplyCurrentLimit = 30;
         intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        intakeConfig.CurrentLimits.SupplyCurrentLowerLimit = 37.5;
-        intakeConfig.CurrentLimits.SupplyCurrentLowerTime = 0.2;
+        intakeConfig.CurrentLimits.SupplyCurrentLowerLimit = 22;
+        intakeConfig.CurrentLimits.SupplyCurrentLowerTime = 0.25;
       }
     }
 
@@ -226,20 +228,22 @@ public final class Constants {
         indexerConfig.Slot0.kP = indexerKP;
         indexerConfig.Slot0.kV = indexerKV;
         indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        indexerConfig.CurrentLimits.StatorCurrentLimit = 80;
+        indexerConfig.CurrentLimits.StatorCurrentLimit = 55;
         indexerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        indexerConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        indexerConfig.CurrentLimits.SupplyCurrentLimit = 35;
         indexerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        indexerConfig.CurrentLimits.SupplyCurrentLowerLimit = 24;
+        indexerConfig.CurrentLimits.SupplyCurrentLowerTime = 0.3;
 
         hotdogConfig.Slot0.kP = hotdogKP;
         hotdogConfig.Slot0.kV = hotdogKV;
         hotdogConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        hotdogConfig.CurrentLimits.StatorCurrentLimit = 50;
+        hotdogConfig.CurrentLimits.StatorCurrentLimit = 45;
         hotdogConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 30;
+        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 32;
         hotdogConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        hotdogConfig.CurrentLimits.SupplyCurrentLowerLimit = 40;
-        hotdogConfig.CurrentLimits.SupplyCurrentLowerTime = 0.5;
+        hotdogConfig.CurrentLimits.SupplyCurrentLowerLimit = 22;
+        hotdogConfig.CurrentLimits.SupplyCurrentLowerTime = 0.3;
       }
     }
     // Josh wrote this part of the code, easter egg of 2026
