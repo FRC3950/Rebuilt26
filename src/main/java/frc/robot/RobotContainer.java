@@ -22,7 +22,6 @@ import static frc.robot.Constants.SubsystemConstants.Turret.rightMinAzimuthContr
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1;
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -58,6 +57,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Field2dPublisher;
+import frc.robot.util.MirroringAutoChooser;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -82,7 +82,7 @@ public class RobotContainer {
   private final EventLoop competitionButtonLoop = new EventLoop();
   private final EventLoop crazyButtonLoop = new EventLoop();
 
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final MirroringAutoChooser autoChooser;
   private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
 
   private BindingMode appliedBindingMode = BindingMode.COMPETITION;
@@ -203,6 +203,7 @@ public class RobotContainer {
         "Intake While Held", Commands.startEnd(intake::startIntake, intake::stopIntake, intake));
     NamedCommands.registerCommand("Start Hotdog", Commands.runOnce(indexer::startHotdog, indexer));
     NamedCommands.registerCommand("Stop Hotdog", Commands.runOnce(indexer::stopHotdog, indexer));
+    NamedCommands.registerCommand("X Wheel Stop", DriveCommands.xWheelStop(drive));
 
     NamedCommands.registerCommand(
         "Start Shoot",
@@ -226,7 +227,7 @@ public class RobotContainer {
             intake));
 
     SmartDashboard.putData("Turret Subsystem", turret1);
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
+    autoChooser = new MirroringAutoChooser("Auto Choices: ");
 
     bindingModeChooser = new LoggedDashboardChooser<>("Code Mode");
     bindingModeChooser.addDefaultOption("Competition", BindingMode.COMPETITION);
@@ -239,7 +240,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return autoChooser.getAutonomousCommand();
   }
 
   public Command getSimulationCommand() {

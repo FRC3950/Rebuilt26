@@ -139,6 +139,11 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
+  /** Stops the drive and points the modules into an X arrangement. */
+  public static Command xWheelStop(Drive drive) {
+    return Commands.runOnce(drive::stopWithX, drive);
+  }
+
   /**
    * Measures the velocity feedforward constants for the drive motors.
    *
