@@ -81,8 +81,6 @@ public class RobotContainer {
 
   private final EventLoop competitionButtonLoop = new EventLoop();
   private final EventLoop crazyButtonLoop = new EventLoop();
-  private static final int MIN_REV_CAN_ID = 0;
-  private static final int MAX_REV_CAN_ID = 62;
 
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
@@ -270,10 +268,6 @@ public class RobotContainer {
   static boolean shouldApplyBindingMode(
       BindingMode selectedBindingMode, BindingMode currentBindingMode, boolean isDisabled) {
     return isDisabled && selectedBindingMode != currentBindingMode;
-  }
-
-  static boolean isValidRevServoHubCanId(int canId) {
-    return canId >= MIN_REV_CAN_ID && canId <= MAX_REV_CAN_ID;
   }
 
   private void configureCompetitionBindings() {

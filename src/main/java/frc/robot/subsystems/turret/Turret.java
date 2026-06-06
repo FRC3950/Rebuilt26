@@ -19,7 +19,6 @@ import frc.robot.subsystems.turret.turret_base.Azimuth;
 import frc.robot.subsystems.turret.turret_base.Flywheels;
 import frc.robot.subsystems.turret.turret_base.Hood;
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
   private static final double ANGLE_WRAP_DEGREES = 360.0;
@@ -176,27 +175,11 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    String logKey = getLogKey();
-    azimuth.periodic(logKey + "/Azimuth");
-    hood.periodic(logKey + "/Hood");
-    flywheels.periodic(logKey + "/Flywheels");
-
     if (DriverStation.isDisabled() && turretZeroingCandi != null) {
       updateDisabledZeroing();
     } else {
       zeroSwitchClosedLastPoll = false;
     }
-    Logger.recordOutput(logKey + "/TurnTrimDeg", turnTrimDeg);
-  }
-
-  String getLogKey() {
-    if (getName().equals("Turret" + azimuthID)) {
-      return "Turret/Left";
-    }
-    if (getName().equals("Turret" + azimuthID2)) {
-      return "Turret/Right";
-    }
-    return "Turret/" + getName();
   }
 
   private void updateDisabledZeroing() {

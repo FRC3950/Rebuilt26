@@ -1,8 +1,6 @@
 package frc.robot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import frc.robot.generated.TunerConstants;
 import org.junit.jupiter.api.Test;
@@ -48,12 +46,5 @@ class PowerOptimizationConstantsTest {
     assertEquals(18.0, steer.SupplyCurrentLimit, 1e-9);
     assertEquals(14.0, steer.SupplyCurrentLowerLimit, 1e-9);
     assertEquals(0.35, steer.SupplyCurrentLowerTime, 1e-9);
-  }
-
-  @Test
-  void revServoHubCanId63IsInvalid() {
-    assertTrue(RobotContainer.isValidRevServoHubCanId(0));
-    assertTrue(RobotContainer.isValidRevServoHubCanId(62));
-    assertFalse(RobotContainer.isValidRevServoHubCanId(63));
   }
 }
