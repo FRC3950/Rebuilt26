@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Extend Intake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.75
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NorthStoot_NeutralOne"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralOne_NorthStoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 6.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "End Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NorthStoot_DOT FLIP"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "X Wheel Stop"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}

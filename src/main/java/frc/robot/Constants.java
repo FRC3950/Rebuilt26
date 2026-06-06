@@ -84,7 +84,7 @@ public final class Constants {
       public static final double maxFlywheelRps = 100.0;
       public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0;
 
-      public static final int HOOD_SERVO_HUB_CAN_ID = 63;
+      public static final int HOOD_SERVO_HUB_CAN_ID = 62;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 =
           ServoChannel.ChannelId.kChannelId0;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_2 =

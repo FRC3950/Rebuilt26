@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Extend Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "center_depo"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "depo_shooty"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 8.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "End Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

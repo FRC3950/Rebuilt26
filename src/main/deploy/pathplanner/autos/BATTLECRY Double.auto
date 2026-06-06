@@ -1,0 +1,79 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Extend Intake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.6
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NorthStoot_NeutralOne"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralOne_NorthStoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "End Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NorthStoot_NeutralTwo"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NeutralTwo_NorthStoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "End Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NorthStoot_DOT (FULL SEND)"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
