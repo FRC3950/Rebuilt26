@@ -7,7 +7,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -131,7 +133,38 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+    double matchTime = DriverStation.getMatchTime();
+
+    double shiftCountdown = 0.0;
+    String currentPhaseName = "Unknown";
+
+    // Logic mapped to 2026 REBUILT match timelines
+    if (matchTime > 130.0) {
+      currentPhaseName = "Transition";
+      shiftCountdown = matchTime - 130.0; // Counts down from 10 to 0
+    } else if (matchTime > 105.0) {
+      currentPhaseName = "Shift 1";
+      shiftCountdown = matchTime - 105.0; // Counts down from 25 to 0
+    } else if (matchTime > 80.0) {
+      currentPhaseName = "Shift 2";
+      shiftCountdown = matchTime - 80.0; // Counts down from 25 to 0
+    } else if (matchTime > 55.0) {
+      currentPhaseName = "Shift 3";
+      shiftCountdown = matchTime - 55.0; // Counts down from 25 to 0
+    } else if (matchTime > 30.0) {
+      currentPhaseName = "Shift 4";
+      shiftCountdown = matchTime - 30.0; // Counts down from 25 to 0
+    } else {
+      currentPhaseName = "Endgame";
+      shiftCountdown = matchTime; // Counts down from 30 to 0
+    }
+
+    // Pushes the separate values directly to your dashboard
+    SmartDashboard.putString("Current Phase", currentPhaseName);
+    SmartDashboard.putNumber("Shift Countdown", shiftCountdown);
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override

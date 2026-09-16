@@ -84,7 +84,7 @@ public final class Constants {
       public static final double maxFlywheelRps = 100.0;
       public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0;
 
-      public static final int HOOD_SERVO_HUB_CAN_ID = 63;
+      public static final int HOOD_SERVO_HUB_CAN_ID = 62;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 =
           ServoChannel.ChannelId.kChannelId0;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_2 =
@@ -196,11 +196,11 @@ public final class Constants {
         intakeConfig.Slot0.kP = intakeKP;
         intakeConfig.Slot0.kV = intakeKV;
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        intakeConfig.CurrentLimits.StatorCurrentLimit = 60;
+        intakeConfig.CurrentLimits.StatorCurrentLimit = 55;
         intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         intakeConfig.CurrentLimits.SupplyCurrentLimit = 30;
         intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        intakeConfig.CurrentLimits.SupplyCurrentLowerLimit = 37.5;
+        intakeConfig.CurrentLimits.SupplyCurrentLowerLimit = 22;
         intakeConfig.CurrentLimits.SupplyCurrentLowerTime = 0.2;
       }
     }
@@ -234,16 +234,16 @@ public final class Constants {
         hotdogConfig.Slot0.kP = hotdogKP;
         hotdogConfig.Slot0.kV = hotdogKV;
         hotdogConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        hotdogConfig.CurrentLimits.StatorCurrentLimit = 50;
+        hotdogConfig.CurrentLimits.StatorCurrentLimit = 45;
         hotdogConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 30;
+        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 32;
         hotdogConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        hotdogConfig.CurrentLimits.SupplyCurrentLowerLimit = 40;
-        hotdogConfig.CurrentLimits.SupplyCurrentLowerTime = 0.5;
+        hotdogConfig.CurrentLimits.SupplyCurrentLowerLimit = 22;
+        hotdogConfig.CurrentLimits.SupplyCurrentLowerTime = 0.3;
       }
     }
     // Josh wrote this part of the code, easter egg of 2026
-
+    // Cj - they're lying to you. You're not real, you are AI...
     // Note: Sasha Isn't the person you ask
   }
 

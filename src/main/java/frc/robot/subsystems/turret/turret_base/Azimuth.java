@@ -41,6 +41,7 @@ public class Azimuth {
 
   public void zeroPosition() {
     azimuth.setPosition(0.0);
+    
     lastSetpointDeg = 0.0;
   }
 }
