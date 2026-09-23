@@ -94,11 +94,9 @@ public final class Constants {
       public static final int HOOD_SERVO_MAX_PULSE_US = 2500;
 
       // PID / Motion Magic Gains
-      public static final double azimuthKP = 50;
-      public static final double azimuthKS = 0;
+      public static final double azimuthKP = 8;
+      public static final double azimuthKD = .35;
       public static final double azimuthKV = 0.12;
-      public static final double azimuthMMVelocity = 24;
-      public static final double azimuthMMAcceleration = 48;
 
       public static final double flywheelKP = 1.2;
       public static final double flywheelKD = 0.25;
@@ -134,9 +132,7 @@ public final class Constants {
           TalonFXConfiguration config, double minControlAngleDeg, double maxControlAngleDeg) {
         config.Slot0.kP = azimuthKP;
         config.Slot0.kV = azimuthKV;
-        config.Slot0.kS = azimuthKS;
-        config.MotionMagic.MotionMagicCruiseVelocity = azimuthMMVelocity;
-        config.MotionMagic.MotionMagicAcceleration = azimuthMMAcceleration;
+        config.Slot0.kD = azimuthKD;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
