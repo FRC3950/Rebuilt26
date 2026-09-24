@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.servohub.ServoChannel;
@@ -57,7 +58,7 @@ public final class Constants {
 
     public static final class Turret {
       public static final int azimuthID = 19;
-      public static final int TURRET_CANDI_ID = 45;
+      // public static final int TURRET_CANDI_ID = 45;
       public static final int flywheelID = 3;
       public static final int flywheelFollowerID = 2;
 
@@ -68,6 +69,9 @@ public final class Constants {
       public static final TalonFXConfiguration leftAzimuthConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration rightAzimuthConfig = new TalonFXConfiguration();
       public static final TalonFXConfiguration flywheelConfig = new TalonFXConfiguration();
+
+      public static final CANcoder leftAzimuthEncoder = new CANcoder(48, CANivore);
+      public static final CANcoder rightAzimuthEncoder = new CANcoder(47, CANivore);
 
       public static final double azimuthGearRatio = 10;
       public static final double flywheelGearRatio = 1.0;
@@ -84,7 +88,7 @@ public final class Constants {
       public static final double maxFlywheelRps = 100.0;
       public static final double TURRET_LIMIT_SWITCH_ANGLE_DEG = 0;
 
-      public static final int HOOD_SERVO_HUB_CAN_ID = 63;
+      public static final int HOOD_SERVO_HUB_CAN_ID = 62;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_1 =
           ServoChannel.ChannelId.kChannelId0;
       public static final ServoChannel.ChannelId HOOD_SERVO_CHANNEL_2 =
@@ -114,9 +118,15 @@ public final class Constants {
       static {
         // Azimuth Motor Config
         applyAzimuthConfig(
-            leftAzimuthConfig, leftMinAzimuthControlAngle, leftMaxAzimuthControlAngle);
+            leftAzimuthConfig,
+            leftMinAzimuthControlAngle,
+            leftMaxAzimuthControlAngle,
+            leftAzimuthEncoder);
         applyAzimuthConfig(
-            rightAzimuthConfig, rightMinAzimuthControlAngle, rightMaxAzimuthControlAngle);
+            rightAzimuthConfig,
+            rightMinAzimuthControlAngle,
+            rightMaxAzimuthControlAngle,
+            rightAzimuthEncoder);
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
@@ -129,13 +139,17 @@ public final class Constants {
       }
 
       private static void applyAzimuthConfig(
-          TalonFXConfiguration config, double minControlAngleDeg, double maxControlAngleDeg) {
+          TalonFXConfiguration config,
+          double minControlAngleDeg,
+          double maxControlAngleDeg,
+          CANcoder encoder) {
         config.Slot0.kP = azimuthKP;
         config.Slot0.kV = azimuthKV;
         config.Slot0.kD = azimuthKD;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.Feedback.withRemoteCANcoder(encoder);
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
             Units.degreesToRotations(
                     maxControlAngleDeg + azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
