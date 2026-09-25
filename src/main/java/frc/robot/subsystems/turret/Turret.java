@@ -147,16 +147,16 @@ public class Turret extends SubsystemBase {
     // }
   }
 
-  private void updateDisabledZeroing() {
-    // boolean zeroSwitchClosed =
-    //     usesCandiS1
-    //         ? Boolean.TRUE.equals(turretZeroingCandi.getS1Closed().getValue())
-    //         : Boolean.TRUE.equals(turretZeroingCandi.getS2Closed().getValue());
-    // if (zeroSwitchClosed && !zeroSwitchClosedLastPoll) {
-    //   azimuth.zeroPosition();
-    // }
-    // zeroSwitchClosedLastPoll = zeroSwitchClosed;
-  }
+  // private void updateDisabledZeroing() {
+  //   // boolean zeroSwitchClosed =
+  //   //     usesCandiS1
+  //   //         ? Boolean.TRUE.equals(turretZeroingCandi.getS1Closed().getValue())
+  //   //         : Boolean.TRUE.equals(turretZeroingCandi.getS2Closed().getValue());
+  //   // if (zeroSwitchClosed && !zeroSwitchClosedLastPoll) {
+  //   //   azimuth.zeroPosition();
+  //   // }
+  //   // zeroSwitchClosedLastPoll = zeroSwitchClosed;
+  // }
 
   private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
     double referenceSetpointDegrees =
