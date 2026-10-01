@@ -1,10 +1,12 @@
 package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -72,6 +74,16 @@ public final class Constants {
 
       public static final CANcoder leftAzimuthEncoder = new CANcoder(48, CANivore);
       public static final CANcoder rightAzimuthEncoder = new CANcoder(47, CANivore);
+      public static final CANcoderConfiguration leftConfig = new CANcoderConfiguration();
+      public static final CANcoderConfiguration rightConfig = new CANcoderConfiguration();
+
+      public static final double leftEncoderOffset = 0.385009765625;
+      public static final double rightEncoderOffset = 0.394287109375;
+
+      public static final SensorDirectionValue leftEncoderDirection =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue rightEncoderDirection =
+          SensorDirectionValue.Clockwise_Positive;
 
       public static final double azimuthGearRatio = 10;
       public static final double flywheelGearRatio = 1.0;
@@ -121,12 +133,18 @@ public final class Constants {
             leftAzimuthConfig,
             leftMinAzimuthControlAngle,
             leftMaxAzimuthControlAngle,
-            leftAzimuthEncoder);
+            leftAzimuthEncoder,
+            leftConfig,
+            leftEncoderOffset,
+            leftEncoderDirection);
         applyAzimuthConfig(
             rightAzimuthConfig,
             rightMinAzimuthControlAngle,
             rightMaxAzimuthControlAngle,
-            rightAzimuthEncoder);
+            rightAzimuthEncoder,
+            rightConfig,
+            rightEncoderOffset,
+            rightEncoderDirection);
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
@@ -142,14 +160,17 @@ public final class Constants {
           TalonFXConfiguration config,
           double minControlAngleDeg,
           double maxControlAngleDeg,
-          CANcoder encoder) {
+          CANcoder encoder,
+          CANcoderConfiguration encoderConfig,
+          double encoderMagnetOffset,
+          SensorDirectionValue encoderDirection) {
         config.Slot0.kP = azimuthKP;
         config.Slot0.kV = azimuthKV;
         config.Slot0.kD = azimuthKD;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        config.Feedback.withRemoteCANcoder(encoder);
+        // config.Feedback.withRemoteCANcoder(encoder);
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
             Units.degreesToRotations(
                     maxControlAngleDeg + azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
@@ -163,6 +184,9 @@ public final class Constants {
         config.CurrentLimits.SupplyCurrentLimit = 25;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
+
+        encoderConfig.MagnetSensor.SensorDirection = encoderDirection;
+        encoderConfig.MagnetSensor.MagnetOffset = encoderMagnetOffset;
       }
     }
 
