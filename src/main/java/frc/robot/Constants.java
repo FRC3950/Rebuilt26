@@ -80,10 +80,13 @@ public final class Constants {
       public static final double leftEncoderOffset = 0.385009765625;
       public static final double rightEncoderOffset = 0.394287109375;
 
+      public static final double leftTurretAzimuthOffset = 0.33;
+      public static final double rightTurretAzimuthOffset = 0;
+
       public static final SensorDirectionValue leftEncoderDirection =
           SensorDirectionValue.CounterClockwise_Positive;
       public static final SensorDirectionValue rightEncoderDirection =
-          SensorDirectionValue.Clockwise_Positive;
+          SensorDirectionValue.CounterClockwise_Positive;
 
       public static final double azimuthGearRatio = 10;
       public static final double flywheelGearRatio = 1.0;
@@ -136,7 +139,8 @@ public final class Constants {
             leftAzimuthEncoder,
             leftConfig,
             leftEncoderOffset,
-            leftEncoderDirection);
+            leftEncoderDirection,
+            leftTurretAzimuthOffset);
         applyAzimuthConfig(
             rightAzimuthConfig,
             rightMinAzimuthControlAngle,
@@ -144,7 +148,8 @@ public final class Constants {
             rightAzimuthEncoder,
             rightConfig,
             rightEncoderOffset,
-            rightEncoderDirection);
+            rightEncoderDirection,
+            rightTurretAzimuthOffset);
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
@@ -163,14 +168,15 @@ public final class Constants {
           CANcoder encoder,
           CANcoderConfiguration encoderConfig,
           double encoderMagnetOffset,
-          SensorDirectionValue encoderDirection) {
+          SensorDirectionValue encoderDirection,
+          double azimuthOffset) {
         config.Slot0.kP = azimuthKP;
         config.Slot0.kV = azimuthKV;
         config.Slot0.kD = azimuthKD;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        // config.Feedback.withRemoteCANcoder(encoder);
+        config.Feedback.withRemoteCANcoder(encoder);
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
             Units.degreesToRotations(
                     maxControlAngleDeg + azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
@@ -180,6 +186,7 @@ public final class Constants {
             Units.degreesToRotations(
                     minControlAngleDeg - azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
                 * azimuthGearRatio;
+        config.Feedback.FeedbackRotorOffset = azimuthOffset;
         config.CurrentLimits.StatorCurrentLimit = 60;
         config.CurrentLimits.SupplyCurrentLimit = 25;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
