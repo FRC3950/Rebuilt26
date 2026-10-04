@@ -150,6 +150,8 @@ public class RobotContainer {
             leftAzimuthConfig,
             leftMinAzimuthControlAngle,
             leftMaxAzimuthControlAngle,
+            Constants.SubsystemConstants.Turret.leftAzimuthEncoder,
+            Constants.SubsystemConstants.Turret.leftAzimuthStartupCenterDeg,
             HOOD_SERVO_CHANNEL_2,
             flywheelID,
             flywheelConfig,
@@ -161,11 +163,27 @@ public class RobotContainer {
             rightAzimuthConfig,
             rightMinAzimuthControlAngle,
             rightMaxAzimuthControlAngle,
+            Constants.SubsystemConstants.Turret.rightAzimuthEncoder,
+            Constants.SubsystemConstants.Turret.rightAzimuthStartupCenterDeg,
             HOOD_SERVO_CHANNEL_1,
             flywheelID2,
             flywheelConfig,
             flywheelFollowerID2,
             CANivore);
+    turret1.setStartupInterlock(() -> turret1.isStartupReady() && turret2.isStartupReady());
+    turret2.setStartupInterlock(() -> turret1.isStartupReady() && turret2.isStartupReady());
+    SmartDashboard.putData(
+        "Turrets/Confirm both startup windows",
+        Commands.runOnce(
+                () -> {
+                  if (DriverStation.isDisabled()) {
+                    turret1.initializeFromStartupWindow();
+                    turret2.initializeFromStartupWindow();
+                  }
+                },
+                turret1,
+                turret2)
+            .ignoringDisable(true));
     turretVisualization = new TurretVisualization(turret1, turret2);
     fieldPublisher = new Field2dPublisher("Field", drive::getPose);
 

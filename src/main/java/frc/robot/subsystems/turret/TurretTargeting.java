@@ -79,7 +79,9 @@ public class TurretTargeting extends Command {
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    turret.stop();
+  }
 
   @Override
   public boolean isFinished() {

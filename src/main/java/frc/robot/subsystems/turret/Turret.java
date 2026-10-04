@@ -4,7 +4,7 @@ import static frc.robot.Constants.SubsystemConstants.Turret.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-// import com.ctre.phoenix6.hardware.CANdi;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -12,11 +12,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.turret.turret_base.Azimuth;
 import frc.robot.subsystems.turret.turret_base.Flywheels;
 import frc.robot.subsystems.turret.turret_base.Hood;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Turret extends SubsystemBase {
@@ -27,11 +30,9 @@ public class Turret extends SubsystemBase {
   private final Azimuth azimuth;
   private final double minAzimuthControlAngleDeg;
   private final double maxAzimuthControlAngleDeg;
-  // private final CANdi turretZeroingCandi;
-  // private final boolean usesCandiS1;
+  private BooleanSupplier bothTurretsReady = () -> false;
 
   private static boolean lockedIn = false;
-  // private boolean zeroSwitchClosedLastPoll = false;
 
   // private final Mechanism2d mechanism;
   // private final MechanismRoot2d mechRoot;
@@ -42,6 +43,8 @@ public class Turret extends SubsystemBase {
       TalonFXConfiguration azimuthConfig,
       double minAzimuthControlAngleDeg,
       double maxAzimuthControlAngleDeg,
+      CANcoder azimuthEncoder,
+      double startupCenterDeg,
       ServoChannel.ChannelId hoodChannelId,
       int flywheelID,
       TalonFXConfiguration flywheelConfig,
@@ -50,12 +53,17 @@ public class Turret extends SubsystemBase {
     setName("Turret" + azimuthMotorId);
     this.minAzimuthControlAngleDeg = minAzimuthControlAngleDeg;
     this.maxAzimuthControlAngleDeg = maxAzimuthControlAngleDeg;
-    // usesCandiS1 = azimuthMotorId == frc.robot.Constants.SubsystemConstants.Turret.azimuthID;
-    // turretZeroingCandi =
-    //     Constants.currentMode == Constants.Mode.REAL ? new CANdi(TURRET_CANDI_ID, canbus) : null;
     hood = new Hood(hoodChannelId);
     flywheels = new Flywheels(flywheelID, flywheelConfig, flywheelFollowerID, canbus);
-    azimuth = new Azimuth(azimuthMotorId, azimuthConfig, canbus);
+    azimuth =
+        new Azimuth(
+            azimuthMotorId,
+            azimuthConfig,
+            canbus,
+            azimuthEncoder,
+            startupCenterDeg,
+            minAzimuthControlAngleDeg,
+            maxAzimuthControlAngleDeg);
   }
 
   /** Returns the live turret pose with robot-relative translation and measured azimuth. */
@@ -74,8 +82,23 @@ public class Turret extends SubsystemBase {
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
+    if (DriverStation.isDisabled() || !bothTurretsReady.getAsBoolean()) {
+      stop();
+      return;
+    }
+    double referenceAngleDeg = azimuth.getWrapReferenceAngleDeg();
+    if (!Double.isFinite(referenceAngleDeg)) {
+      // Retry next scheduler tick without issuing targets from invalid startup feedback.
+      stop();
+      return;
+    }
     double targetAzimuthDegrees = turretAngleRobot.getDegrees();
-    double setpointDegrees = selectSafeSetpointDegrees(targetAzimuthDegrees);
+    double setpointDegrees =
+        selectSafeSetpointDegrees(
+            targetAzimuthDegrees,
+            referenceAngleDeg,
+            minAzimuthControlAngleDeg,
+            maxAzimuthControlAngleDeg);
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
 
     azimuth.setTargetAngleDeg(setpointDegrees);
@@ -138,30 +161,42 @@ public class Turret extends SubsystemBase {
     return getTargetingMode();
   }
 
-  @Override
-  public void periodic() {
-    // if (DriverStation.isDisabled() && turretZeroingCandi != null) {
-    //   updateDisabledZeroing();
-    // } else {
-    //   zeroSwitchClosedLastPoll = false;
-    // }
+  public void setStartupInterlock(BooleanSupplier bothTurretsReady) {
+    this.bothTurretsReady = bothTurretsReady;
   }
 
-  // private void updateDisabledZeroing() {
-  //   // boolean zeroSwitchClosed =
-  //   //     usesCandiS1
-  //   //         ? Boolean.TRUE.equals(turretZeroingCandi.getS1Closed().getValue())
-  //   //         : Boolean.TRUE.equals(turretZeroingCandi.getS2Closed().getValue());
-  //   // if (zeroSwitchClosed && !zeroSwitchClosedLastPoll) {
-  //   //   azimuth.zeroPosition();
-  //   // }
-  //   // zeroSwitchClosedLastPoll = zeroSwitchClosed;
-  // }
+  public void initializeFromStartupWindow() {
+    azimuth.initializeFromStartupWindow();
+  }
 
-  private double selectSafeSetpointDegrees(double targetAzimuthDegrees) {
+  @AutoLogOutput
+  public boolean isStartupReady() {
+    return azimuth.isStartupReady();
+  }
+
+  public void stop() {
+    azimuth.stop();
+    flywheels.stop();
+  }
+
+  @Override
+  public void periodic() {
+    azimuth.updateStartup();
+    if (DriverStation.isDisabled() || !bothTurretsReady.getAsBoolean()) {
+      stop();
+    }
+    SmartDashboard.putBoolean(getName() + "/StartupReady", isStartupReady());
+    SmartDashboard.putString(getName() + "/StartupStatus", azimuth.getStartupStatus());
+    SmartDashboard.putNumber(getName() + "/StartupAngleDeg", azimuth.getStartupAngleDeg());
+  }
+
+  static double selectSafeSetpointDegrees(
+      double targetAzimuthDegrees,
+      double referenceAngleDeg,
+      double minAzimuthControlAngleDeg,
+      double maxAzimuthControlAngleDeg) {
     double referenceSetpointDegrees =
-        MathUtil.clamp(
-            azimuth.getSetpointDeg(), minAzimuthControlAngleDeg, maxAzimuthControlAngleDeg);
+        MathUtil.clamp(referenceAngleDeg, minAzimuthControlAngleDeg, maxAzimuthControlAngleDeg);
     double bestCandidateDegrees = Double.NaN;
     double bestErrorDegrees = Double.POSITIVE_INFINITY;
 
