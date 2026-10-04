@@ -184,6 +184,17 @@ public class RobotContainer {
                 turret1,
                 turret2)
             .ignoringDisable(true));
+    SmartDashboard.putData(
+        "Turrets/Use hub tracking",
+        Commands.runOnce(
+                () -> {
+                  if (DriverStation.isDisabled()) {
+                    Turret.useHubTracking();
+                  }
+                },
+                turret1,
+                turret2)
+            .ignoringDisable(true));
     turretVisualization = new TurretVisualization(turret1, turret2);
     fieldPublisher = new Field2dPublisher("Field", drive::getPose);
 
