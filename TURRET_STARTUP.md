@@ -32,12 +32,6 @@ not measurements inferred from the earlier sketch.
 4. Clear people from the mechanism and enable. Tracking can move the turrets immediately. Initial
    testing should have no fuel loaded, a clear mechanism, and an operator ready to disable.
 
-For hub tracking, while disabled run **Turrets/Use hub tracking**. Both **TargetingMode** displays
-should read **Tracking target**. **Fixed angle (-135 deg)** means the operator A toggle has selected
-the fixed-angle mode: in that mode the turrets do not follow the hub. The startup-window center
-and this operating mode are separate settings. With normal default commands, tracking targets the
-hub; held ferry-shot overrides can select a different target.
-
 The action reads calibrated AbsolutePosition and adds the integer sensor turn nearest the center.
 It assigns CANcoder **Position**, then checks both CANcoder Position and Talon selected feedback.
 It does not change MagnetOffset or reset AbsolutePosition. No limit switches or previous-angle

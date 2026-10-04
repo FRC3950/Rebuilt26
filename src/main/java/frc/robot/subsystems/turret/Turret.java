@@ -114,10 +114,6 @@ public class Turret extends SubsystemBase {
     runSetpoints(Rotation2d.fromDegrees(-135), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 
-  public static void useHubTracking() {
-    lockedIn = false;
-  }
-
   public static void toggleTurretMode() {
     if (lockedIn) {
       lockedIn = false;
@@ -190,8 +186,6 @@ public class Turret extends SubsystemBase {
       stop();
     }
     SmartDashboard.putBoolean(getName() + "/StartupReady", isStartupReady());
-    SmartDashboard.putString(
-        getName() + "/TargetingMode", lockedIn ? "Fixed angle (-135 deg)" : "Tracking target");
     SmartDashboard.putString(getName() + "/StartupStatus", azimuth.getStartupStatus());
     SmartDashboard.putNumber(getName() + "/StartupAngleDeg", azimuth.getStartupAngleDeg());
   }
