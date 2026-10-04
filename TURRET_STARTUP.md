@@ -26,7 +26,9 @@ not measurements inferred from the earlier sketch.
 3. Wait for **Turret19/StartupReady** and **Turret17/StartupReady** to both become true. Read each
    **StartupStatus** if initialization fails. **StartupAngleDeg** should match the physical angle
    inside its window. The software verifies CANcoder and Talon feedback within 0.5 degree and times
-   out after 1 second; that does not independently verify physical placement.
+   out after 1 second following a successful position write; that does not independently verify
+   physical placement. The write uses a 0.1-second Phoenix timeout on a background worker, keeping
+   the command scheduler responsive. A rejected write shows its exact Phoenix status and description.
 4. Clear people from the mechanism and enable. Tracking can move the turrets immediately. Initial
    testing should have no fuel loaded, a clear mechanism, and an operator ready to disable.
 

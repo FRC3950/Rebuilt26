@@ -3,6 +3,7 @@ package frc.robot.subsystems.turret.turret_base;
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -11,6 +12,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class Azimuth {
 
@@ -28,6 +31,7 @@ public class Azimuth {
   private boolean verifyingStartup = false;
   private double startupSensorRotations = Double.NaN;
   private double verificationStartSec;
+  private CompletableFuture<StatusCode> startupPositionWrite;
   private String startupStatus = "Confirm both physical startup windows while disabled";
 
   public Azimuth(
@@ -108,6 +112,10 @@ public class Azimuth {
     if (!DriverStation.isDisabled() || Constants.currentMode != Constants.Mode.REAL) {
       return;
     }
+    // An aborted attempt may still be finishing its bounded CAN call. Never overlap writes.
+    if (startupPositionWrite != null && !startupPositionWrite.isDone()) {
+      return;
+    }
     failStartup("Initializing");
     if (!configurationApplied) {
       failStartup("Talon configuration failed; restart robot code and check CAN");
@@ -134,14 +142,14 @@ public class Azimuth {
     // Consume previous resets. Any new reset during verification invalidates this attempt.
     encoder.hasResetOccurred();
     // Assign the reconstructed turn count, preserving the calibrated absolute/magnet offset.
-    // Zero timeout avoids waiting on CAN in the scheduler; later ticks verify propagation.
-    if (!encoder.setPosition(startupSensorRotations, 0.0).isOK()) {
-      failStartup("CANcoder position assignment failed");
-      return;
-    }
-    verificationStartSec = Timer.getFPGATimestamp();
+    // Phoenix rejects a zero timeout. Run its bounded blocking write off the scheduler thread.
+    startupPositionWrite =
+        StartupPositionWrite.submit(
+            (position, timeout) -> encoder.setPosition(position, timeout),
+            startupSensorRotations,
+            azimuthStartupPositionWriteTimeoutSec);
     verifyingStartup = true;
-    startupStatus = "Verifying CANcoder and Talon feedback";
+    startupStatus = "Assigning CANcoder position";
   }
 
   public void updateStartup() {
@@ -165,6 +173,30 @@ public class Azimuth {
     if (verifyingStartup && !DriverStation.isDisabled()) {
       failStartup("Enabled before verification completed; disable and confirm again");
       return;
+    }
+    if (verifyingStartup && startupPositionWrite != null) {
+      if (!startupPositionWrite.isDone()) {
+        return;
+      }
+      StatusCode writeStatus;
+      try {
+        writeStatus = startupPositionWrite.join();
+      } catch (CompletionException exception) {
+        startupPositionWrite = null;
+        failStartup("CANcoder position assignment threw: " + exception.getCause());
+        return;
+      }
+      startupPositionWrite = null;
+      if (!writeStatus.isOK()) {
+        failStartup(
+            "CANcoder position assignment failed: "
+                + writeStatus.getName()
+                + " - "
+                + writeStatus.getDescription());
+        return;
+      }
+      verificationStartSec = Timer.getFPGATimestamp();
+      startupStatus = "Verifying CANcoder and Talon feedback";
     }
     var sensorPosition = encoder.getPosition();
     var motorPosition = azimuth.getPosition();

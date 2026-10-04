@@ -96,6 +96,7 @@ public final class Constants {
       public static final double azimuthStartupVerificationToleranceDeg = 0.5;
       public static final double azimuthStartupVerificationTimeoutSec = 1.0;
       public static final double azimuthStartupVerificationDelaySec = 0.05;
+      public static final double azimuthStartupPositionWriteTimeoutSec = 0.1;
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)
