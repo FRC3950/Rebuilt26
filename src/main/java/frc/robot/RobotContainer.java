@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.controls.CrazyModeBindings;
+import frc.robot.controls.TuneModeBindings;
 import frc.robot.generated.TunerConstants;
 import frc.robot.sim.FuelSimCommand;
 import frc.robot.sim.FuelSimulationController;
@@ -64,7 +65,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   public enum BindingMode {
     COMPETITION,
-    CRAZY
+    CRAZY,
+    TUNE
   }
 
   private final Drive drive;
@@ -81,6 +83,7 @@ public class RobotContainer {
 
   private final EventLoop competitionButtonLoop = new EventLoop();
   private final EventLoop crazyButtonLoop = new EventLoop();
+  private final EventLoop tuneButtonLoop = new EventLoop();
 
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
@@ -249,9 +252,11 @@ public class RobotContainer {
     bindingModeChooser = new LoggedDashboardChooser<>("Code Mode");
     bindingModeChooser.addDefaultOption("Competition", BindingMode.COMPETITION);
     bindingModeChooser.addOption("CRAZY", BindingMode.CRAZY);
+    bindingModeChooser.addOption("TUNE", BindingMode.TUNE);
 
     configureCompetitionBindings();
     configureCrazyBindings();
+    configureTuneBindings();
     applyCompetitionDefaults();
     applyBindingMode(BindingMode.COMPETITION);
   }
@@ -373,12 +378,17 @@ public class RobotContainer {
     CrazyModeBindings.configure(crazyButtonLoop, driver, drive, intake, indexer, turret1, turret2);
   }
 
+  private void configureTuneBindings() {
+    TuneModeBindings.configure(tuneButtonLoop, driver, drive, intake, indexer, turret1, turret2);
+  }
+
   private void applyBindingMode(BindingMode bindingMode) {
     CommandScheduler.getInstance()
         .setActiveButtonLoop(
             switch (bindingMode) {
               case COMPETITION -> competitionButtonLoop;
               case CRAZY -> crazyButtonLoop;
+              case TUNE -> tuneButtonLoop;
             });
 
     appliedBindingMode = bindingMode;
