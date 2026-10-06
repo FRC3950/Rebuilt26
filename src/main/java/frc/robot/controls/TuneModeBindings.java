@@ -19,6 +19,8 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.GetAdjustedShot;
 import frc.robot.subsystems.turret.Turret;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Shot table tuning. Both turrets share one hood/flywheel setpoint because they read the same
@@ -117,18 +119,21 @@ public final class TuneModeBindings {
     double distanceMeters =
         (getDistanceToHub(robotPose, robotToTurret1) + getDistanceToHub(robotPose, robotToTurret2))
             / 2.0;
-    boolean written =
-        GetAdjustedShot.saveTunedRow(
-            distanceMeters, setpoint.hoodAngleDeg(), setpoint.flywheelRps());
+    String result;
+    try {
+      File file =
+          GetAdjustedShot.saveTunedRow(
+              distanceMeters, setpoint.hoodAngleDeg(), setpoint.flywheelRps());
+      result = "Saved to " + file.getPath();
+    } catch (IOException e) {
+      result = "In use but FILE WRITE FAILED (" + e.getMessage() + ")";
+    }
 
     SmartDashboard.putString(
         SAVE_STATUS_KEY,
         String.format(
             "%s d=%.2f m, hood=%.1f, rps=%.1f",
-            written ? "Saved" : "In use but FILE WRITE FAILED:",
-            distanceMeters,
-            setpoint.hoodAngleDeg(),
-            setpoint.flywheelRps()));
+            result, distanceMeters, setpoint.hoodAngleDeg(), setpoint.flywheelRps()));
   }
 
   private static void publishTuneTelemetry(Pose2d robotPose) {

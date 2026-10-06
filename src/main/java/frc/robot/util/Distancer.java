@@ -3,6 +3,7 @@ package frc.robot.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.wpilibj.Filesystem;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -58,24 +59,16 @@ public record Distancer(double hoodAngleDeg, double flywheelRps, double tofSec) 
     }
   }
 
-  public static boolean saveRowsToDeploy(String filename, List<Row> rows) {
-    try {
-      DistancerFile data = new DistancerFile();
-      data.units = new Units();
-      data.units.distance = "m";
-      data.units.hood = "deg";
-      data.units.flywheel = "rps";
-      data.units.tof = "s";
-      data.points = rows;
+  public static void saveRows(File file, List<Row> rows) throws IOException {
+    DistancerFile data = new DistancerFile();
+    data.units = new Units();
+    data.units.distance = "m";
+    data.units.hood = "deg";
+    data.units.flywheel = "rps";
+    data.units.tof = "s";
+    data.points = rows;
 
-      File file = new File(Filesystem.getDeployDirectory(), filename);
-      new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(file, data);
-      return true;
-
-    } catch (Exception e) {
-      System.err.println("[Distancer] Failed to save " + filename + ": " + e.getMessage());
-      return false;
-    }
+    new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(file, data);
   }
 
   private static double lerp(double a, double b, double t) {
