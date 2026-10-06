@@ -141,9 +141,17 @@ public final class TuneModeBindings {
     if (!Double.isFinite(hoodAngleDeg)) {
       return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, false, "Hood NaN");
     }
-    if (hoodAngleDeg < minHoodAngle || hoodAngleDeg > maxHoodAngle) {
-      return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, false, "Hood out of range");
+    // Dashboard widgets can land a hair past a limit, e.g. 12.9999 still displays as 13.
+    double roundedHoodDeg = Math.round(hoodAngleDeg * 100.0) / 100.0;
+    if (roundedHoodDeg < minHoodAngle || roundedHoodDeg > maxHoodAngle) {
+      return new TurretTuneSetpoint(
+          hoodAngleDeg,
+          flywheelRps,
+          false,
+          String.format(
+              "Hood %.4f out of range (%.2f-%.2f)", hoodAngleDeg, minHoodAngle, maxHoodAngle));
     }
+    hoodAngleDeg = roundedHoodDeg;
     if (!Double.isFinite(flywheelRps)) {
       return new TurretTuneSetpoint(hoodAngleDeg, flywheelRps, false, "Flywheel NaN");
     }
