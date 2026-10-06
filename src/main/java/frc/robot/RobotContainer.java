@@ -1,8 +1,5 @@
 package frc.robot;
 
-import static frc.robot.Constants.FieldConstants.getCloserFerryTarget;
-import static frc.robot.Constants.FieldConstants.getHubTranslation;
-import static frc.robot.Constants.FieldConstants.isRobotInNeutralZone;
 import static frc.robot.Constants.SubsystemConstants.CANivore;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_1;
 import static frc.robot.Constants.SubsystemConstants.Turret.HOOD_SERVO_CHANNEL_2;
@@ -24,17 +21,10 @@ import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.controls.CrazyModeBindings;
@@ -58,15 +48,9 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Field2dPublisher;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
-  public enum BindingMode {
-    COMPETITION,
-    CRAZY
-  }
-
   private final Drive drive;
   private final Turret turret1;
   private final Turret turret2;
@@ -79,13 +63,7 @@ public class RobotContainer {
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
 
-  private final EventLoop competitionButtonLoop = new EventLoop();
-  private final EventLoop crazyButtonLoop = new EventLoop();
-
   private final LoggedDashboardChooser<Command> autoChooser;
-  private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
-
-  private BindingMode appliedBindingMode = BindingMode.COMPETITION;
 
   public RobotContainer() {
     intake = new Intake();
@@ -228,14 +206,9 @@ public class RobotContainer {
     SmartDashboard.putData("Turret Subsystem", turret1);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
 
-    bindingModeChooser = new LoggedDashboardChooser<>("Code Mode");
-    bindingModeChooser.addDefaultOption("Competition", BindingMode.COMPETITION);
-    bindingModeChooser.addOption("CRAZY", BindingMode.CRAZY);
-
-    configureCompetitionBindings();
-    configureCrazyBindings();
-    applyCompetitionDefaults();
-    applyBindingMode(BindingMode.COMPETITION);
+    CrazyModeBindings.configure(driver, drive, intake, indexer, turret1, turret2);
+    configureEmergencyBindings();
+    configureDefaults();
   }
 
   public Command getAutonomousCommand() {
@@ -252,27 +225,9 @@ public class RobotContainer {
     indexer.stopHotdog();
   }
 
-  public void checkMode() {
-    BindingMode selectedBindingMode = getSelectedBindingMode();
-    SmartDashboard.putString("Code Mode/Selected", selectedBindingMode.name());
-    Logger.recordOutput("Controls/BindingModeSelected", selectedBindingMode.name());
-
-    if (!shouldApplyBindingMode(
-        selectedBindingMode, appliedBindingMode, DriverStation.isDisabled())) {
-      return;
-    }
-
-    applyBindingMode(selectedBindingMode);
-  }
-
-  static boolean shouldApplyBindingMode(
-      BindingMode selectedBindingMode, BindingMode currentBindingMode, boolean isDisabled) {
-    return isDisabled && selectedBindingMode != currentBindingMode;
-  }
-
-  private void configureCompetitionBindings() {
+  private void configureEmergencyBindings() {
     operator
-        .leftTrigger(0.5, competitionButtonLoop)
+        .leftTrigger(0.5)
         .whileTrue(
             new IntakeCommand(
                 intake,
@@ -280,25 +235,10 @@ public class RobotContainer {
                   var speeds = drive.getRobotRelativeSpeeds();
                   return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
                 }));
-    Trigger neutralZoneFerryTrigger =
-        new Trigger(competitionButtonLoop, () -> isRobotInNeutralZone(drive.getPose().getX()));
-    neutralZoneFerryTrigger.whileTrue(
-        Commands.parallel(
-            new TurretTargeting(
-                turret1,
-                drive,
-                robotToTurret1,
-                () -> getCloserFerryTarget(drive.getPose().getTranslation())),
-            new TurretTargeting(
-                turret2,
-                drive,
-                robotToTurret2,
-                () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
-
-    operator.rightBumper(competitionButtonLoop).onTrue(intake.retractCommand());
+    operator.rightBumper().onTrue(intake.retractCommand());
 
     operator
-        .rightTrigger(0.5, competitionButtonLoop)
+        .rightTrigger(0.5)
         .whileTrue(
             Commands.startEnd(
                 () -> {
@@ -311,69 +251,29 @@ public class RobotContainer {
                 },
                 indexer));
 
-    driver
-        .y(competitionButtonLoop)
-        .onTrue(
-            Commands.runOnce(
-                () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                drive));
-    driver
-        .a(competitionButtonLoop)
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -driver.getLeftY(),
-                () -> -driver.getLeftX(),
-                () -> {
-                  Translation2d robotToHub =
-                      getHubTranslation().minus(drive.getPose().getTranslation());
-                  return new Rotation2d(robotToHub.getX(), robotToHub.getY())
-                      .rotateBy(new Rotation2d(Math.PI));
-                }));
     operator
-        .b(competitionButtonLoop)
+        .b()
+        .and(operator.start().negate())
         .whileTrue(
             Commands.startEnd(
                 () -> {
-                  intake.reverseIntake();
-                  indexer.reverseHotdog();
+                  indexer.setIndexerSpeed(-Constants.SubsystemConstants.Indexer.indexerSpeed);
+                  indexer.setHotdogSpeed(-Constants.SubsystemConstants.Indexer.hotdogSpeed);
                 },
                 () -> {
-                  intake.stopIntake();
+                  indexer.stopIndexer();
                   indexer.stopHotdog();
                 },
-                intake,
                 indexer));
-
     operator
-        .a(competitionButtonLoop)
-        .onTrue(Commands.runOnce(Turret::toggleTurretMode))
-        .debounce(0.25);
+        .start()
+        .and(operator.b())
+        .whileTrue(Commands.startEnd(intake::reverseIntake, intake::stopIntake, intake));
+
+    operator.a().onTrue(Commands.runOnce(Turret::toggleTurretMode)).debounce(0.25);
   }
 
-  private void configureCrazyBindings() {
-    CrazyModeBindings.configure(crazyButtonLoop, driver, drive, intake, indexer, turret1, turret2);
-  }
-
-  private void applyBindingMode(BindingMode bindingMode) {
-    CommandScheduler.getInstance()
-        .setActiveButtonLoop(
-            switch (bindingMode) {
-              case COMPETITION -> competitionButtonLoop;
-              case CRAZY -> crazyButtonLoop;
-            });
-
-    appliedBindingMode = bindingMode;
-    SmartDashboard.putString("Code Mode/Applied", appliedBindingMode.name());
-    Logger.recordOutput("Controls/BindingModeApplied", appliedBindingMode.name());
-  }
-
-  private BindingMode getSelectedBindingMode() {
-    BindingMode selectedBindingMode = bindingModeChooser.get();
-    return selectedBindingMode != null ? selectedBindingMode : BindingMode.COMPETITION;
-  }
-
-  private void applyCompetitionDefaults() {
+  private void configureDefaults() {
 
     // turret1.setDefaultCommand(
     //     new TurretTargeting(turret1, drive, robotToTurret1, Turret.getTargetingMode()));
