@@ -17,6 +17,7 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.turret.GetAdjustedShot;
 import frc.robot.subsystems.turret.Turret;
 
 /**
@@ -30,6 +31,7 @@ public final class TuneModeBindings {
   private static final String SHARED_STATUS_KEY = "Tune/Setpoints Status";
   private static final String LEFT_TURRET_DISTANCE_KEY = "Tune/Left Turret To Hub Distance M";
   private static final String RIGHT_TURRET_DISTANCE_KEY = "Tune/Right Turret To Hub Distance M";
+  private static final String SAVE_STATUS_KEY = "Tune/Save Status";
 
   private TuneModeBindings() {}
 
@@ -90,6 +92,43 @@ public final class TuneModeBindings {
                 },
                 leftTurret,
                 rightTurret));
+
+    driver
+        .a(buttonLoop)
+        .onTrue(Commands.runOnce(() -> saveTunePoint(drive.getPose())).ignoringDisable(true));
+  }
+
+  private static void saveTunePoint(Pose2d robotPose) {
+    TurretTuneSetpoint setpoint =
+        validateTuneSetpoint(
+            SmartDashboard.getNumber(SHARED_HOOD_KEY, Double.NaN),
+            SmartDashboard.getNumber(SHARED_FLYWHEEL_KEY, 0.0));
+    if (!setpoint.valid()) {
+      SmartDashboard.putString(SAVE_STATUS_KEY, "Not saved: " + setpoint.status());
+      return;
+    }
+    if (setpoint.flywheelRps() <= 0.0) {
+      SmartDashboard.putString(SAVE_STATUS_KEY, "Not saved: flywheel is 0");
+      return;
+    }
+
+    // Both turrets share one table row, so save the distance between them. Line up head-on to the
+    // hub so the two turret distances match.
+    double distanceMeters =
+        (getDistanceToHub(robotPose, robotToTurret1) + getDistanceToHub(robotPose, robotToTurret2))
+            / 2.0;
+    boolean written =
+        GetAdjustedShot.saveTunedRow(
+            distanceMeters, setpoint.hoodAngleDeg(), setpoint.flywheelRps());
+
+    SmartDashboard.putString(
+        SAVE_STATUS_KEY,
+        String.format(
+            "%s d=%.2f m, hood=%.1f, rps=%.1f",
+            written ? "Saved" : "In use but FILE WRITE FAILED:",
+            distanceMeters,
+            setpoint.hoodAngleDeg(),
+            setpoint.flywheelRps()));
   }
 
   private static void publishTuneTelemetry(Pose2d robotPose) {
@@ -122,6 +161,7 @@ public final class TuneModeBindings {
     SmartDashboard.putString(SHARED_STATUS_KEY, "Idle");
     SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, 0.0);
     SmartDashboard.putNumber(RIGHT_TURRET_DISTANCE_KEY, 0.0);
+    SmartDashboard.putString(SAVE_STATUS_KEY, "Nothing saved yet");
   }
 
   private static void applyTurretTune(

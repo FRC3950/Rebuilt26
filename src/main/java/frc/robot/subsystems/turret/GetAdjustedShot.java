@@ -12,6 +12,8 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
 import frc.robot.util.Distancer;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class GetAdjustedShot {
@@ -39,15 +41,24 @@ public class GetAdjustedShot {
     }
   }
 
+  private static final String SHOT_TABLE_FILE = "shot_table.json";
+  // A tuned row replaces any existing row this close to it.
+  private static final double SAME_ROW_TOLERANCE_METERS = 0.1;
+
   private static double minDistance;
   private static double maxDistance;
-  private static final List<Distancer.Row> shotRows;
+  private static final List<Distancer.Row> shotRows = new ArrayList<>();
 
-  private static final InterpolatingTreeMap<Double, Distancer> shotMap =
-      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Distancer::interpolate);
+  private static InterpolatingTreeMap<Double, Distancer> shotMap;
 
   static {
-    shotRows = Distancer.loadRowsFromDeploy("shot_table.json");
+    shotRows.addAll(Distancer.loadRowsFromDeploy(SHOT_TABLE_FILE));
+    rebuildShotMap();
+  }
+
+  private static void rebuildShotMap() {
+    shotRows.sort(Comparator.comparingDouble(r -> r.d));
+    shotMap = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Distancer::interpolate);
     if (shotRows.isEmpty()) {
       minDistance = 0.0;
       maxDistance = 0.0;
@@ -59,6 +70,30 @@ public class GetAdjustedShot {
     for (var r : shotRows) {
       shotMap.put(r.d, new Distancer(r.hoodDeg, r.rps, r.tof));
     }
+  }
+
+  /**
+   * Adds a tuned row, replacing any row within 10 cm, and uses it immediately. Time of flight is
+   * carried over from the current table. Returns whether the table was written back to the deploy
+   * directory; the in-memory table is updated either way.
+   */
+  public static boolean saveTunedRow(double distanceMeters, double hoodDeg, double flywheelRps) {
+    Distancer current = getShotForDistance(distanceMeters);
+
+    Distancer.Row row = new Distancer.Row();
+    row.d = Math.round(distanceMeters * 100.0) / 100.0;
+    row.hoodDeg = hoodDeg;
+    row.rps = flywheelRps;
+    row.tof = current != null ? Math.round(current.tofSec() * 1000.0) / 1000.0 : 0.0;
+
+    shotRows.removeIf(r -> Math.abs(r.d - row.d) < SAME_ROW_TOLERANCE_METERS);
+    shotRows.add(row);
+    rebuildShotMap();
+
+    System.out.printf(
+        "[ShotTable] {\"d\": %.2f, \"hoodDeg\": %.2f, \"rps\": %.2f, \"tof\": %.3f}%n",
+        row.d, row.hoodDeg, row.rps, row.tof);
+    return Distancer.saveRowsToDeploy(SHOT_TABLE_FILE, shotRows);
   }
 
   public ShootingParameters getParameters(Pose2d robotPose, Translation2d robotToTurret) {
