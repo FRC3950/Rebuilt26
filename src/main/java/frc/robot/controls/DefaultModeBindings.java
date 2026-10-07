@@ -9,6 +9,7 @@ import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -21,10 +22,11 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
 
-public final class CrazyModeBindings {
-  private CrazyModeBindings() {}
+public final class DefaultModeBindings {
+  private DefaultModeBindings() {}
 
   public static void configure(
+      EventLoop buttonLoop,
       CommandXboxController driver,
       Drive drive,
       Intake intake,
@@ -32,7 +34,7 @@ public final class CrazyModeBindings {
       Turret turret1,
       Turret turret2) {
     driver
-        .leftTrigger(0.5)
+        .leftTrigger(0.5, buttonLoop)
         .whileTrue(
             new IntakeCommand(
                 intake,
@@ -42,7 +44,7 @@ public final class CrazyModeBindings {
                 }));
 
     Trigger neutralZoneFerryTrigger =
-        new Trigger(() -> isRobotInNeutralZone(drive.getPose().getX()));
+        new Trigger(buttonLoop, () -> isRobotInNeutralZone(drive.getPose().getX()));
     neutralZoneFerryTrigger.whileTrue(
         Commands.parallel(
             new TurretTargeting(
@@ -56,10 +58,10 @@ public final class CrazyModeBindings {
                 robotToTurret2,
                 () -> getCloserFerryTarget(drive.getPose().getTranslation()))));
 
-    driver.rightBumper().onTrue(intake.retractCommand());
+    driver.rightBumper(buttonLoop).onTrue(intake.retractCommand());
 
     driver
-        .rightTrigger(0.5)
+        .rightTrigger(0.5, buttonLoop)
         .whileTrue(
             Commands.startEnd(
                 () -> {
@@ -73,13 +75,13 @@ public final class CrazyModeBindings {
                 indexer));
 
     driver
-        .y()
+        .y(buttonLoop)
         .onTrue(
             Commands.runOnce(
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                 drive));
     driver
-        .a()
+        .a(buttonLoop)
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
@@ -92,8 +94,8 @@ public final class CrazyModeBindings {
                       .rotateBy(new Rotation2d(Math.PI));
                 }));
     driver
-        .b()
-        .and(driver.start().negate())
+        .b(buttonLoop)
+        .and(driver.start(buttonLoop).negate())
         .whileTrue(
             Commands.startEnd(
                 () -> {
@@ -106,10 +108,10 @@ public final class CrazyModeBindings {
                 },
                 indexer));
     driver
-        .start()
-        .and(driver.b())
+        .start(buttonLoop)
+        .and(driver.b(buttonLoop))
         .whileTrue(Commands.startEnd(intake::reverseIntake, intake::stopIntake, intake));
-    new Trigger(() -> driver.getHID().getPOV() == 180)
+    new Trigger(buttonLoop, () -> driver.getHID().getPOV() == 180)
         .onTrue(Commands.runOnce(Turret::toggleTurretMode))
         .debounce(0.25);
   }

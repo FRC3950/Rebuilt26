@@ -10,8 +10,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants;
 import frc.robot.util.Distancer;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class GetAdjustedShot {
@@ -39,15 +44,24 @@ public class GetAdjustedShot {
     }
   }
 
+  private static final String SHOT_TABLE_FILE = "shot_table.json";
+  // A tuned row replaces any existing row this close to it.
+  private static final double SAME_ROW_TOLERANCE_METERS = 0.1;
+
   private static double minDistance;
   private static double maxDistance;
-  private static final List<Distancer.Row> shotRows;
+  private static final List<Distancer.Row> shotRows = new ArrayList<>();
 
-  private static final InterpolatingTreeMap<Double, Distancer> shotMap =
-      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Distancer::interpolate);
+  private static InterpolatingTreeMap<Double, Distancer> shotMap;
 
   static {
-    shotRows = Distancer.loadRowsFromDeploy("shot_table.json");
+    shotRows.addAll(Distancer.loadRowsFromDeploy(SHOT_TABLE_FILE));
+    rebuildShotMap();
+  }
+
+  private static void rebuildShotMap() {
+    shotRows.sort(Comparator.comparingDouble(r -> r.d));
+    shotMap = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Distancer::interpolate);
     if (shotRows.isEmpty()) {
       minDistance = 0.0;
       maxDistance = 0.0;
@@ -59,6 +73,41 @@ public class GetAdjustedShot {
     for (var r : shotRows) {
       shotMap.put(r.d, new Distancer(r.hoodDeg, r.rps, r.tof));
     }
+  }
+
+  // Robot code can't write to the deploy directory on the RIO, so tuned tables go to
+  // /home/lvuser/shot_table.json there. In sim they go straight into src/main/deploy.
+  private static File getTunedTableFile() {
+    return Constants.currentMode == Constants.Mode.REAL
+        ? new File(Filesystem.getOperatingDirectory(), SHOT_TABLE_FILE)
+        : new File(Filesystem.getDeployDirectory(), SHOT_TABLE_FILE);
+  }
+
+  /**
+   * Adds a tuned row, replacing any row within 10 cm, and uses it immediately. Time of flight is
+   * carried over from the current table. Writes the whole table out and returns the file; the
+   * in-memory table is updated even if the write throws.
+   */
+  public static File saveTunedRow(double distanceMeters, double hoodDeg, double flywheelRps)
+      throws IOException {
+    Distancer current = getShotForDistance(distanceMeters);
+
+    Distancer.Row row = new Distancer.Row();
+    row.d = Math.round(distanceMeters * 100.0) / 100.0;
+    row.hoodDeg = hoodDeg;
+    row.rps = flywheelRps;
+    row.tof = current != null ? Math.round(current.tofSec() * 1000.0) / 1000.0 : 0.0;
+
+    shotRows.removeIf(r -> Math.abs(r.d - row.d) < SAME_ROW_TOLERANCE_METERS);
+    shotRows.add(row);
+    rebuildShotMap();
+
+    System.out.printf(
+        "[ShotTable] {\"d\": %.2f, \"hoodDeg\": %.2f, \"rps\": %.2f, \"tof\": %.3f}%n",
+        row.d, row.hoodDeg, row.rps, row.tof);
+    File file = getTunedTableFile();
+    Distancer.saveRows(file, shotRows);
+    return file;
   }
 
   public ShootingParameters getParameters(Pose2d robotPose, Translation2d robotToTurret) {
@@ -152,6 +201,11 @@ public class GetAdjustedShot {
             turretAngleRobot.minus(lastTurretAngle).getRadians() / Constants.loopPeriodSecs);
     lastTurretAngle = turretAngleRobot;
     return turretVelocity;
+  }
+
+  /** Returns the table's hood/flywheel/tof for a distance, or null if the table is empty. */
+  public static Distancer getTableShot(double distanceMeters) {
+    return getShotForDistance(distanceMeters);
   }
 
   private static Distancer getShotForDistance(double distance) {

@@ -77,7 +77,7 @@ public final class Constants {
       public static final CANcoderConfiguration leftConfig = new CANcoderConfiguration();
       public static final CANcoderConfiguration rightConfig = new CANcoderConfiguration();
 
-      public static final double leftEncoderOffset = 0.385009765625;
+      public static final double leftEncoderOffset = -0.385009765625;
       public static final double rightEncoderOffset = 0.394287109375;
 
       public static final double leftTurretAzimuthOffset = 0.33;
@@ -89,6 +89,14 @@ public final class Constants {
           SensorDirectionValue.CounterClockwise_Positive;
 
       public static final double azimuthGearRatio = 10;
+      // Mark these poses from the established zero along the negative-angle wire route.
+      public static final double leftAzimuthStartupCenterDeg = -180.0;
+      public static final double rightAzimuthStartupCenterDeg = -180.0;
+      public static final double azimuthStartupHalfWindowDeg = 9.0;
+      public static final double azimuthStartupVerificationToleranceDeg = 0.5;
+      public static final double azimuthStartupVerificationTimeoutSec = 1.0;
+      public static final double azimuthStartupVerificationDelaySec = 0.05;
+      public static final double azimuthStartupPositionWriteTimeoutSec = 0.1;
       public static final double flywheelGearRatio = 1.0;
 
       // Limits (Placeholders - UPDATE ME)

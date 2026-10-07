@@ -54,4 +54,9 @@ public class Flywheels {
   public double getTargetRps() {
     return targetRps;
   }
+
+  public void stop() {
+    targetRps = 0.0;
+    flywheel.stopMotor();
+  }
 }

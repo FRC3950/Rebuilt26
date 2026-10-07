@@ -3,6 +3,7 @@ package frc.robot.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.wpilibj.Filesystem;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -56,6 +57,18 @@ public record Distancer(double hoodAngleDeg, double flywheelRps, double tofSec) 
       System.err.println("[Distancer] Failed to load " + filename + ": " + e.getMessage());
       return List.of();
     }
+  }
+
+  public static void saveRows(File file, List<Row> rows) throws IOException {
+    DistancerFile data = new DistancerFile();
+    data.units = new Units();
+    data.units.distance = "m";
+    data.units.hood = "deg";
+    data.units.flywheel = "rps";
+    data.units.tof = "s";
+    data.points = rows;
+
+    new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(file, data);
   }
 
   private static double lerp(double a, double b, double t) {

@@ -21,13 +21,17 @@ import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.controls.CrazyModeBindings;
+import frc.robot.controls.DefaultModeBindings;
+import frc.robot.controls.TuneModeBindings;
 import frc.robot.generated.TunerConstants;
 import frc.robot.sim.FuelSimCommand;
 import frc.robot.sim.FuelSimulationController;
@@ -48,9 +52,15 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Field2dPublisher;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
+  public enum BindingMode {
+    DEFAULT,
+    TUNE
+  }
+
   private final Drive drive;
   private final Turret turret1;
   private final Turret turret2;
@@ -63,7 +73,13 @@ public class RobotContainer {
   private final CommandXboxController driver = new CommandXboxController(0);
   private final CommandXboxController operator = new CommandXboxController(1);
 
+  private final EventLoop defaultButtonLoop = new EventLoop();
+  private final EventLoop tuneButtonLoop = new EventLoop();
+
   private final LoggedDashboardChooser<Command> autoChooser;
+  private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
+
+  private BindingMode appliedBindingMode = BindingMode.DEFAULT;
 
   public RobotContainer() {
     intake = new Intake();
@@ -128,6 +144,8 @@ public class RobotContainer {
             leftAzimuthConfig,
             leftMinAzimuthControlAngle,
             leftMaxAzimuthControlAngle,
+            Constants.SubsystemConstants.Turret.leftAzimuthEncoder,
+            Constants.SubsystemConstants.Turret.leftAzimuthStartupCenterDeg,
             HOOD_SERVO_CHANNEL_2,
             flywheelID,
             flywheelConfig,
@@ -139,11 +157,27 @@ public class RobotContainer {
             rightAzimuthConfig,
             rightMinAzimuthControlAngle,
             rightMaxAzimuthControlAngle,
+            Constants.SubsystemConstants.Turret.rightAzimuthEncoder,
+            Constants.SubsystemConstants.Turret.rightAzimuthStartupCenterDeg,
             HOOD_SERVO_CHANNEL_1,
             flywheelID2,
             flywheelConfig,
             flywheelFollowerID2,
             CANivore);
+    turret1.setStartupInterlock(() -> turret1.isStartupReady() && turret2.isStartupReady());
+    turret2.setStartupInterlock(() -> turret1.isStartupReady() && turret2.isStartupReady());
+    SmartDashboard.putData(
+        "Turrets/Confirm both startup windows",
+        Commands.runOnce(
+                () -> {
+                  if (DriverStation.isDisabled()) {
+                    turret1.initializeFromStartupWindow();
+                    turret2.initializeFromStartupWindow();
+                  }
+                },
+                turret1,
+                turret2)
+            .ignoringDisable(true));
     turretVisualization = new TurretVisualization(turret1, turret2);
     fieldPublisher = new Field2dPublisher("Field", drive::getPose);
 
@@ -206,9 +240,16 @@ public class RobotContainer {
     SmartDashboard.putData("Turret Subsystem", turret1);
     autoChooser = new LoggedDashboardChooser<>("Auto Choices: ", AutoBuilder.buildAutoChooser());
 
-    CrazyModeBindings.configure(driver, drive, intake, indexer, turret1, turret2);
+    bindingModeChooser = new LoggedDashboardChooser<>("Code Mode");
+    bindingModeChooser.addDefaultOption("Default", BindingMode.DEFAULT);
+    bindingModeChooser.addOption("TUNE", BindingMode.TUNE);
+
+    DefaultModeBindings.configure(
+        defaultButtonLoop, driver, drive, intake, indexer, turret1, turret2);
     configureEmergencyBindings();
+    configureTuneBindings();
     configureDefaults();
+    applyBindingMode(BindingMode.DEFAULT);
   }
 
   public Command getAutonomousCommand() {
@@ -225,9 +266,27 @@ public class RobotContainer {
     indexer.stopHotdog();
   }
 
+  public void checkMode() {
+    BindingMode selectedBindingMode = getSelectedBindingMode();
+    SmartDashboard.putString("Code Mode/Selected", selectedBindingMode.name());
+    Logger.recordOutput("Controls/BindingModeSelected", selectedBindingMode.name());
+
+    if (!shouldApplyBindingMode(
+        selectedBindingMode, appliedBindingMode, DriverStation.isDisabled())) {
+      return;
+    }
+
+    applyBindingMode(selectedBindingMode);
+  }
+
+  static boolean shouldApplyBindingMode(
+      BindingMode selectedBindingMode, BindingMode currentBindingMode, boolean isDisabled) {
+    return isDisabled && selectedBindingMode != currentBindingMode;
+  }
+
   private void configureEmergencyBindings() {
     operator
-        .leftTrigger(0.5)
+        .leftTrigger(0.5, defaultButtonLoop)
         .whileTrue(
             new IntakeCommand(
                 intake,
@@ -235,10 +294,10 @@ public class RobotContainer {
                   var speeds = drive.getRobotRelativeSpeeds();
                   return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
                 }));
-    operator.rightBumper().onTrue(intake.retractCommand());
+    operator.rightBumper(defaultButtonLoop).onTrue(intake.retractCommand());
 
     operator
-        .rightTrigger(0.5)
+        .rightTrigger(0.5, defaultButtonLoop)
         .whileTrue(
             Commands.startEnd(
                 () -> {
@@ -252,8 +311,8 @@ public class RobotContainer {
                 indexer));
 
     operator
-        .b()
-        .and(operator.start().negate())
+        .b(defaultButtonLoop)
+        .and(operator.start(defaultButtonLoop).negate())
         .whileTrue(
             Commands.startEnd(
                 () -> {
@@ -266,11 +325,35 @@ public class RobotContainer {
                 },
                 indexer));
     operator
-        .start()
-        .and(operator.b())
+        .start(defaultButtonLoop)
+        .and(operator.b(defaultButtonLoop))
         .whileTrue(Commands.startEnd(intake::reverseIntake, intake::stopIntake, intake));
 
-    operator.a().onTrue(Commands.runOnce(Turret::toggleTurretMode)).debounce(0.25);
+    operator.a(defaultButtonLoop).onTrue(Commands.runOnce(Turret::toggleTurretMode)).debounce(0.25);
+  }
+
+  private void configureTuneBindings() {
+    TuneModeBindings.configure(tuneButtonLoop, driver, drive, intake, indexer, turret1, turret2);
+  }
+
+  private void applyBindingMode(BindingMode bindingMode) {
+    CommandScheduler.getInstance()
+        .setActiveButtonLoop(
+            switch (bindingMode) {
+              case DEFAULT -> defaultButtonLoop;
+              case TUNE -> tuneButtonLoop;
+            });
+
+    TuneModeBindings.setDashboardActive(
+        bindingMode == BindingMode.TUNE, turret1.getCommandedHoodAngleDeg());
+    appliedBindingMode = bindingMode;
+    SmartDashboard.putString("Code Mode/Applied", appliedBindingMode.name());
+    Logger.recordOutput("Controls/BindingModeApplied", appliedBindingMode.name());
+  }
+
+  private BindingMode getSelectedBindingMode() {
+    BindingMode selectedBindingMode = bindingModeChooser.get();
+    return selectedBindingMode != null ? selectedBindingMode : BindingMode.DEFAULT;
   }
 
   private void configureDefaults() {
