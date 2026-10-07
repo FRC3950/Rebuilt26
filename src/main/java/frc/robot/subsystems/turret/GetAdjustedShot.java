@@ -203,6 +203,11 @@ public class GetAdjustedShot {
     return turretVelocity;
   }
 
+  /** Returns the table's hood/flywheel/tof for a distance, or null if the table is empty. */
+  public static Distancer getTableShot(double distanceMeters) {
+    return getShotForDistance(distanceMeters);
+  }
+
   private static Distancer getShotForDistance(double distance) {
     if (shotRows.isEmpty()) {
       return null;

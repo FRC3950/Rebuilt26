@@ -6,6 +6,7 @@ import static frc.robot.Constants.SubsystemConstants.Turret.minHoodAngle;
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1;
 import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,6 +20,7 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.GetAdjustedShot;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.util.Distancer;
 import java.io.File;
 import java.io.IOException;
 
@@ -34,6 +36,8 @@ public final class TuneModeBindings {
   private static final String LEFT_TURRET_DISTANCE_KEY = "Tune/Left Turret To Hub Distance M";
   private static final String RIGHT_TURRET_DISTANCE_KEY = "Tune/Right Turret To Hub Distance M";
   private static final String SAVE_STATUS_KEY = "Tune/Save Status";
+  private static final String TABLE_HOOD_KEY = "Tune/Table Hood Deg";
+  private static final String TABLE_FLYWHEEL_KEY = "Tune/Table Flywheel RPS";
 
   private TuneModeBindings() {}
 
@@ -116,9 +120,7 @@ public final class TuneModeBindings {
 
     // Both turrets share one table row, so save the distance between them. Line up head-on to the
     // hub so the two turret distances match.
-    double distanceMeters =
-        (getDistanceToHub(robotPose, robotToTurret1) + getDistanceToHub(robotPose, robotToTurret2))
-            / 2.0;
+    double distanceMeters = getTuneDistance(robotPose);
     String result;
     try {
       File file =
@@ -140,6 +142,28 @@ public final class TuneModeBindings {
     SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, getDistanceToHub(robotPose, robotToTurret1));
     SmartDashboard.putNumber(
         RIGHT_TURRET_DISTANCE_KEY, getDistanceToHub(robotPose, robotToTurret2));
+
+    // What the shot table currently says for this spot, at the same distance a save would use.
+    Distancer tableShot = GetAdjustedShot.getTableShot(getTuneDistance(robotPose));
+    // Clamped like the turret does, so the value can be copied straight into Tune/Hood Deg.
+    SmartDashboard.putNumber(
+        TABLE_HOOD_KEY,
+        tableShot != null
+            ? roundToHundredths(
+                MathUtil.clamp(tableShot.hoodAngleDeg(), minHoodAngle, maxHoodAngle))
+            : 0.0);
+    SmartDashboard.putNumber(
+        TABLE_FLYWHEEL_KEY, tableShot != null ? roundToHundredths(tableShot.flywheelRps()) : 0.0);
+  }
+
+  private static double getTuneDistance(Pose2d robotPose) {
+    return (getDistanceToHub(robotPose, robotToTurret1)
+            + getDistanceToHub(robotPose, robotToTurret2))
+        / 2.0;
+  }
+
+  private static double roundToHundredths(double value) {
+    return Math.round(value * 100.0) / 100.0;
   }
 
   static TurretTuneSetpoint validateTuneSetpoint(double hoodAngleDeg, double flywheelRps) {
