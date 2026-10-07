@@ -38,6 +38,13 @@ public final class TuneModeBindings {
   private static final String SAVE_STATUS_KEY = "Tune/Save Status";
   private static final String TABLE_HOOD_KEY = "Tune/Table Hood Deg";
   private static final String TABLE_FLYWHEEL_KEY = "Tune/Table Flywheel RPS";
+  // Commanded, not measured: the hood servos have no feedback.
+  private static final String LEFT_TURRET_HOOD_KEY = "Tune/Left Turret Commanded Hood Deg";
+  private static final String RIGHT_TURRET_HOOD_KEY = "Tune/Right Turret Commanded Hood Deg";
+  private static final String LEFT_TURRET_COMMANDED_RPS_KEY = "Tune/Left Turret Commanded RPS";
+  private static final String RIGHT_TURRET_COMMANDED_RPS_KEY = "Tune/Right Turret Commanded RPS";
+  private static final String LEFT_TURRET_MEASURED_RPS_KEY = "Tune/Left Turret Measured RPS";
+  private static final String RIGHT_TURRET_MEASURED_RPS_KEY = "Tune/Right Turret Measured RPS";
 
   private TuneModeBindings() {}
 
@@ -50,7 +57,7 @@ public final class TuneModeBindings {
       Turret leftTurret,
       Turret rightTurret) {
     publishDefaultTuneValues(leftTurret);
-    buttonLoop.bind(() -> publishTuneTelemetry(drive.getPose()));
+    buttonLoop.bind(() -> publishTuneTelemetry(drive.getPose(), leftTurret, rightTurret));
 
     driver
         .leftTrigger(0.5, buttonLoop)
@@ -138,10 +145,20 @@ public final class TuneModeBindings {
             result, distanceMeters, setpoint.hoodAngleDeg(), setpoint.flywheelRps()));
   }
 
-  private static void publishTuneTelemetry(Pose2d robotPose) {
+  private static void publishTuneTelemetry(
+      Pose2d robotPose, Turret leftTurret, Turret rightTurret) {
     SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, getDistanceToHub(robotPose, robotToTurret1));
     SmartDashboard.putNumber(
         RIGHT_TURRET_DISTANCE_KEY, getDistanceToHub(robotPose, robotToTurret2));
+    SmartDashboard.putNumber(LEFT_TURRET_HOOD_KEY, leftTurret.getCommandedHoodAngleDeg());
+    SmartDashboard.putNumber(RIGHT_TURRET_HOOD_KEY, rightTurret.getCommandedHoodAngleDeg());
+    SmartDashboard.putNumber(LEFT_TURRET_COMMANDED_RPS_KEY, leftTurret.getCommandedFlywheelRps());
+    SmartDashboard.putNumber(
+        RIGHT_TURRET_COMMANDED_RPS_KEY, rightTurret.getCommandedFlywheelRps());
+    SmartDashboard.putNumber(
+        LEFT_TURRET_MEASURED_RPS_KEY, roundToHundredths(leftTurret.getMeasuredFlywheelRps()));
+    SmartDashboard.putNumber(
+        RIGHT_TURRET_MEASURED_RPS_KEY, roundToHundredths(rightTurret.getMeasuredFlywheelRps()));
 
     // What the shot table currently says for this spot, at the same distance a save would use.
     Distancer tableShot = GetAdjustedShot.getTableShot(getTuneDistance(robotPose));
