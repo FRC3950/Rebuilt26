@@ -31,6 +31,8 @@ public class Turret extends SubsystemBase {
   private final double minAzimuthControlAngleDeg;
   private final double maxAzimuthControlAngleDeg;
   private BooleanSupplier bothTurretsReady = () -> false;
+  private boolean flipping = false;
+  private Runnable flipStartedCallback = () -> {};
 
   private static boolean lockedIn = false;
 
@@ -101,6 +103,14 @@ public class Turret extends SubsystemBase {
             maxAzimuthControlAngleDeg);
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
 
+    boolean wasFlipping = flipping;
+    flipping =
+        nextFlippingState(
+            flipping, referenceAngleDeg, setpointDegrees, azimuth.getMeasuredAngleDeg());
+    if (flipping && !wasFlipping) {
+      // Stop latched feeding before issuing the large azimuth move, independent of scheduler order.
+      flipStartedCallback.run();
+    }
     azimuth.setTargetAngleDeg(setpointDegrees);
     hood.setAngleDeg(clampedHoodAngleDeg);
     flywheels.setTargetRps(flywheelSpeed);
@@ -174,7 +184,17 @@ public class Turret extends SubsystemBase {
     return azimuth.isStartupReady();
   }
 
+  @AutoLogOutput
+  public boolean isFlipping() {
+    return flipping;
+  }
+
+  public void setFlipStartedCallback(Runnable flipStartedCallback) {
+    this.flipStartedCallback = flipStartedCallback;
+  }
+
   public void stop() {
+    flipping = false;
     azimuth.stop();
     flywheels.stop();
   }
@@ -185,9 +205,25 @@ public class Turret extends SubsystemBase {
     if (DriverStation.isDisabled() || !bothTurretsReady.getAsBoolean()) {
       stop();
     }
+    if (flipping
+        && Math.abs(getCommandedAzimuthDeg() - getMeasuredAzimuthDeg())
+            <= AZIMUTH_FLIP_FINISHED_TOLERANCE_DEG) {
+      flipping = false;
+    }
+    SmartDashboard.putBoolean(getName() + "/Flipping", isFlipping());
     SmartDashboard.putBoolean(getName() + "/StartupReady", isStartupReady());
     SmartDashboard.putString(getName() + "/StartupStatus", azimuth.getStartupStatus());
     SmartDashboard.putNumber(getName() + "/StartupAngleDeg", azimuth.getStartupAngleDeg());
+  }
+
+  static boolean nextFlippingState(
+      boolean wasFlipping, double referenceDeg, double targetDeg, double measuredDeg) {
+    // Continuous angles preserve the full turn; a wrapped error would hide the flip.
+    boolean largeMove =
+        Math.abs(targetDeg - referenceDeg) > AZIMUTH_FLIP_THRESHOLD_DEG
+            || Math.abs(targetDeg - measuredDeg) > AZIMUTH_FLIP_THRESHOLD_DEG;
+    return (wasFlipping || largeMove)
+        && !(Math.abs(targetDeg - measuredDeg) <= AZIMUTH_FLIP_FINISHED_TOLERANCE_DEG);
   }
 
   static double selectSafeSetpointDegrees(

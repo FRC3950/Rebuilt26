@@ -89,6 +89,9 @@ public final class Constants {
           SensorDirectionValue.CounterClockwise_Positive;
 
       public static final double azimuthGearRatio = 10;
+      public static final double AZIMUTH_FLIP_THRESHOLD_DEG = 180.0;
+      // Starting tolerance; verify that feeding resumes only after the turret settles on robot.
+      public static final double AZIMUTH_FLIP_FINISHED_TOLERANCE_DEG = 5.0;
       // Mark these poses from the established zero along the negative-angle wire route.
       public static final double leftAzimuthStartupCenterDeg = -180.0;
       public static final double rightAzimuthStartupCenterDeg = -180.0;

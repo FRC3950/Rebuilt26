@@ -9,8 +9,10 @@ import static frc.robot.Constants.SubsystemConstants.Indexer.*;
 
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Indexer extends SubsystemBase {
@@ -22,6 +24,9 @@ public class Indexer extends SubsystemBase {
   private final VelocityVoltage hotdogControl = new VelocityVoltage(0);
   private double commandedIndexerSpeed = 0.0;
   private double commandedHotdogSpeed = 0.0;
+  private double requestedIndexerSpeed = 0.0;
+  private double requestedHotdogSpeed = 0.0;
+  private BooleanSupplier forwardFeedAllowed = () -> true;
 
   public Indexer() {
     hotdogMotor = new TalonFX(hotdogMotorID, CANivore);
@@ -32,8 +37,8 @@ public class Indexer extends SubsystemBase {
   }
 
   public void setIndexerSpeed(double speed) {
-    commandedIndexerSpeed = speed;
-    indexerMotor.setControl(indexerControl.withVelocity(speed));
+    requestedIndexerSpeed = speed;
+    updateOutputs();
   }
 
   public void startIndexer() {
@@ -50,8 +55,34 @@ public class Indexer extends SubsystemBase {
   }
 
   public void setHotdogSpeed(double speed) {
-    commandedHotdogSpeed = speed;
-    hotdogMotor.setControl(hotdogControl.withVelocity(speed));
+    requestedHotdogSpeed = speed;
+    updateOutputs();
+  }
+
+  public void setForwardFeedInterlock(BooleanSupplier forwardFeedAllowed) {
+    this.forwardFeedAllowed = forwardFeedAllowed;
+  }
+
+  @Override
+  public void periodic() {
+    updateOutputs();
+  }
+
+  /** Recheck latched feed requests each tick and immediately when a turret starts flipping. */
+  public void updateOutputs() {
+    if (DriverStation.isDisabled()) {
+      requestedIndexerSpeed = 0.0;
+      requestedHotdogSpeed = 0.0;
+    }
+    boolean allowed = forwardFeedAllowed.getAsBoolean();
+    commandedIndexerSpeed = permittedSpeed(requestedIndexerSpeed, allowed);
+    commandedHotdogSpeed = permittedSpeed(requestedHotdogSpeed, allowed);
+    indexerMotor.setControl(indexerControl.withVelocity(commandedIndexerSpeed));
+    hotdogMotor.setControl(hotdogControl.withVelocity(commandedHotdogSpeed));
+  }
+
+  static double permittedSpeed(double requestedSpeed, boolean forwardAllowed) {
+    return !forwardAllowed && requestedSpeed > 0.0 ? 0.0 : requestedSpeed;
   }
 
   public void startHotdog() {

@@ -166,6 +166,9 @@ public class RobotContainer {
             CANivore);
     turret1.setStartupInterlock(() -> turret1.isStartupReady() && turret2.isStartupReady());
     turret2.setStartupInterlock(() -> turret1.isStartupReady() && turret2.isStartupReady());
+    indexer.setForwardFeedInterlock(() -> !turret1.isFlipping() && !turret2.isFlipping());
+    turret1.setFlipStartedCallback(indexer::updateOutputs);
+    turret2.setFlipStartedCallback(indexer::updateOutputs);
     SmartDashboard.putData(
         "Turrets/Confirm both startup windows",
         Commands.runOnce(
