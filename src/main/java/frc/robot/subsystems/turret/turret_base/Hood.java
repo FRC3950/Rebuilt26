@@ -2,23 +2,27 @@ package frc.robot.subsystems.turret.turret_base;
 
 import static frc.robot.Constants.SubsystemConstants.Turret.*;
 
+import com.revrobotics.REVLibError;
 import com.revrobotics.ResetMode;
 import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.config.ServoChannelConfig;
 import com.revrobotics.servohub.config.ServoHubConfig;
 import edu.wpi.first.math.MathUtil;
+import java.util.function.Function;
 
 public class Hood {
   private static ServoHub hoodServoHub;
 
   private final ServoChannel hoodServo;
+  private final EnableState enableState;
   private final boolean invertPulseDirection;
   private double lastSetpointDeg = minHoodAngle;
   private double positionDeg = minHoodAngle;
 
   public Hood(ServoChannel.ChannelId hoodChannelId) {
     hoodServo = getConfiguredHoodServoHub().getServoChannel(hoodChannelId);
+    enableState = new EnableState(hoodServo::setEnabled);
     invertPulseDirection = hoodChannelId == HOOD_SERVO_CHANNEL_2;
     initializeAtMinimum();
   }
@@ -26,7 +30,7 @@ public class Hood {
   public void setAngleDeg(double hoodAngleDeg) {
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
     hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(clampedHoodAngleDeg, invertPulseDirection));
-    hoodServo.setEnabled(true);
+    enableState.setEnabled(true);
     lastSetpointDeg = clampedHoodAngleDeg;
     positionDeg = clampedHoodAngleDeg;
   }
@@ -41,14 +45,14 @@ public class Hood {
 
   public void stop() {
     // Disable position pulses; retain the configured power behavior while disabled.
-    hoodServo.setEnabled(false);
+    enableState.setEnabled(false);
   }
 
   private void initializeAtMinimum() {
     lastSetpointDeg = minHoodAngle;
     positionDeg = minHoodAngle;
 
-    hoodServo.setEnabled(true);
+    enableState.setEnabled(true);
     hoodServo.setPowered(true);
     hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(minHoodAngle, invertPulseDirection));
   }
@@ -90,5 +94,23 @@ public class Hood {
     }
     int pulseUs = (int) Math.round(HOOD_SERVO_MIN_PULSE_US + t * servoPulseRangeUs);
     return Math.max(HOOD_SERVO_MIN_PULSE_US, Math.min(HOOD_SERVO_MAX_PULSE_US, pulseUs));
+  }
+
+  /** Skips redundant successful writes; a failed write leaves the state unknown. */
+  static final class EnableState {
+    private final Function<Boolean, REVLibError> writeEnabled;
+    private Boolean lastSuccessfulEnabled;
+
+    EnableState(Function<Boolean, REVLibError> writeEnabled) {
+      this.writeEnabled = writeEnabled;
+    }
+
+    void setEnabled(boolean enabled) {
+      if (lastSuccessfulEnabled != null && lastSuccessfulEnabled == enabled) {
+        return;
+      }
+
+      lastSuccessfulEnabled = writeEnabled.apply(enabled) == REVLibError.kOk ? enabled : null;
+    }
   }
 }
