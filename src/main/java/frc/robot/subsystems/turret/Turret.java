@@ -41,6 +41,7 @@ public class Turret extends SubsystemBase {
   // private final MechanismLigament2d turretLigament;
 
   public Turret(
+      String name,
       int azimuthMotorId,
       TalonFXConfiguration azimuthConfig,
       double minAzimuthControlAngleDeg,
@@ -52,7 +53,7 @@ public class Turret extends SubsystemBase {
       TalonFXConfiguration flywheelConfig,
       int flywheelFollowerID,
       CANBus canbus) {
-    setName("Turret" + azimuthMotorId);
+    setName(name);
     this.minAzimuthControlAngleDeg = minAzimuthControlAngleDeg;
     this.maxAzimuthControlAngleDeg = maxAzimuthControlAngleDeg;
     hood = new Hood(hoodChannelId);

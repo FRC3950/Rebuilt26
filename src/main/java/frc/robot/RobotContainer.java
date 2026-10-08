@@ -140,6 +140,7 @@ public class RobotContainer {
 
     turret1 =
         new Turret(
+            "TurretLeft",
             azimuthID,
             leftAzimuthConfig,
             leftMinAzimuthControlAngle,
@@ -153,6 +154,7 @@ public class RobotContainer {
             CANivore);
     turret2 =
         new Turret(
+            "TurretRight",
             azimuthID2,
             rightAzimuthConfig,
             rightMinAzimuthControlAngle,
