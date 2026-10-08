@@ -28,6 +28,7 @@ public class Turret extends SubsystemBase {
   private final Hood hood;
   private final Flywheels flywheels;
   private final Azimuth azimuth;
+  private final String disableKey;
   private final double minAzimuthControlAngleDeg;
   private final double maxAzimuthControlAngleDeg;
   private BooleanSupplier bothTurretsReady = () -> false;
@@ -52,6 +53,8 @@ public class Turret extends SubsystemBase {
       int flywheelFollowerID,
       CANBus canbus) {
     setName(name);
+    disableKey = name + "/Disable";
+    SmartDashboard.setDefaultBoolean(disableKey, false);
     this.minAzimuthControlAngleDeg = minAzimuthControlAngleDeg;
     this.maxAzimuthControlAngleDeg = maxAzimuthControlAngleDeg;
     hood = new Hood(hoodChannelId);
@@ -65,6 +68,9 @@ public class Turret extends SubsystemBase {
             startupCenterDeg,
             minAzimuthControlAngleDeg,
             maxAzimuthControlAngleDeg);
+    if (isDisabledBySwitch()) {
+      stop();
+    }
   }
 
   /** Returns the live turret pose with robot-relative translation and measured azimuth. */
@@ -83,7 +89,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void runSetpoints(Rotation2d turretAngleRobot, double hoodAngleDeg, double flywheelSpeed) {
-    if (DriverStation.isDisabled() || !bothTurretsReady.getAsBoolean()) {
+    if (isDisabledBySwitch() || DriverStation.isDisabled() || !bothTurretsReady.getAsBoolean()) {
       stop();
       return;
     }
@@ -167,7 +173,17 @@ public class Turret extends SubsystemBase {
   }
 
   public void initializeFromStartupWindow() {
+    if (isDisabledBySwitch()) {
+      stop();
+      return;
+    }
     azimuth.initializeFromStartupWindow();
+  }
+
+  /** Each dashboard switch blocks every actuator command for this turret in every mode. */
+  @AutoLogOutput
+  public boolean isDisabledBySwitch() {
+    return SmartDashboard.getBoolean(disableKey, false);
   }
 
   @AutoLogOutput
@@ -177,13 +193,14 @@ public class Turret extends SubsystemBase {
 
   public void stop() {
     azimuth.stop();
+    hood.stop();
     flywheels.stop();
   }
 
   @Override
   public void periodic() {
     azimuth.updateStartup();
-    if (DriverStation.isDisabled() || !bothTurretsReady.getAsBoolean()) {
+    if (isDisabledBySwitch() || DriverStation.isDisabled() || !bothTurretsReady.getAsBoolean()) {
       stop();
     }
     SmartDashboard.putBoolean(getName() + "/StartupReady", isStartupReady());

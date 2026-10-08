@@ -166,8 +166,8 @@ public class RobotContainer {
             flywheelConfig,
             flywheelFollowerID2,
             CANivore);
-    turret1.setStartupInterlock(() -> turret1.isStartupReady() && turret2.isStartupReady());
-    turret2.setStartupInterlock(() -> turret1.isStartupReady() && turret2.isStartupReady());
+    turret1.setStartupInterlock(this::areActiveTurretsReady);
+    turret2.setStartupInterlock(this::areActiveTurretsReady);
     SmartDashboard.putData(
         "Turrets/Confirm both startup windows",
         Commands.runOnce(
@@ -256,6 +256,12 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  private boolean areActiveTurretsReady() {
+    // A disabled, broken turret must not prevent the remaining turret from operating.
+    return (turret1.isDisabledBySwitch() || turret1.isStartupReady())
+        && (turret2.isDisabledBySwitch() || turret2.isStartupReady());
   }
 
   public Command getSimulationCommand() {

@@ -26,6 +26,7 @@ public class Hood {
   public void setAngleDeg(double hoodAngleDeg) {
     double clampedHoodAngleDeg = MathUtil.clamp(hoodAngleDeg, minHoodAngle, maxHoodAngle);
     hoodServo.setPulseWidth(hoodAngleToPulseWidthUs(clampedHoodAngleDeg, invertPulseDirection));
+    hoodServo.setEnabled(true);
     lastSetpointDeg = clampedHoodAngleDeg;
     positionDeg = clampedHoodAngleDeg;
   }
@@ -36,6 +37,11 @@ public class Hood {
 
   public double getSetpointDeg() {
     return lastSetpointDeg;
+  }
+
+  public void stop() {
+    // Disable position pulses; retain the configured power behavior while disabled.
+    hoodServo.setEnabled(false);
   }
 
   private void initializeAtMinimum() {
