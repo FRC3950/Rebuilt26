@@ -1,4 +1,4 @@
-package frc.robot.controls;
+package frc.robot.subsystems.turret;
 
 import static frc.robot.Constants.FieldConstants.getHubTranslation;
 import static frc.robot.Constants.SubsystemConstants.Turret.maxHoodAngle;
@@ -10,25 +10,19 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.indexer.Indexer;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.turret.GetAdjustedShot;
-import frc.robot.subsystems.turret.Turret;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Distancer;
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Supplier;
 
 /**
  * Shot table tuning. Both turrets share one hood/flywheel setpoint because they read the same
- * shot_table.json, so record a row using the distance of the turret whose shot you were watching.
+ * shot_table.json. Line up head-on to the hub; saved rows use the mean of the two turret distances.
  */
-public final class TuneModeBindings {
+public final class Tune extends SubsystemBase {
   private static final String SHARED_HOOD_KEY = "Tune/Hood Deg";
   private static final String SHARED_FLYWHEEL_KEY = "Tune/Flywheel RPS";
   private static final String SHARED_VALID_KEY = "Tune/Setpoints Valid";
@@ -46,113 +40,56 @@ public final class TuneModeBindings {
   private static final String LEFT_TURRET_MEASURED_RPS_KEY = "Tune/Left Turret Measured RPS";
   private static final String RIGHT_TURRET_MEASURED_RPS_KEY = "Tune/Right Turret Measured RPS";
 
-  private static final String[] DASHBOARD_KEYS = {
-    SHARED_HOOD_KEY,
-    SHARED_FLYWHEEL_KEY,
-    SHARED_VALID_KEY,
-    SHARED_STATUS_KEY,
-    LEFT_TURRET_DISTANCE_KEY,
-    RIGHT_TURRET_DISTANCE_KEY,
-    SAVE_STATUS_KEY,
-    TABLE_HOOD_KEY,
-    TABLE_FLYWHEEL_KEY,
-    LEFT_TURRET_HOOD_KEY,
-    RIGHT_TURRET_HOOD_KEY,
-    LEFT_TURRET_COMMANDED_RPS_KEY,
-    RIGHT_TURRET_COMMANDED_RPS_KEY,
-    LEFT_TURRET_MEASURED_RPS_KEY,
-    RIGHT_TURRET_MEASURED_RPS_KEY
-  };
-  private static double savedHoodDeg = Double.NaN;
-  private static double savedFlywheelRps = 0.0;
+  private static final String USE_TUNE_VALUES_KEY = "Tune/Use Tune Values";
 
-  private TuneModeBindings() {}
+  private final Supplier<Pose2d> robotPose;
+  private final Turret leftTurret;
+  private final Turret rightTurret;
 
-  /** Publish tuning controls only in Tune; retain the operator's inputs across mode changes. */
-  public static void setDashboardActive(boolean active, double currentHoodDeg) {
-    if (active) {
-      publishDefaultTuneValues(Double.isFinite(savedHoodDeg) ? savedHoodDeg : currentHoodDeg);
-      return;
-    }
-    savedHoodDeg = SmartDashboard.getNumber(SHARED_HOOD_KEY, savedHoodDeg);
-    savedFlywheelRps = SmartDashboard.getNumber(SHARED_FLYWHEEL_KEY, savedFlywheelRps);
-    for (String key : DASHBOARD_KEYS) {
-      SmartDashboard.getEntry(key).clearPersistent();
-      SmartDashboard.getEntry(key).unpublish();
-    }
+  public Tune(Supplier<Pose2d> robotPose, Turret leftTurret, Turret rightTurret) {
+    this.robotPose = robotPose;
+    this.leftTurret = leftTurret;
+    this.rightTurret = rightTurret;
+    initializeDashboard(robotPose, leftTurret.getCommandedHoodAngleDeg());
+    publishTuneTelemetry(robotPose.get(), leftTurret, rightTurret);
   }
 
-  public static void configure(
-      EventLoop buttonLoop,
-      CommandXboxController driver,
-      Drive drive,
-      Intake intake,
-      Indexer indexer,
-      Turret leftTurret,
-      Turret rightTurret) {
-    buttonLoop.bind(() -> publishTuneTelemetry(drive.getPose(), leftTurret, rightTurret));
+  @Override
+  public void periodic() {
+    publishTuneTelemetry(robotPose.get(), leftTurret, rightTurret);
+  }
 
-    driver
-        .leftTrigger(0.5, buttonLoop)
-        .whileTrue(
-            new IntakeCommand(
-                intake,
-                () -> {
-                  var speeds = drive.getRobotRelativeSpeeds();
-                  return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
-                }));
+  /** Keep controls available in every code mode; never resume tuning automatically at startup. */
+  static void initializeDashboard(Supplier<Pose2d> robotPose, double currentHoodDeg) {
+    SmartDashboard.putBoolean(USE_TUNE_VALUES_KEY, false);
+    publishDefaultTuneValues(currentHoodDeg);
+    SmartDashboard.putData(
+        "Tune/Save Point",
+        Commands.runOnce(() -> saveTunePoint(robotPose.get())).ignoringDisable(true));
+  }
 
-    driver.rightBumper(buttonLoop).onTrue(intake.retractCommand());
+  public static boolean useTuneValues() {
+    return SmartDashboard.getBoolean(USE_TUNE_VALUES_KEY, false);
+  }
 
-    driver.rightTrigger(0.5, buttonLoop).whileTrue(indexer.feedCommand());
+  /** Called by the targeting command that owns this turret, including ferry targeting. */
+  public static void runTuneValues(Turret turret, Pose2d robotPose, Translation2d robotToTurret) {
+    TurretTuneSetpoint setpoint = readTuneSetpoint();
+    if (!setpoint.valid()) {
+      turret.stop();
+      return;
+    }
+    applyTurretTune(turret, robotPose, robotToTurret, setpoint);
+  }
 
-    driver
-        .y(buttonLoop)
-        .onTrue(
-            Commands.runOnce(
-                () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                drive));
-
-    driver
-        .leftBumper(buttonLoop)
-        .whileTrue(
-            Commands.runEnd(
-                () -> {
-                  TurretTuneSetpoint setpoint =
-                      validateTuneSetpoint(
-                          SmartDashboard.getNumber(
-                              SHARED_HOOD_KEY, leftTurret.getCommandedHoodAngleDeg()),
-                          SmartDashboard.getNumber(SHARED_FLYWHEEL_KEY, 0.0));
-
-                  SmartDashboard.putBoolean(SHARED_VALID_KEY, setpoint.valid());
-                  SmartDashboard.putString(SHARED_STATUS_KEY, setpoint.status());
-
-                  if (!setpoint.valid()) {
-                    leftTurret.stop();
-                    rightTurret.stop();
-                    return;
-                  }
-
-                  applyTurretTune(leftTurret, drive.getPose(), robotToTurret1, setpoint);
-                  applyTurretTune(rightTurret, drive.getPose(), robotToTurret2, setpoint);
-                },
-                () -> {
-                  leftTurret.stop();
-                  rightTurret.stop();
-                },
-                leftTurret,
-                rightTurret));
-
-    driver
-        .a(buttonLoop)
-        .onTrue(Commands.runOnce(() -> saveTunePoint(drive.getPose())).ignoringDisable(true));
+  private static TurretTuneSetpoint readTuneSetpoint() {
+    return validateTuneSetpoint(
+        SmartDashboard.getNumber(SHARED_HOOD_KEY, Double.NaN),
+        SmartDashboard.getNumber(SHARED_FLYWHEEL_KEY, 0.0));
   }
 
   private static void saveTunePoint(Pose2d robotPose) {
-    TurretTuneSetpoint setpoint =
-        validateTuneSetpoint(
-            SmartDashboard.getNumber(SHARED_HOOD_KEY, Double.NaN),
-            SmartDashboard.getNumber(SHARED_FLYWHEEL_KEY, 0.0));
+    TurretTuneSetpoint setpoint = readTuneSetpoint();
     if (!setpoint.valid()) {
       SmartDashboard.putString(SAVE_STATUS_KEY, "Not saved: " + setpoint.status());
       return;
@@ -184,6 +121,9 @@ public final class TuneModeBindings {
 
   private static void publishTuneTelemetry(
       Pose2d robotPose, Turret leftTurret, Turret rightTurret) {
+    TurretTuneSetpoint setpoint = readTuneSetpoint();
+    SmartDashboard.putBoolean(SHARED_VALID_KEY, setpoint.valid());
+    SmartDashboard.putString(SHARED_STATUS_KEY, setpoint.status());
     SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, getDistanceToHub(robotPose, robotToTurret1));
     SmartDashboard.putNumber(
         RIGHT_TURRET_DISTANCE_KEY, getDistanceToHub(robotPose, robotToTurret2));
@@ -246,7 +186,7 @@ public final class TuneModeBindings {
 
   private static void publishDefaultTuneValues(double hoodDeg) {
     SmartDashboard.setDefaultNumber(SHARED_HOOD_KEY, hoodDeg);
-    SmartDashboard.setDefaultNumber(SHARED_FLYWHEEL_KEY, savedFlywheelRps);
+    SmartDashboard.setDefaultNumber(SHARED_FLYWHEEL_KEY, 0.0);
     SmartDashboard.putBoolean(SHARED_VALID_KEY, true);
     SmartDashboard.putString(SHARED_STATUS_KEY, "Idle");
     SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, 0.0);

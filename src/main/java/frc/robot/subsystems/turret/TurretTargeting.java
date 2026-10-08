@@ -61,6 +61,10 @@ public class TurretTargeting extends Command {
   @Override
   public void execute() {
     Pose2d robotPose = drive.getPose();
+    if (Tune.useTuneValues()) {
+      Tune.runTuneValues(turret, robotPose, robotToTurret);
+      return;
+    }
     var fieldVelocity = drive.getFieldRelativeSpeeds();
     Translation2d targetOverride =
         targetOverrideSupplier != null ? targetOverrideSupplier.get() : null;
@@ -75,6 +79,9 @@ public class TurretTargeting extends Command {
       } else {
         turret.runAutoTarget(params);
       }
+    } else {
+      // Do not retain the last tuning outputs if normal targeting has no valid shot.
+      turret.stop();
     }
   }
 

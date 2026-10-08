@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.controls.DefaultModeBindings;
-import frc.robot.controls.TuneModeBindings;
 import frc.robot.generated.TunerConstants;
 import frc.robot.sim.FuelSimCommand;
 import frc.robot.sim.FuelSimulationController;
@@ -43,6 +42,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.turret.Tune;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
 import frc.robot.subsystems.turret.TurretVisualization;
@@ -57,8 +57,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   public enum BindingMode {
-    DEFAULT,
-    TUNE
+    DEFAULT
   }
 
   private final Drive drive;
@@ -74,7 +73,8 @@ public class RobotContainer {
   private final CommandXboxController operator = new CommandXboxController(1);
 
   private final EventLoop defaultButtonLoop = new EventLoop();
-  private final EventLoop tuneButtonLoop = new EventLoop();
+
+  private final Tune tune;
 
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
@@ -244,12 +244,12 @@ public class RobotContainer {
 
     bindingModeChooser = new LoggedDashboardChooser<>("Code Mode");
     bindingModeChooser.addDefaultOption("Default", BindingMode.DEFAULT);
-    bindingModeChooser.addOption("TUNE", BindingMode.TUNE);
 
     DefaultModeBindings.configure(
         defaultButtonLoop, driver, drive, intake, indexer, turret1, turret2);
     configureEmergencyBindings();
-    configureTuneBindings();
+    tune = new Tune(drive::getPose, turret1, turret2);
+    defaultButtonLoop.bind(this::checkMode);
     configureDefaults();
     applyBindingMode(BindingMode.DEFAULT);
   }
@@ -340,20 +340,13 @@ public class RobotContainer {
     operator.a(defaultButtonLoop).onTrue(Commands.runOnce(Turret::toggleTurretMode)).debounce(0.25);
   }
 
-  private void configureTuneBindings() {
-    TuneModeBindings.configure(tuneButtonLoop, driver, drive, intake, indexer, turret1, turret2);
-  }
-
   private void applyBindingMode(BindingMode bindingMode) {
     CommandScheduler.getInstance()
         .setActiveButtonLoop(
             switch (bindingMode) {
               case DEFAULT -> defaultButtonLoop;
-              case TUNE -> tuneButtonLoop;
             });
 
-    TuneModeBindings.setDashboardActive(
-        bindingMode == BindingMode.TUNE, turret1.getCommandedHoodAngleDeg());
     appliedBindingMode = bindingMode;
     SmartDashboard.putString("Code Mode/Applied", appliedBindingMode.name());
     Logger.recordOutput("Controls/BindingModeApplied", appliedBindingMode.name());
