@@ -11,17 +11,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Distancer;
-import java.io.File;
-import java.io.IOException;
 import java.util.function.Supplier;
 
-/**
- * Shot table tuning. Both turrets share one hood/flywheel setpoint because they read the same
- * shot_table.json. Line up head-on to the hub; saved rows use the mean of the two turret distances.
- */
+/** Live tuning controls and telemetry for the two turrets' shared hood/flywheel setpoint. */
 public final class Tune extends SubsystemBase {
   private static final String SHARED_HOOD_KEY = "Tune/Hood Deg";
   private static final String SHARED_FLYWHEEL_KEY = "Tune/Flywheel RPS";
@@ -29,7 +23,6 @@ public final class Tune extends SubsystemBase {
   private static final String SHARED_STATUS_KEY = "Tune/Setpoints Status";
   private static final String LEFT_TURRET_DISTANCE_KEY = "Tune/Left Turret To Hub Distance M";
   private static final String RIGHT_TURRET_DISTANCE_KEY = "Tune/Right Turret To Hub Distance M";
-  private static final String SAVE_STATUS_KEY = "Tune/Save Status";
   private static final String TABLE_HOOD_KEY = "Tune/Table Hood Deg";
   private static final String TABLE_FLYWHEEL_KEY = "Tune/Table Flywheel RPS";
   // Commanded, not measured: the hood servos have no feedback.
@@ -50,7 +43,7 @@ public final class Tune extends SubsystemBase {
     this.robotPose = robotPose;
     this.leftTurret = leftTurret;
     this.rightTurret = rightTurret;
-    initializeDashboard(robotPose, leftTurret.getCommandedHoodAngleDeg());
+    initializeDashboard(leftTurret.getCommandedHoodAngleDeg());
     publishTuneTelemetry(robotPose.get(), leftTurret, rightTurret);
   }
 
@@ -60,12 +53,9 @@ public final class Tune extends SubsystemBase {
   }
 
   /** Keep controls available in every code mode; never resume tuning automatically at startup. */
-  static void initializeDashboard(Supplier<Pose2d> robotPose, double currentHoodDeg) {
+  static void initializeDashboard(double currentHoodDeg) {
     SmartDashboard.putBoolean(USE_TUNE_VALUES_KEY, false);
     publishDefaultTuneValues(currentHoodDeg);
-    SmartDashboard.putData(
-        "Tune/Save Point",
-        Commands.runOnce(() -> saveTunePoint(robotPose.get())).ignoringDisable(true));
   }
 
   public static boolean useTuneValues() {
@@ -88,37 +78,6 @@ public final class Tune extends SubsystemBase {
         SmartDashboard.getNumber(SHARED_FLYWHEEL_KEY, 0.0));
   }
 
-  private static void saveTunePoint(Pose2d robotPose) {
-    TurretTuneSetpoint setpoint = readTuneSetpoint();
-    if (!setpoint.valid()) {
-      SmartDashboard.putString(SAVE_STATUS_KEY, "Not saved: " + setpoint.status());
-      return;
-    }
-    if (setpoint.flywheelRps() <= 0.0) {
-      SmartDashboard.putString(SAVE_STATUS_KEY, "Not saved: flywheel is 0");
-      return;
-    }
-
-    // Both turrets share one table row, so save the distance between them. Line up head-on to the
-    // hub so the two turret distances match.
-    double distanceMeters = getTuneDistance(robotPose);
-    String result;
-    try {
-      File file =
-          GetAdjustedShot.saveTunedRow(
-              distanceMeters, setpoint.hoodAngleDeg(), setpoint.flywheelRps());
-      result = "Saved to " + file.getPath();
-    } catch (IOException e) {
-      result = "In use but FILE WRITE FAILED (" + e.getMessage() + ")";
-    }
-
-    SmartDashboard.putString(
-        SAVE_STATUS_KEY,
-        String.format(
-            "%s d=%.2f m, hood=%.1f, rps=%.1f",
-            result, distanceMeters, setpoint.hoodAngleDeg(), setpoint.flywheelRps()));
-  }
-
   private static void publishTuneTelemetry(
       Pose2d robotPose, Turret leftTurret, Turret rightTurret) {
     TurretTuneSetpoint setpoint = readTuneSetpoint();
@@ -136,7 +95,7 @@ public final class Tune extends SubsystemBase {
     SmartDashboard.putNumber(
         RIGHT_TURRET_MEASURED_RPS_KEY, roundToHundredths(rightTurret.getMeasuredFlywheelRps()));
 
-    // What the shot table currently says for this spot, at the same distance a save would use.
+    // Read the shared table at the mean of the two turret distances.
     Distancer tableShot = GetAdjustedShot.getTableShot(getTuneDistance(robotPose));
     // Clamped like the turret does, so the value can be copied straight into Tune/Hood Deg.
     SmartDashboard.putNumber(
@@ -191,7 +150,6 @@ public final class Tune extends SubsystemBase {
     SmartDashboard.putString(SHARED_STATUS_KEY, "Idle");
     SmartDashboard.putNumber(LEFT_TURRET_DISTANCE_KEY, 0.0);
     SmartDashboard.putNumber(RIGHT_TURRET_DISTANCE_KEY, 0.0);
-    SmartDashboard.putString(SAVE_STATUS_KEY, "Nothing saved yet");
   }
 
   private static void applyTurretTune(

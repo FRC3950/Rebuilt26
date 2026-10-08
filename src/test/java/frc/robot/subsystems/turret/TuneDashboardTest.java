@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.junit.jupiter.api.Test;
@@ -18,9 +17,10 @@ class TuneDashboardTest {
       instance.startLocal();
       SmartDashboard.setNetworkTableInstance(instance);
       try {
-        Tune.initializeDashboard(Pose2d::new, 13.0);
+        Tune.initializeDashboard(13.0);
         assertTrue(SmartDashboard.containsKey("Tune/Hood Deg"));
-        assertTrue(SmartDashboard.containsKey("Tune/Save Status"));
+        assertFalse(SmartDashboard.containsKey("Tune/Save Status"));
+        assertFalse(SmartDashboard.containsKey("Tune/Save Point/.type"));
         assertFalse(Tune.useTuneValues());
 
         SmartDashboard.putNumber("Tune/Hood Deg", 20.0);
@@ -33,7 +33,7 @@ class TuneDashboardTest {
         assertEquals(35.0, SmartDashboard.getNumber("Tune/Flywheel RPS", -1.0));
 
         SmartDashboard.putBoolean("Tune/Use Tune Values", true);
-        Tune.initializeDashboard(Pose2d::new, 13.0);
+        Tune.initializeDashboard(13.0);
         assertFalse(Tune.useTuneValues());
         assertEquals(20.0, SmartDashboard.getNumber("Tune/Hood Deg", -1.0));
         assertEquals(35.0, SmartDashboard.getNumber("Tune/Flywheel RPS", -1.0));
