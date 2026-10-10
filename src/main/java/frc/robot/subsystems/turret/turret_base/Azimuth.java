@@ -32,6 +32,7 @@ public class Azimuth {
   private double startupSensorRotations = Double.NaN;
   private double verificationStartSec;
   private CompletableFuture<StatusCode> startupPositionWrite;
+  private final StartupEnableRecovery enableRecovery = new StartupEnableRecovery();
   private String startupStatus = "Confirm both physical startup windows while disabled";
 
   public Azimuth(
@@ -112,6 +113,10 @@ public class Azimuth {
     if (!DriverStation.isDisabled() || Constants.currentMode != Constants.Mode.REAL) {
       return;
     }
+    beginStartupInitialization();
+  }
+
+  private void beginStartupInitialization() {
     // An aborted attempt may still be finishing its bounded CAN call. Never overlap writes.
     if (startupPositionWrite != null && !startupPositionWrite.isDone()) {
       return;
@@ -152,10 +157,13 @@ public class Azimuth {
     startupStatus = "Assigning CANcoder position";
   }
 
-  public void updateStartup() {
+  public void updateStartup(boolean automaticRecoveryAllowed) {
     if (Constants.currentMode != Constants.Mode.REAL) {
       return;
     }
+    boolean recoverOnEnable =
+        enableRecovery.shouldAttempt(
+            DriverStation.isEnabled(), startupReady, verifyingStartup, automaticRecoveryAllowed);
     boolean encoderReset = encoder.hasResetOccurred();
     boolean motorReset = azimuth.hasResetOccurred();
     if (motorReset) {
@@ -167,11 +175,11 @@ public class Azimuth {
       failStartup("Device reset; disable, return to windows, and confirm again");
       return;
     }
-    if (!startupReady && !verifyingStartup) {
-      return;
+    // Placement in the marked windows is still required. Reuse the manual checks once at enable.
+    if (recoverOnEnable) {
+      beginStartupInitialization();
     }
-    if (verifyingStartup && !DriverStation.isDisabled()) {
-      failStartup("Enabled before verification completed; disable and confirm again");
+    if (!startupReady && !verifyingStartup) {
       return;
     }
     if (verifyingStartup && startupPositionWrite != null) {

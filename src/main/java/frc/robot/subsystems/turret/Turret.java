@@ -198,7 +198,7 @@ public class Turret extends SubsystemBase {
 
   @Override
   public void periodic() {
-    azimuth.updateStartup();
+    azimuth.updateStartup(!isDisabledBySwitch());
     if (isDisabledBySwitch() || !bothTurretsReady.getAsBoolean()) {
       stop();
     }

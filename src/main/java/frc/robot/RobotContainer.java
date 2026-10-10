@@ -171,7 +171,7 @@ public class RobotContainer {
     turret1.setStartupInterlock(this::areActiveTurretsReady);
     turret2.setStartupInterlock(this::areActiveTurretsReady);
     SmartDashboard.putData(
-        "Turrets/Confirm both startup windows",
+        "Turrets/Larp",
         Commands.runOnce(
                 () -> {
                   if (DriverStation.isDisabled()) {
