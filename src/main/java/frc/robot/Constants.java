@@ -275,9 +275,9 @@ public final class Constants {
         indexerConfig.Slot0.kP = indexerKP;
         indexerConfig.Slot0.kV = indexerKV;
         indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        indexerConfig.CurrentLimits.StatorCurrentLimit = 80;
+        indexerConfig.CurrentLimits.StatorCurrentLimit = 60;
         indexerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        indexerConfig.CurrentLimits.SupplyCurrentLimit = 60;
+        indexerConfig.CurrentLimits.SupplyCurrentLimit = 40;
         indexerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         hotdogConfig.Slot0.kP = hotdogKP;

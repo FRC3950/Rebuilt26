@@ -6,7 +6,8 @@
   },
   "System Joysticks": {
     "window": {
-      "enabled": false
+      "enabled": true,
+      "visible": true
     }
   },
   "keyboardJoysticks": [
