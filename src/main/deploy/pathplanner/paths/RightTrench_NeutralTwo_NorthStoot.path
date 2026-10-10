@@ -1,0 +1,66 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.065486111111112,
+        "y": 0.6512336892052204
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.815486111111112,
+        "y": 0.6512336892052204
+      },
+      "isLocked": false,
+      "linkedName": "RightTrench_NorthNeutralSecondSwipe"
+    },
+    {
+      "anchor": {
+        "x": 3.8264531435349944,
+        "y": 0.6512336892052204
+      },
+      "prevControl": {
+        "x": 4.534980817522322,
+        "y": 0.655489042207793
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "RightTrench_NorthStoot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Shoot Early",
+      "waypointRelativePos": 0.9041297935103247,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Start Shoot"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 11.25,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "SOUTH",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

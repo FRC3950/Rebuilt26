@@ -1,0 +1,147 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.8264531435349944,
+        "y": 0.6512336892052204
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.012806818179971,
+        "y": 0.5822159090950407
+      },
+      "isLocked": false,
+      "linkedName": "RightTrench_NorthStoot"
+    },
+    {
+      "anchor": {
+        "x": 7.759615668402779,
+        "y": 1.4686022727272725
+      },
+      "prevControl": {
+        "x": 6.9695441774998255,
+        "y": 0.7074191785520432
+      },
+      "nextControl": {
+        "x": 8.257056210398945,
+        "y": 1.9478542585090945
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.878340909090909,
+        "y": 3.6883139467592594
+      },
+      "prevControl": {
+        "x": 8.381185368954334,
+        "y": 3.1054671218037173
+      },
+      "nextControl": {
+        "x": 7.440193351260496,
+        "y": 4.196170616817515
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.065486111111112,
+        "y": 3.6883139467592594
+      },
+      "prevControl": {
+        "x": 6.4532029057824865,
+        "y": 4.312496790323261
+      },
+      "nextControl": {
+        "x": 5.746550906085132,
+        "y": 3.1748621543123576
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.065486111111112,
+        "y": 1.903773075810185
+      },
+      "prevControl": {
+        "x": 6.168852935661285,
+        "y": 2.769060849784891
+      },
+      "nextControl": {
+        "x": 6.029395856611059,
+        "y": 1.601660128890992
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.065486111111112,
+        "y": 0.6512336892052204
+      },
+      "prevControl": {
+        "x": 6.029328902550828,
+        "y": 1.829039122566174
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "RightTrench_NorthNeutralSecondSwipe"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.2796463815789472,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1.0266036184210554,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 1.750330250990756,
+      "rotationDegrees": 130.0
+    },
+    {
+      "waypointRelativePos": 3.4877055921052436,
+      "rotationDegrees": -90.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Intake Zone",
+      "waypointRelativePos": 0.8407079646017696,
+      "endWaypointRelativePos": 5.0,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Intake While Held"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 11.25,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "SOUTH",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
