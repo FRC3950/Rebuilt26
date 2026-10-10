@@ -52,6 +52,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Field2dPublisher;
+import frc.robot.util.MatchTiming;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -66,6 +67,7 @@ public class RobotContainer {
   private final TurretVisualization turretVisualization;
   private final Vision vision;
   private final Field2dPublisher fieldPublisher;
+  private final MatchTiming matchTiming;
   private final Intake intake;
   private final Indexer indexer;
   private final Command simulationCommand;
@@ -182,6 +184,7 @@ public class RobotContainer {
             .ignoringDisable(true));
     turretVisualization = new TurretVisualization(turret1, turret2);
     fieldPublisher = new Field2dPublisher("Field", drive::getPose);
+    matchTiming = new MatchTiming();
 
     if (Constants.currentMode == Constants.Mode.SIM) {
       FuelSimulationController fuelSimulationController =
