@@ -77,8 +77,8 @@ public final class Constants {
       public static final CANcoderConfiguration leftConfig = new CANcoderConfiguration();
       public static final CANcoderConfiguration rightConfig = new CANcoderConfiguration();
 
-      public static final double leftEncoderOffset = -0.37939453125;
-      public static final double rightEncoderOffset = 0.386474609375;
+      public static final double leftEncoderOffset = -0.4873046875;
+      public static final double rightEncoderOffset = 0.393798828125;
 
       public static final double leftTurretAzimuthOffset = 0;
       public static final double rightTurretAzimuthOffset = 0;
@@ -275,7 +275,7 @@ public final class Constants {
         indexerConfig.Slot0.kP = indexerKP;
         indexerConfig.Slot0.kV = indexerKV;
         indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        indexerConfig.CurrentLimits.StatorCurrentLimit = 60;
+        indexerConfig.CurrentLimits.StatorCurrentLimit = 80;
         indexerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         indexerConfig.CurrentLimits.SupplyCurrentLimit = 40;
         indexerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
