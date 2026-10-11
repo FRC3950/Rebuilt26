@@ -77,7 +77,7 @@ public final class Constants {
       public static final CANcoderConfiguration leftConfig = new CANcoderConfiguration();
       public static final CANcoderConfiguration rightConfig = new CANcoderConfiguration();
       public static final double leftEncoderOffset = -0.4873046875;
-      public static final double rightEncoderOffset = 0.393798828125;
+      public static final double rightEncoderOffset = 0.293701171875;
 
       public static final double leftTurretAzimuthOffset = 0;
       public static final double rightTurretAzimuthOffset = 0;
