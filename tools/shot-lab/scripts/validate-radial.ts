@@ -1,0 +1,10 @@
+import { readFileSync, writeFileSync } from "node:fs";
+import { type RadialMap } from "../src/precomputed";
+import { validateAlliance } from "../src/map-coverage";
+const file = process.argv[2] ?? "../../src/main/deploy/chuck_shot_model.json";
+const m = JSON.parse(readFileSync(file, "utf8")) as RadialMap;
+const report = validateAlliance(m);
+m.coverage = report;
+writeFileSync(file, JSON.stringify(m));
+writeFileSync("test/fixtures/radial-v2-coverage.json", JSON.stringify(report));
+console.log(JSON.stringify({ ...report, points: undefined }));

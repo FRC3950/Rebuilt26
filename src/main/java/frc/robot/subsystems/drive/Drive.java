@@ -381,6 +381,18 @@ public class Drive extends SubsystemBase {
     return getChassisSpeeds();
   }
 
+  public double getPitchRad() {
+    return Constants.currentMode == Constants.Mode.SIM
+        ? 0
+        : gyroInputs.tiltConnected ? gyroInputs.pitchRad : Double.NaN;
+  }
+
+  public double getRollRad() {
+    return Constants.currentMode == Constants.Mode.SIM
+        ? 0
+        : gyroInputs.tiltConnected ? gyroInputs.rollRad : Double.NaN;
+  }
+
   /** Returns the measured chassis speeds of the robot (field-relative). */
   public ChassisSpeeds getFieldRelativeSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(getRobotRelativeSpeeds(), getRotation());

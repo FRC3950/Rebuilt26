@@ -49,11 +49,13 @@ public final class Tune extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SimpleShotModel.refreshDashboard();
     publishTuneTelemetry(robotPose.get(), leftTurret, rightTurret);
   }
 
   /** Keep controls available in every code mode; never resume tuning automatically at startup. */
   static void initializeDashboard(double currentHoodDeg) {
+    SimpleShotModel.initializeDashboard();
     SmartDashboard.putBoolean(USE_TUNE_VALUES_KEY, false);
     publishDefaultTuneValues(currentHoodDeg);
   }

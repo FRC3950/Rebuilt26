@@ -63,6 +63,14 @@ public class TurretTargeting extends Command {
     Pose2d robotPose = drive.getPose();
     if (Tune.useTuneValues()) {
       Tune.runTuneValues(turret, robotPose, robotToTurret);
+      turret.recordShotLab(
+          robotPose,
+          drive.getFieldRelativeSpeeds(),
+          drive.getRollRad(),
+          drive.getPitchRad(),
+          null,
+          null,
+          "Manual tune");
       return;
     }
     var fieldVelocity = drive.getFieldRelativeSpeeds();
@@ -70,7 +78,8 @@ public class TurretTargeting extends Command {
         targetOverrideSupplier != null ? targetOverrideSupplier.get() : null;
     var params =
         targetOverride == null
-            ? shotCalc.getParameters(robotPose, fieldVelocity, robotToTurret)
+            ? shotCalc.getHubParameters(
+                robotPose, fieldVelocity, robotToTurret, drive.getRollRad(), drive.getPitchRad())
             : shotCalc.getParameters(robotPose, fieldVelocity, targetOverride, robotToTurret);
 
     if (params.isValid()) {
@@ -83,6 +92,14 @@ public class TurretTargeting extends Command {
       // Do not retain the last tuning outputs if normal targeting has no valid shot.
       turret.stop();
     }
+    turret.recordShotLab(
+        robotPose,
+        fieldVelocity,
+        drive.getRollRad(),
+        drive.getPitchRad(),
+        targetOverride == null ? shotCalc.getLastHubSolution() : null,
+        params,
+        targetOverride == null ? "Precomputed radial quadratic hub" : "Legacy ferry");
   }
 
   @Override

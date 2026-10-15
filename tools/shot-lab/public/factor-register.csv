@@ -1,0 +1,46 @@
+factor,units,baseline_or_reference_NOT_measured,measured_value,uncertainty,method,evidence_file_and_trial_ids,supported_operating_range,notes
+Release height,m,.445,,,Video ball center at separation,,,Regenerate; check hood dependence
+Wheel radius,m,.0508,,,Measure defined contact radius,,,Fix radius convention before fitting transfer
+Elevation at hood 13,deg,77 assumed,,,Stationary initial velocity fit,,,angleMin; regenerate
+Elevation at hood 29.85,deg,60.15 assumed,,,Stationary initial velocity fit,,,angleMax; regenerate
+Speed transfer,ratio,1 ideal,,,Measured exit speed / measured wheel surface speed,,,Regenerate; check speed and hood dependence
+Drag Cd,dimensionless,0 disabled,,,Fit full measured trajectories with launch state fixed,,,Regenerate; fixed density/mass/radius
+Spin ratio,ball rev / wheel rev,0 disabled,,,Signed marker rotation / measured wheel RPS,,,Regenerate
+Effective Magnus coefficient,s/m in current equation,0 disabled,,,Fit code-specific force law after spin measurement,,,Not standard CL; regenerate
+Spin decay,1/s,0 disabled,,,Slope of log absolute measured spin versus time,,,Regenerate
+Release delay,s,0 disabled,,,Synchronized command/state event to ball separation,,,Live; paired moving trials
+Angle standard deviation,deg,.5 assumed,,,Repeated identical-condition measured releases,,,Map-only; regenerate
+Speed standard deviation,m/s,.15 assumed,,,Repeated identical-condition measured releases,,,Map-only; regenerate
+Left speed multiplier,ratio,1,,,Compare measured side transfer against common transfer,,,Live; revalidate
+Left hood trim,deg,0,,,Multi-point measured release angle offset,,,Live; cannot correct slope
+Left aim trim,deg,0,,,Measured horizontal release direction after pose/zero checks,,,Live; positive CCW
+Right speed multiplier,ratio,1,,,Compare measured side transfer against common transfer,,,Live; revalidate
+Right hood trim,deg,0,,,Multi-point measured release angle offset,,,Live; cannot correct slope
+Right aim trim,deg,0,,,Measured horizontal release direction after pose/zero checks,,,Live; positive CCW
+Ball mass,kg,.20335424,,,Weigh identified representative balls,,,Fixed code reference; code update/regenerate
+Ball radius,m,.075,,,Measure several diameters without substantial compression,,,Fixed code reference and vacuum fast path
+Air density,kg/m3,1.2041,,,Temperature and station pressure; humidity if needed,,,Fixed code reference
+Gravity,m/s2,9.81,,,Known reference; use trajectory check to diagnose timing/scale,,,Do not fit as shooter correction
+Wind vector,m/s,"[0,0,0]",,,Observe/measure airflow by field position,,,Simple map is still-air; arbitrary wind unsupported
+Hub center,field m,"[4.6256194,4.0346376]",,,Field survey in localization frame,,,Canonical robot/generator geometry
+Hub opening height,m,1.83,,,Measure opening plane relative to floor,,,Fixed code reference and fast path
+Hub ring radius,m,.56,,,Measure tube centerline and opening shape,,,Circular/torus approximation; code update
+Rim tube radius,m,.025,,,Measure collision cross-section,,,Fixed code reference and fast path
+Left turret offset,robot m,"[-.18415,+.19685]",,,Survey from odometry origin; rotation check,,,Check pivot versus ball release displacement
+Right turret offset,robot m,"[-.18415,-.19685]",,,Survey from odometry origin; rotation check,,,Check identity and offset sign
+Turret azimuth zero,deg,Installed calibration,,,Mechanical direction and observed ball direction,,,Do not hide pose error in aim trim
+Pitch/roll axes and offsets,rad,Sensor readings,,,Independent level and controlled inclinations,,,Verify Rz Ry Rx signs; correct code/sensor transform
+Pose and heading,m/rad,Localization readings,,,Independent surveyed poses/headings,,,"Measured state, not fitted correction"
+Field velocity,m/s,Drive estimate,,,External distance/time in both directions/headings,,,Check frame and freshness
+Angular velocity,rad/s,Drive estimate,,,External angle/time in both directions,,,Check radians and sign
+Hood command bounds,deg,"[13,29.85]",,,Configured limits plus mechanism verification,,,Protections; do not raise to hide invalid shots
+Wheel command bounds,RPS,"[0,100]",,,Configured limits plus tracking verification,,,Protections
+Chassis shooting speed limit,m/s,2.5,,,Configured limit and actual measured motion,,,Not a tuning correction
+Coverage angular limit,rad/s,6.254342289681399,,,Configured reference and measured motion,,,Revalidate operating envelope
+Turret release speed envelope,m/s,4.25,,,Translation plus omega cross offset,,,Runtime envelope guard
+Fit distance domain,m,"[.65,7.5]",,,Actual release-state distance envelope,,,Software validation setting
+Fit radial domain,m/s,"[-4.25,4.25]",,,Actual release-point radial envelope,,,Software validation setting
+Sweep angle spacing,deg,<=.5,,,Convergence test with smaller spacing,,,Software; not physical measurement
+Sweep speed spacing,m/s,<=.15,,,Convergence test with smaller spacing,,,Software; not physical measurement
+Integration nominal step,s,.01 plus adaptive travel cap,,,Step convergence and analytic reference tests,,,Software; not physical measurement
+Rim restitution,ratio,.2 display reference,,,Controlled impacts only if bounce modeling needed,,,Older display only; clean rim touches rejected

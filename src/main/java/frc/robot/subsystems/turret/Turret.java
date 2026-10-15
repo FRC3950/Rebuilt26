@@ -7,10 +7,12 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,11 +22,13 @@ import frc.robot.subsystems.turret.turret_base.Flywheels;
 import frc.robot.subsystems.turret.turret_base.Hood;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Turret extends SubsystemBase {
   private static final double ANGLE_WRAP_DEGREES = 360.0;
 
   private final Hood hood;
+  private final ServoChannel.ChannelId hoodChannel;
   private final Flywheels flywheels;
   private final Azimuth azimuth;
   private final String disableKey;
@@ -56,6 +60,7 @@ public class Turret extends SubsystemBase {
     SmartDashboard.setDefaultBoolean(disableKey, false);
     this.minAzimuthControlAngleDeg = minAzimuthControlAngleDeg;
     this.maxAzimuthControlAngleDeg = maxAzimuthControlAngleDeg;
+    hoodChannel = hoodChannelId;
     hood = new Hood(hoodChannelId);
     flywheels = new Flywheels(flywheelID, flywheelConfig, flywheelFollowerID, canbus);
     azimuth =
@@ -194,6 +199,52 @@ public class Turret extends SubsystemBase {
     azimuth.stop();
     hood.stop();
     flywheels.stop();
+  }
+
+  /** Commanded hood position is not measured feedback; ball release data is measured externally. */
+  public void recordShotLab(
+      Pose2d pose,
+      ChassisSpeeds velocity,
+      double roll,
+      double pitch,
+      SimpleShotModel.Solution solution,
+      GetAdjustedShot.ShootingParameters params,
+      String mode) {
+    String side = HOOD_SERVO_CHANNEL_1 == hoodChannel ? "Left" : "Right";
+    String key = "ShotLab/" + side + "/";
+    Logger.recordOutput(key + "Mode", mode);
+    Logger.recordOutput(
+        key + "Status",
+        params == null ? mode : params.isValid() ? "Valid" : params.invalidReason());
+    Logger.recordOutput(key + "Pose", pose);
+    Logger.recordOutput(key + "FieldVelocity", velocity);
+    Logger.recordOutput(key + "RollRad", roll);
+    Logger.recordOutput(key + "PitchRad", pitch);
+    Logger.recordOutput(key + "HoodCommandDeg", hood.getSetpointDeg());
+    Logger.recordOutput(key + "WheelCommandRps", flywheels.getTargetRps());
+    Logger.recordOutput(key + "MeasuredWheelRps", flywheels.getMeasuredVelocityRps());
+    Logger.recordOutput(key + "FollowerWheelRps", flywheels.getFollowerVelocityRps());
+    Logger.recordOutput(key + "MeasuredAzimuthDeg", azimuth.getMotorAngleDeg());
+    Translation2d offset = side.equals("Left") ? robotToTurret1 : robotToTurret2;
+    Translation2d offsetField = offset.rotateBy(pose.getRotation());
+    Translation2d target =
+        Constants.FieldConstants.getHubTranslation().minus(pose.getTranslation().plus(offsetField));
+    double distance = target.getNorm();
+    double vx = velocity.vxMetersPerSecond - velocity.omegaRadiansPerSecond * offsetField.getY();
+    double vy = velocity.vyMetersPerSecond + velocity.omegaRadiansPerSecond * offsetField.getX();
+    Logger.recordOutput(key + "BearingRad", target.getAngle().getRadians());
+    Logger.recordOutput(key + "DistanceM", solution != null ? solution.distance() : distance);
+    Logger.recordOutput(
+        key + "RadialMps",
+        solution != null
+            ? solution.radial()
+            : distance > 0 ? (vx * target.getX() + vy * target.getY()) / distance : 0);
+    Logger.recordOutput(
+        key + "TangentialMps",
+        solution != null
+            ? solution.tangential()
+            : distance > 0 ? (-vx * target.getY() + vy * target.getX()) / distance : 0);
+    Logger.recordOutput(key + "FlightTimeSec", solution != null ? solution.timeOfFlight() : 0.0);
   }
 
   @Override

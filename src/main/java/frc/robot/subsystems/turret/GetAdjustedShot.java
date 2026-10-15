@@ -35,13 +35,32 @@ public class GetAdjustedShot {
       double turretVelocity, // rad/s (robot-relative)
       double hoodAngleDeg, // degrees
       double flywheelSpeed, // same units as flywheelSpeeds[] (ex: RPS)
-      String invalidReason) {
-    public boolean isValid() {
-      if (!isValid) {
-        System.out.println("Invalid shot parameters: " + invalidReason);
-      }
-      return isValid;
-    }
+      String invalidReason) {}
+
+  private SimpleShotModel.Solution lastHubSolution;
+
+  public ShootingParameters getHubParameters(
+      Pose2d robotPose,
+      ChassisSpeeds fieldVelocity,
+      Translation2d robotToTurret,
+      double rollRad,
+      double pitchRad) {
+    lastHubSolution =
+        SimpleShotModel.solve(
+            robotPose, fieldVelocity, getHubTranslation(), robotToTurret, rollRad, pitchRad);
+    var result = lastHubSolution.parameters();
+    if (!result.isValid()) return result;
+    return new ShootingParameters(
+        true,
+        result.turretAngle(),
+        calculateTurretVelocity(result.turretAngle()),
+        result.hoodAngleDeg(),
+        result.flywheelSpeed(),
+        "");
+  }
+
+  public SimpleShotModel.Solution getLastHubSolution() {
+    return lastHubSolution;
   }
 
   private static final String SHOT_TABLE_FILE = "shot_table.json";
@@ -111,7 +130,7 @@ public class GetAdjustedShot {
   }
 
   public ShootingParameters getParameters(Pose2d robotPose, Translation2d robotToTurret) {
-    return getParameters(robotPose, new ChassisSpeeds(), getHubTranslation(), robotToTurret);
+    return getHubParameters(robotPose, new ChassisSpeeds(), robotToTurret, 0, 0);
   }
 
   public ShootingParameters getParameters(
@@ -121,7 +140,7 @@ public class GetAdjustedShot {
 
   public ShootingParameters getParameters(
       Pose2d robotPose, ChassisSpeeds fieldVelocity, Translation2d robotToTurret) {
-    return getParameters(robotPose, fieldVelocity, getHubTranslation(), robotToTurret);
+    return getHubParameters(robotPose, fieldVelocity, robotToTurret, 0, 0);
   }
 
   public ShootingParameters getParameters(
