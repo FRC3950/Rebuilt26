@@ -1,0 +1,271 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chuck Norris · Rookie Shot-Tuning Guide</title><style>*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:25px}body{margin:0;background:#101b20;color:#dce7e4;font:16px/1.8 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}aside{position:fixed;left:0;top:0;bottom:0;width:285px;background:#15262b;padding:30px 20px;overflow:auto;border-right:1px solid #30464a}aside strong{display:block;color:#c4f369;font-size:12px;letter-spacing:2px;margin-bottom:18px}aside a{display:block;font-size:12px;color:#a9bebb;padding:6px 8px;border-radius:4px;line-height:1.5}aside a:hover{background:#263e43;color:#dce7e4;text-decoration:none}main{max-width:1000px;margin-left:285px;padding:45px 55px 100px}h1{font-size:43px;line-height:1.15;letter-spacing:-1.2px;margin:20px 0 25px}h2{font-size:26px;line-height:1.35;margin:65px 0 18px;padding-top:20px;border-top:1px solid #385056;letter-spacing:-.4px}h3{font-size:19px;color:#c4f369;margin-top:32px}p{margin:14px 0}a{color:#c4f369;text-decoration:none}a:hover{text-decoration:underline}strong{color:#f1f3d5}code{font:13px/1.6 ui-monospace,SFMono-Regular,monospace;color:#d8dcae;background:#203239;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}pre{background:#17292f;padding:20px;border:1px solid #30464a;border-radius:8px;overflow:auto;line-height:1.6}pre code{background:none;padding:0;white-space:pre}li{padding:5px 0}ul,ol{padding-left:25px}.table-scroll{overflow:auto;border:1px solid #30464a;border-radius:8px;margin:24px 0}table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.6}th,td{text-align:left;vertical-align:top;padding:13px 15px;border-bottom:1px solid #30464a}th{background:#20343a;color:#c9e0d8}td:first-child{min-width:145px}td code{font-size:11px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 35px}.actions a,button{font:600 12px system-ui;background:#c4f369;color:#152320;border:0;border-radius:5px;padding:12px 15px;cursor:pointer}.actions .secondary{background:#20363b;color:#dce7e4}.kicker{font-size:11px;letter-spacing:2px;color:#b6c797}.note{padding:17px 21px;border-left:3px solid #c4f369;background:#c4f3690a;font-size:14px}.downloads{padding:20px;background:#15262b;border:1px solid #30464a;border-radius:8px;margin:30px 0}.downloads a{display:block;padding:5px 0;font-size:14px}footer{margin-top:60px;color:#9eb4b4;font-size:12px}@media(min-width:1400px){main{margin-left:calc(285px + (100vw - 1285px)/2)}}@media(max-width:1050px){aside{position:static;width:auto;max-height:360px;border-bottom:1px solid #30464a}aside nav{columns:2}main{margin:0 auto;padding:30px 25px 80px}h1{font-size:34px}}@media(max-width:600px){aside nav{columns:1}main{padding:25px 17px}h1{font-size:30px}h2{font-size:23px}pre{padding:12px}}@media print{@page{margin:16mm}body{background:white;color:#111;font-size:10pt;line-height:1.5}aside,.actions,.screen-only{display:none}main{max-width:none;margin:0;padding:0}h1{font-size:25pt}h2{font-size:16pt;margin-top:24pt;break-after:avoid}h3{break-after:avoid;color:#111}a,strong{color:#111}pre{white-space:pre-wrap;background:#f7f7f7;border:1px solid #bbb;break-inside:avoid}pre code{white-space:pre-wrap}code{color:#111;background:#f6f6f6;font-size:9pt}table{font-size:9pt}th{background:#eee;color:#111}tr{break-inside:avoid}.table-scroll{overflow:visible;border-color:#aaa}.note,.downloads{background:#fafafa;border-color:#888}p,li{orphans:3;widows:3}}input{display:block;padding:10px;margin-top:6px;width:100%;border:1px solid #49616a;border-radius:5px;background:#15262b;color:#dce7e4;font:16px system-ui}.calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}label{font-size:13px}.calc{padding:22px;background:#20343a;border:1px solid #49616a;border-radius:9px;margin:25px 0}.calc input[type=checkbox]{display:inline-block;width:auto;margin-right:8px}.calc output{display:block;color:#c4f369;font-size:22px;margin-top:15px}.calc small{color:#a9bebb}.quick{padding:20px 24px;border:1px solid #49616a;border-radius:8px}.quick li{padding:7px 0}@media(max-width:650px){.calc-grid{grid-template-columns:1fr}}@media print{.calc{display:none}}</style></head><body><aside><strong>CHUCK / ROOKIE SHOT GUIDE</strong><nav><a href="#step-1">1. Learn the words on the dashboard</a><a href="#step-2">2. Prepare the robot once</a><a href="#step-3">3. Write down the robot’s starting settings</a><a href="#step-4">4. Try nearby wheel settings</a><a href="#step-5">5. Find a setting with room for error</a><a href="#step-6">6. Use your good setting in automatic mode</a><a href="#step-7">7. Check near, middle, and far</a><a href="#step-8">8. Save the settings</a><a href="#step-9">9. Test moving shots last</a><a href="#step-10">10. Know what this procedure can do</a><a href="full-guide.html">Extra details for the programming team ↗</a></nav></aside><main><div class="kicker">ROOKIE GUIDE · TRY A SETTING · COUNT THE MAKES</div><div class="actions"><a href="http://127.0.0.1:5174/map.html">Open trajectory map ↗</a><button onclick="window.print()">Print / Save as PDF</button><a class="secondary" href="make-miss-trials.csv" download>Blank shot sheet ↓</a></div><div class="quick"><strong>The first session</strong><ol><li>Have a teammate load a model using your two launch angles.</li><li>Park still. Copy the robot’s starting hood and wheel settings into Manual Tune.</li><li>Try nearby wheel settings. Count makes. Choose the middle of the settings that keep working.</li><li>Use the calculator below. Copy its answer into that turret’s Speed Multiplier.</li><li>Turn Manual Tune off. Test near, middle, and far with the same adjustments.</li></ol></div><section class="calc screen-only" aria-label="Shot setting calculator"><h3>Let the calculator do the math</h3><p>Use wheel settings from the dashboard. You do not need the ball’s speed.</p><div class="calc-grid"><label>Starting wheel setting · RPS<input id="ref" type="number" min="0.001" step="any" placeholder="e.g. 40"></label><label>Best wheel setting · RPS<input id="good" type="number" min="0.001" max="100" step="any" placeholder="e.g. 55"></label><label>Current speed multiplier<input id="old" type="number" min="0.001" max="2" step="any" value="1"></label></div><output id="answer" aria-live="polite">Enter your starting and best wheel settings.</output><small>New multiplier = current multiplier × best wheel setting ÷ starting wheel setting. If you changed the hood too, follow Step 6. Copy the answer to the dashboard yourself; this page does not change the robot.</small></section><h1>Chuck Norris: a rookie’s shot-tuning guide</h1>
+<p><strong>Your job: try a setting, shoot a few balls, and write down how many go in.</strong></p>
+<p>You do not need to measure how fast the ball flies or how fast it spins. You only need the robot, its dashboard, a few balls, and the shot sheet.</p>
+<h2 id="step-1">1. Learn the words on the dashboard</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Word</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hub</td>
+<td>The goal you are shooting into.</td>
+</tr>
+<tr>
+<td>Turret</td>
+<td>The part of the shooter that turns to aim. Chuck has a left and a right turret.</td>
+</tr>
+<tr>
+<td>Trim</td>
+<td>A small change added to an automatic setting.</td>
+</tr>
+<tr>
+<td>Hood</td>
+<td>The part that changes the ball’s launch angle. You enter its setting in degrees.</td>
+</tr>
+<tr>
+<td>RPS</td>
+<td>Wheel turns per second. A higher wheel-RPS setting asks the shooter wheels to turn faster. This is not a measurement of ball speed.</td>
+</tr>
+<tr>
+<td>Manual Tune</td>
+<td>You choose the hood and wheel settings on the dashboard.</td>
+</tr>
+<tr>
+<td>Automatic mode</td>
+<td>The robot chooses the shot settings based on its position and motion.</td>
+</tr>
+<tr>
+<td>Speed multiplier</td>
+<td>A number that adjusts the wheel setting in automatic mode. A larger number asks for faster wheels.</td>
+</tr>
+</tbody></table></div>
+<p>The <strong>dashboard</strong> is the screen with the robot’s settings. The <strong>model</strong> is the saved set of numbers the robot uses to choose a shot.</p>
+<h2 id="step-2">2. Prepare the robot once</h2>
+<p>Use your team’s normal startup and shooting-area rules.</p>
+<p>Have a teammate check that the robot knows where it is and points toward the hub. Choose a flat place around the middle of your shooting range. Mark the parking spot and the direction the robot faces.</p>
+<p>Measure or estimate the launch angle at these two hood settings:</p>
+<ul>
+<li>Hood set to <strong>13°</strong>.</li>
+<li>Hood set to <strong>29.85°</strong>.</li>
+</ul>
+<p>The <strong>hood setting</strong> and the <strong>ball’s launch angle</strong> are different numbers. Do not copy one into the other by mistake. Write down whether your launch angles were measured or estimated.</p>
+<p>Have the programming teammate enter those angles on the map page and in the matching dashboard fields. They must build and load the matching model once. You do not need a new model after every test shot.</p>
+<p>For a fresh test, use these starting settings:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Dashboard setting</th>
+<th align="right">Start with</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ShotModel/Left/Speed Multiplier</code></td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td><code>ShotModel/Right/Speed Multiplier</code></td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>Left and right <code>Hood Trim Deg</code></td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>Left and right <code>Aim Trim Deg</code></td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td><code>ShotModel/Advanced/Release Delay Sec</code></td>
+<td align="right">0</td>
+</tr>
+</tbody></table></div>
+<p>Leave drag, spin, lift, and spin decay at <strong>0</strong>. Keep the current ball-speed-transfer and map variation settings for now. You will tune by watching shots, not by trying to measure each of these effects.</p>
+<p>If you are continuing an earlier test, write down the saved settings before changing them.</p>
+<h2 id="step-3">3. Write down the robot’s starting settings</h2>
+<p>Park on your marked spot and stay still.</p>
+<p>Set <code>Tune/Use Tune Values</code> to <strong>OFF</strong>. This is automatic mode.</p>
+<p>Choose which turret’s shots you will watch. For the left turret, write down:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Copy this dashboard value</th>
+<th>Call it this on your sheet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ShotModel/Left/Calculated Hood Deg</code></td>
+<td>Starting hood</td>
+</tr>
+<tr>
+<td><code>ShotModel/Left/Calculated Wheel RPS</code></td>
+<td>Starting wheel setting</td>
+</tr>
+<tr>
+<td><code>ShotModel/Left/Speed Multiplier</code></td>
+<td>Current speed multiplier</td>
+</tr>
+</tbody></table></div>
+<p>For the right turret, use the same names with <strong>Right</strong> instead of <strong>Left</strong>.</p>
+<p>Check <code>ShotModel/Left/Model Valid</code>, or the Right version. It must be <strong>true</strong> before you use its numbers. The starting wheel setting must be greater than zero.</p>
+<p>If the model is invalid, tell the programming teammate what the status message says. Do not copy zero or old settings and treat them as a good starting shot. Some places have gaps in the current model. A gap does not prove the robot cannot make that shot.</p>
+<p><strong>Write these numbers down before turning Manual Tune on.</strong> The automatic numbers may stop updating while you use Manual Tune.</p>
+<h2 id="step-4">4. Try nearby wheel settings</h2>
+<p>Set <code>Tune/Use Tune Values</code> to <strong>ON</strong>. This is Manual Tune.</p>
+<ol>
+<li>Put your <strong>starting hood</strong> into <code>Tune/Hood Deg</code>.</li>
+<li>Put your <strong>starting wheel setting</strong> into <code>Tune/Flywheel RPS</code>.</li>
+<li>Keep the robot parked in the same place, facing the same direction.</li>
+<li>Shoot <strong>three balls</strong>. Write down how many score.</li>
+</ol>
+<p>For this test, a <strong>clean make</strong> goes in without touching the rim. Write rim touches in a separate column if you can see them.</p>
+<p>If the setting does not work well, try a little higher and a little lower. Keep the hood the same.</p>
+<p><strong>Example search only:</strong> if the starting wheel setting is 40 RPS, test these settings in order:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th align="right">Wheel setting</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>First</td>
+<td align="right">40 RPS</td>
+</tr>
+<tr>
+<td>Next</td>
+<td align="right">42 RPS</td>
+</tr>
+<tr>
+<td>Next</td>
+<td align="right">38 RPS</td>
+</tr>
+<tr>
+<td>Next</td>
+<td align="right">44 RPS</td>
+</tr>
+<tr>
+<td>Next</td>
+<td align="right">36 RPS</td>
+</tr>
+</tbody></table></div>
+<p>Use your own starting value. You do not need to tell whether a miss was short or long. Just count makes. If you can tell the miss direction, that may help you choose the next test faster.</p>
+<p>Keep wheel settings within <strong>0–100 RPS</strong> and the team’s normal test range. Keep hood settings within <strong>13–29.85°</strong>.</p>
+<p>The two manual settings control <strong>both turrets</strong>. Record the left and right results separately. Do not add their scores together. Use the team’s normal controls to run the test as needed; these are not separate left/right manual widgets.</p>
+<p><strong>Stay still in Manual Tune.</strong> This mode does not correct the shot for robot movement. It also does not add the automatic mode’s side trims.</p>
+<h2 id="step-5">5. Find a setting with room for error</h2>
+<p>When a wheel setting starts working:</p>
+<ol>
+<li>Try nearby settings in <strong>0.5–1 RPS</strong> steps.</li>
+<li>Shoot <strong>five balls</strong> at each setting.</li>
+<li>Write each result as makes out of attempts, such as <strong>4/5</strong>.</li>
+</ol>
+<p>Prefer settings that make 5/5. A 4/5 result is worth testing again. One good shot is not enough to choose a setting.</p>
+<p>Look for several wheel settings <strong>next to each other</strong> that keep working. Pick the middle of that group and test it again.</p>
+<p>For example, if 52, 54, and 56 RPS all work after checking the settings between them, try 54 RPS. These are example numbers, not settings already tested on Chuck.</p>
+<p>Do not assume every number between two successful tests works. Check the numbers in between. If two groups work with a group of misses between them, keep those groups separate.</p>
+<h3>What if none of the wheel settings work?</h3>
+<p>Keep one wheel setting fixed. Try the starting hood <strong>plus 1°</strong>, then <strong>minus 1°</strong>, within the hood limits. Try nearby wheel settings again if the hood change helps.</p>
+<p>Change <strong>one setting at a time</strong> so you know which change helped. Write down both the hood and wheel setting that worked.</p>
+<p>If every ball goes to the same side, have a teammate check the aim and robot position. Faster wheels will not fix a shot that points the wrong way.</p>
+<p>Also check the dashboard’s measured wheel RPS. If the wheels cannot reach or hold the requested speed, have the team fix that first. You do not need a separate speed-measuring tool.</p>
+<h2 id="step-6">6. Use your good setting in automatic mode</h2>
+<p>The calculator near the top of this page does the math for you.</p>
+<p>Enter:</p>
+<ol>
+<li><strong>Starting wheel setting:</strong> the automatic value you wrote down in Step 3.</li>
+<li><strong>Best wheel setting:</strong> the manual value you chose in Step 5.</li>
+<li><strong>Current speed multiplier:</strong> the value you wrote down in Step 3.</li>
+</ol>
+<p>Copy the answer into the turret you tested:</p>
+<ul>
+<li><code>ShotModel/Left/Speed Multiplier</code>, or</li>
+<li><code>ShotModel/Right/Speed Multiplier</code>.</li>
+</ul>
+<p>The calculator does <strong>not</strong> send anything to the robot. You must copy the answer to the dashboard yourself.</p>
+<p>On a printed copy, you can do the same math: multiply the current multiplier by the best wheel setting, then divide by the starting wheel setting.</p>
+<p><strong>Example only:</strong> starting wheels 40 RPS, best wheels 55 RPS, and current multiplier 1 gives a new multiplier of <strong>1.375</strong>.</p>
+<h3>If you also changed the hood</h3>
+<p>If the old hood trim was zero, subtract the starting hood from the hood that worked. Enter that difference in the side’s <code>Hood Trim Deg</code> field.</p>
+<p>Example only: starting hood 18°, good hood 19° means a hood trim of <strong>+1°</strong>.</p>
+<p>If the old hood trim was not zero, add this difference to the old trim. Have a teammate check the numbers if you are unsure.</p>
+<p>Now set <code>Tune/Use Tune Values</code> to <strong>OFF</strong>. Stay on the same parking mark. Shoot five more balls in automatic mode.</p>
+<p>Check that the dashboard commands match the shot you meant to test. If they do not, check your parking spot, copied numbers, and mode switch.</p>
+<p>Repeat the process for the other turret. It may need a different adjustment.</p>
+<h2 id="step-7">7. Check near, middle, and far</h2>
+<p>Keep the same automatic adjustments while you test all three places.</p>
+<ol>
+<li>Shoot five balls from your middle spot.</li>
+<li>Shoot five from a marked near spot.</li>
+<li>Shoot five from a marked far spot.</li>
+<li>Return to the middle spot and check it again.</li>
+</ol>
+<p>Use places where the model is valid and the robot has a clear shot. Record each turret’s results on its own sheet.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>What happens?</th>
+<th>What to do next</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>All three places work</td>
+<td>Keep the settings. Test more balls and more places.</td>
+</tr>
+<tr>
+<td>One place fails</td>
+<td>Use Manual Tune there to find a setting that works. Record it, then turn Manual Tune off again.</td>
+</tr>
+<tr>
+<td>Each place needs a different multiplier</td>
+<td>Keep the results. Ask the programming teammate to use them to improve the model.</td>
+</tr>
+<tr>
+<td>The left and right turrets need different settings</td>
+<td>Keep separate side adjustments. Test both at all three places.</td>
+</tr>
+<tr>
+<td>A manual shot works where the model is invalid</td>
+<td>Record the shot and the error message. The model needs work at that place.</td>
+</tr>
+</tbody></table></div>
+<p>Do not keep changing the same multiplier for each parking spot and call the last value “finished.” You want one saved set of adjustments that works at several distances.</p>
+<p>Five shots are a quick check. Before calling the settings ready, repeat with more shots, several balls, and more field positions. Even five makes in a row do not prove the shot will always work.</p>
+<h2 id="step-8">8. Save the settings</h2>
+<p>After an improvement passes your checks, click <code>ShotModel/Save Settings</code>.</p>
+<p>This keeps the dashboard settings after a robot restart. It does <strong>not</strong> build or load a new model file.</p>
+<p>Give the programming teammate your shot sheet when the settings work at several distances. They can update the model’s overall speed correction and build a new map if needed. After they do, retest the shots. Do not apply the same correction twice in the model and the side multiplier.</p>
+<p>You do not need to measure ball speed for this step. The correction comes from the settings that made shots.</p>
+<h2 id="step-9">9. Test moving shots last</h2>
+<p>Only start this step after parked shots work.</p>
+<p>Set <code>Tune/Use Tune Values</code> to <strong>OFF</strong>. Use automatic mode for all moving tests.</p>
+<p>Test:</p>
+<ul>
+<li>Slowly toward the hub, then away from it.</li>
+<li>Slowly across the hub in both directions.</li>
+<li>Faster motion, then up to the <strong>2.5 m/s</strong> shooting limit where the shot is valid.</li>
+<li>Chassis turns in both directions, watching each turret separately.</li>
+</ul>
+<p>Keep the parked-shot settings unchanged at first.</p>
+<p>If moving shots need work, try a small change to <code>ShotModel/Advanced/Release Delay Sec</code> with the team. This setting tells the robot how far ahead to predict the release point. It is <strong>not</strong> how long the ball flies.</p>
+<p>For example, compare the current delay with a value <strong>0.01 second higher</strong>. Test both travel directions at each value. Keep the change only if the overall results improve. If it helps one direction but hurts the other, go back and record what happened.</p>
+<p>Delay starts at zero and cannot be negative in this version. If delay changes do not help, ask the team to check the model and motion readings. Do not keep increasing it without better results.</p>
+<p>After level moving shots work, test the pitch and roll conditions your team expects. Pitch means the robot leans forward or back. Roll means it leans side to side.</p>
+<h2 id="step-10">10. Know what this procedure can do</h2>
+<p>You are finding settings that work by testing shots. You are <strong>not</strong> measuring each cause of a miss.</p>
+<p>Keep drag, lift, spin, and spin decay off for the first tests. You do not need to work out each one separately.</p>
+<p>If different distances need different corrections, keep the hood, wheel, and make-count results. Those results can guide the next model update.</p>
+<p>The app does <strong>not yet build a new model just from make/miss rows</strong>. Do not fill in guessed ball speeds in the older measurement page. Give the team your real shot results instead.</p>
+<h3>What goes on the sheet?</h3>
+<ul>
+<li>Where you parked and which turret you watched.</li>
+<li>Starting hood, starting wheels, and current speed multiplier.</li>
+<li>The hood and wheel settings you tried.</li>
+<li>Clean makes and total attempts.</li>
+<li>The adjustment you kept and whether it also worked at other places.</li>
+</ul>
+<p>There is no ball-speed or spin-measurement column. Download the blank shot sheet near the top of this page. Open it in a spreadsheet app to fill it in or print it.</p>
+<p><strong>The goal:</strong> one saved set of adjustments that works when parked at several distances, then works during moving tests.</p>
+<footer>These settings come from test shots. You do not need to measure ball speed or spin. No robot code was changed for this guide.</footer></main><script>const inputs=['ref','good','old'].map(id=>document.getElementById(id));function update(){const [r,q,m]=inputs.map(e=>e.valueAsNumber);const out=document.getElementById('answer');if(!Number.isFinite(r)||!Number.isFinite(q)||!Number.isFinite(m)||r<=0||q<=0||m<=0||r>100||q>100||m>2){out.textContent='Use wheel settings above 0 and up to 100. The current multiplier must be above 0 and up to 2.';return;}const value=m*q/r;out.textContent=value>2?'This answer ('+value.toFixed(4)+') is above the limit of 2. Check your starting numbers with a teammate.':'New Speed Multiplier: '+value.toFixed(4);}inputs.forEach(e=>e.addEventListener('input',update));</script></body></html>

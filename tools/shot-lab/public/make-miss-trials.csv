@@ -1,0 +1,7 @@
+date,parking_spot,turret,starting_hood_degrees,starting_wheel_RPS,current_speed_multiplier,tested_hood_degrees,tested_wheel_RPS,clean_makes,shots_taken,rim_touches_optional,new_speed_multiplier,new_hood_trim_degrees,other_spots_checked,notes
+,Middle,Left,,,,,,,,,,,,
+,Middle,Right,,,,,,,,,,,,
+,Near,Left,,,,,,,,,,,,
+,Near,Right,,,,,,,,,,,,
+,Far,Left,,,,,,,,,,,,
+,Far,Right,,,,,,,,,,,,
