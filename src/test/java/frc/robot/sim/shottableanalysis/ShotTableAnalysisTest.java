@@ -469,6 +469,10 @@ class ShotTableAnalysisTest {
   @Test
   void export() throws Exception {
     assumeTrue(MODE.equals("export"));
+    // Re-freezing from an edited table would move the measuring stick; make that deliberate.
+    if (Files.exists(FROZEN) && !env("STA_FORCE_EXPORT", "").equals("1")) {
+      throw new IllegalStateException(FROZEN + " exists; set STA_FORCE_EXPORT=1 to overwrite it");
+    }
     Files.createDirectories(DIR);
     Object derived = derivedCalibration();
     List<double[]> hood = calibrationPoints(derived, "hoodAnglePoints");
@@ -609,7 +613,7 @@ class ShotTableAnalysisTest {
     Path out = DIR.resolve(env("STA_OUT", "search.csv"));
     try (PrintWriter w = new PrintWriter(Files.newBufferedWriter(out))) {
       w.println(
-          "d,hood,rps,bearing,tof,crossAlong,crossLateral,bounced,pert27,bearingsScored,bearingsTotal");
+          "d,hood,rps,bearing,tof,crossAlong,crossLateral,bounced,pert27,bearingsScored,bearingsTotal,apex");
       for (double d = dMin; d <= dMax + 1e-9; d += dStep) {
         double dd = Math.round(d * 1000) / 1000.0;
         List<Integer> bearings = bearingsAt(dd);
@@ -658,7 +662,8 @@ class ShotTableAnalysisTest {
                           res.bounced() ? "1" : "0",
                           Integer.toString(pert),
                           Integer.toString(ok),
-                          Integer.toString(bearingList.size()));
+                          Integer.toString(bearingList.size()),
+                          f(res.apex()));
                 });
         for (String row : rows) {
           if (row != null) {

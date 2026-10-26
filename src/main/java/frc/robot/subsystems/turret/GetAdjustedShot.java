@@ -11,6 +11,7 @@ import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.Distancer;
 import java.io.File;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import org.littletonrobotics.junction.Logger;
 
 public class GetAdjustedShot {
   private static final int LOOKAHEAD_ITERATIONS = 10;
@@ -45,34 +47,47 @@ public class GetAdjustedShot {
   }
 
   private static final String SHOT_TABLE_FILE = "shot_table.json";
+  // Constant-arc table built in sim (see shot_table_analysis/). Only used while Peak Mode is on.
+  private static final String PEAK_SHOT_TABLE_FILE = "shot_table_peak.json";
+  private static final String PEAK_MODE_KEY = "Peak Mode";
   // A tuned row replaces any existing row this close to it.
   private static final double SAME_ROW_TOLERANCE_METERS = 0.1;
 
-  private static double minDistance;
-  private static double maxDistance;
   private static final List<Distancer.Row> shotRows = new ArrayList<>();
-
   private static InterpolatingTreeMap<Double, Distancer> shotMap;
+
+  private static final List<Distancer.Row> peakRows = new ArrayList<>();
+  private static InterpolatingTreeMap<Double, Distancer> peakShotMap;
 
   static {
     shotRows.addAll(Distancer.loadRowsFromDeploy(SHOT_TABLE_FILE));
     rebuildShotMap();
+    peakRows.addAll(Distancer.loadRowsFromDeploy(PEAK_SHOT_TABLE_FILE));
+    peakShotMap = buildShotMap(peakRows);
   }
 
   private static void rebuildShotMap() {
-    shotRows.sort(Comparator.comparingDouble(r -> r.d));
-    shotMap = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Distancer::interpolate);
-    if (shotRows.isEmpty()) {
-      minDistance = 0.0;
-      maxDistance = 0.0;
-    } else {
-      minDistance = shotRows.get(0).d;
-      maxDistance = shotRows.get(shotRows.size() - 1).d;
-    }
+    shotMap = buildShotMap(shotRows);
+  }
 
-    for (var r : shotRows) {
-      shotMap.put(r.d, new Distancer(r.hoodDeg, r.rps, r.tof));
+  private static InterpolatingTreeMap<Double, Distancer> buildShotMap(List<Distancer.Row> rows) {
+    rows.sort(Comparator.comparingDouble(r -> r.d));
+    InterpolatingTreeMap<Double, Distancer> map =
+        new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Distancer::interpolate);
+    for (var r : rows) {
+      map.put(r.d, new Distancer(r.hoodDeg, r.rps, r.tof));
     }
+    return map;
+  }
+
+  /** Publishes the Peak Mode switch, always off at startup so it never resumes on its own. */
+  public static void initializeDashboard() {
+    SmartDashboard.putBoolean(PEAK_MODE_KEY, false);
+  }
+
+  /** True when the driver enabled Peak Mode and the peak table actually loaded. */
+  public static boolean isPeakModeActive() {
+    return SmartDashboard.getBoolean(PEAK_MODE_KEY, false) && !peakRows.isEmpty();
   }
 
   // Robot code can't write to the deploy directory on the RIO, so tuned tables go to
@@ -132,7 +147,11 @@ public class GetAdjustedShot {
     Pose2d turretPosition = robotPose.transformBy(new Transform2d(robotToTurret, Rotation2d.kZero));
     double turretToTargetDistance = target.getDistance(turretPosition.getTranslation());
 
-    Distancer initialShot = getShotForDistance(turretToTargetDistance);
+    // Read the switch once per call so one shot never mixes rows from both tables.
+    boolean peak = isPeakModeActive();
+    Logger.recordOutput("ShotTable/PeakModeActive", peak);
+
+    Distancer initialShot = getShotForDistance(turretToTargetDistance, peak);
     if (initialShot == null) {
       return new ShootingParameters(
           false, turretPosition.getRotation(), 0.0, 0.0, 0.0, "shot table is empty");
@@ -144,7 +163,7 @@ public class GetAdjustedShot {
     double lookaheadDistance = turretToTargetDistance;
 
     for (int i = 0; i < LOOKAHEAD_ITERATIONS; i++) {
-      Distancer shotForDistance = getShotForDistance(lookaheadDistance);
+      Distancer shotForDistance = getShotForDistance(lookaheadDistance, peak);
       if (shotForDistance == null) {
         return new ShootingParameters(
             false, turretPosition.getRotation(), 0.0, 0.0, 0.0, "shot table is empty");
@@ -161,7 +180,7 @@ public class GetAdjustedShot {
       lookaheadDistance = target.getDistance(lookaheadTurretTranslation);
     }
 
-    Distancer interpolatedShot = getShotForDistance(lookaheadDistance);
+    Distancer interpolatedShot = getShotForDistance(lookaheadDistance, peak);
     if (interpolatedShot == null) {
       return new ShootingParameters(
           false, turretPosition.getRotation(), 0.0, 0.0, 0.0, "shot table is empty");
@@ -203,26 +222,36 @@ public class GetAdjustedShot {
     return turretVelocity;
   }
 
-  /** Returns the table's hood/flywheel/tof for a distance, or null if the table is empty. */
+  /** Returns the active table's hood/flywheel/tof for a distance, or null if the table is empty. */
   public static Distancer getTableShot(double distanceMeters) {
-    return getShotForDistance(distanceMeters);
+    return getShotForDistance(distanceMeters, isPeakModeActive());
   }
 
   private static Distancer getShotForDistance(double distance) {
-    if (shotRows.isEmpty()) {
+    return getShotForDistance(distance, false);
+  }
+
+  private static Distancer getShotForDistance(double distance, boolean peak) {
+    return peak
+        ? getShotForDistance(peakRows, peakShotMap, distance)
+        : getShotForDistance(shotRows, shotMap, distance);
+  }
+
+  private static Distancer getShotForDistance(
+      List<Distancer.Row> rows, InterpolatingTreeMap<Double, Distancer> map, double distance) {
+    if (rows.isEmpty()) {
       return null;
     }
-    if (shotRows.size() == 1) {
-      return Distancer.fromRow(shotRows.get(0));
+    if (rows.size() == 1) {
+      return Distancer.fromRow(rows.get(0));
     }
-    if (distance < minDistance) {
-      return interpolateBetweenRows(shotRows.get(0), shotRows.get(1), distance);
+    if (distance < rows.get(0).d) {
+      return interpolateBetweenRows(rows.get(0), rows.get(1), distance);
     }
-    if (distance > maxDistance) {
-      return interpolateBetweenRows(
-          shotRows.get(shotRows.size() - 2), shotRows.get(shotRows.size() - 1), distance);
+    if (distance > rows.get(rows.size() - 1).d) {
+      return interpolateBetweenRows(rows.get(rows.size() - 2), rows.get(rows.size() - 1), distance);
     }
-    return shotMap.get(distance);
+    return map.get(distance);
   }
 
   private static Distancer interpolateBetweenRows(

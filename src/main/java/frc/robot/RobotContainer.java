@@ -42,6 +42,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.turret.GetAdjustedShot;
 import frc.robot.subsystems.turret.Tune;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
@@ -252,6 +253,7 @@ public class RobotContainer {
         defaultButtonLoop, driver, drive, intake, indexer, turret1, turret2);
     configureEmergencyBindings();
     tune = new Tune(drive::getPose, turret1, turret2);
+    GetAdjustedShot.initializeDashboard();
     defaultButtonLoop.bind(this::checkMode);
     configureDefaults();
     applyBindingMode(BindingMode.DEFAULT);

@@ -31,3 +31,11 @@ table right now. The test is skipped in normal builds unless `SHOT_TABLE_ANALYSI
   post-score dispersal).
 - Perturbations (assumed, adjustable in the test): aim +/-1 deg, hood +/-1 deg, rps +/-2.5%.
   `pert27` = 3x3x3 grid at those tolerances; `ext125` = 5x5x5 grid at up to 2x.
+
+## Peak table (`src/main/deploy/shot_table_peak.json`, used when the "Peak Mode" switch is on)
+Built by `peak_table.py 3.6` from `search_peak.csv` against the frozen baseline: every row scores at
+every in-region bearing with 27/27 perturbed shots, apex held at 3.6 m wherever hood 13 allows
+(from 3.25 m out), hood and rps never decrease, ties go to the shot that crosses closest to center.
+The 1.3 m row is copied from the patched table (close range can't be made robust).
+Maps: `map_peak_frozen.txt` (frozen baseline), `map_peak_derived.txt` (what the live sim derives
+from the patched shot_table.json).
