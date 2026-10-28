@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -74,8 +75,8 @@ public final class Constants {
       public static final CANcoder rightAzimuthEncoder = new CANcoder(47, CANivore);
       public static final CANcoderConfiguration leftConfig = new CANcoderConfiguration();
       public static final CANcoderConfiguration rightConfig = new CANcoderConfiguration();
-      public static final double leftEncoderOffset = -0.49853515625;
-      public static final double rightEncoderOffset = 0.097412109375;
+      public static final double leftEncoderOffset = -0.479248046875;
+      public static final double rightEncoderOffset = 0.105712890625;
 
       public static final double azimuthGearRatio = 10;
       // Mark these poses from the established zero along the negative-angle wire route.
