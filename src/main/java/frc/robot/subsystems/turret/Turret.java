@@ -45,6 +45,7 @@ public class Turret extends SubsystemBase {
       double minAzimuthControlAngleDeg,
       double maxAzimuthControlAngleDeg,
       CANcoder azimuthEncoder,
+      double azimuthEncoderOffsetRotations,
       double startupCenterDeg,
       ServoChannel.ChannelId hoodChannelId,
       int flywheelID,
@@ -64,6 +65,7 @@ public class Turret extends SubsystemBase {
             azimuthConfig,
             canbus,
             azimuthEncoder,
+            azimuthEncoderOffsetRotations,
             startupCenterDeg,
             minAzimuthControlAngleDeg,
             maxAzimuthControlAngleDeg);
@@ -117,7 +119,7 @@ public class Turret extends SubsystemBase {
   }
 
   public void runZeroAzimuthTarget(GetAdjustedShot.ShootingParameters params) {
-    runSetpoints(new Rotation2d(-135), params.hoodAngleDeg(), params.flywheelSpeed());
+    runSetpoints(Rotation2d.fromDegrees(-135), params.hoodAngleDeg(), params.flywheelSpeed());
   }
 
   public static void toggleTurretMode() {
