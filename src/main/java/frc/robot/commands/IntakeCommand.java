@@ -26,12 +26,14 @@ public class IntakeCommand extends Command {
   @Override
   public void initialize() {
     intake.extend();
-    intake.setIntakeSpeed(mintakeSpeed + (3 * driveSpeedMetersPerSecond.getAsDouble()));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    // Re-evaluated each loop so the roller keeps up with the current drive speed.
+    intake.setIntakeSpeed(mintakeSpeed + (3 * driveSpeedMetersPerSecond.getAsDouble()));
+  }
 
   // Called once the command ends or is interrupted.
   @Override

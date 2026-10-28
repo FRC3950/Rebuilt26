@@ -25,6 +25,9 @@ public class Flywheels {
     flywheelFollower = new TalonFX(flywheelFollowerID, canbus);
 
     flywheel.getConfigurator().apply(flywheelConfig);
+    // Configs are per-device: a follower copies the leader's output, not its neutral mode or
+    // current limits. Its invert comes from the leader plus MotorAlignmentValue below.
+    flywheelFollower.getConfigurator().apply(flywheelConfig);
     flywheelFollower.setControl(new Follower(flywheelID, MotorAlignmentValue.Opposed));
   }
 

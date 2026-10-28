@@ -4,6 +4,7 @@ import static frc.robot.Constants.SubsystemConstants.Turret.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -40,11 +41,18 @@ public class Azimuth {
       TalonFXConfiguration azimuthConfig,
       CANBus canbus,
       CANcoder encoder,
+      double encoderMagnetOffsetRotations,
       double startupCenterDeg,
       double minAngleDeg,
       double maxAngleDeg) {
     azimuth = new TalonFX(azimuthID, canbus);
-    configurationApplied = azimuth.getConfigurator().apply(azimuthConfig).isOK();
+    boolean talonConfigured = azimuth.getConfigurator().apply(azimuthConfig).isOK();
+    boolean encoderConfigured =
+        encoder
+            .getConfigurator()
+            .apply(new MagnetSensorConfigs().withMagnetOffset(encoderMagnetOffsetRotations))
+            .isOK();
+    configurationApplied = talonConfigured && encoderConfigured;
     azimuth.hasResetOccurred();
     this.encoder = encoder;
     this.startupCenterDeg = startupCenterDeg;
@@ -123,7 +131,7 @@ public class Azimuth {
     }
     failStartup("Initializing");
     if (!configurationApplied) {
-      failStartup("Talon configuration failed; restart robot code and check CAN");
+      failStartup("Talon or CANcoder configuration failed; restart robot code and check CAN");
       return;
     }
     var absolute = encoder.getAbsolutePosition();

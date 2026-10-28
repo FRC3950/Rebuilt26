@@ -21,6 +21,7 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
+import frc.robot.util.AllianceFlipUtil;
 
 public final class DefaultModeBindings {
   private DefaultModeBindings() {}
@@ -78,7 +79,12 @@ public final class DefaultModeBindings {
         .y(buttonLoop)
         .onTrue(
             Commands.runOnce(
-                () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                // "Away from the driver" is 180 deg in the blue-origin field frame on red.
+                () ->
+                    drive.setPose(
+                        new Pose2d(
+                            drive.getPose().getTranslation(),
+                            AllianceFlipUtil.apply(Rotation2d.kZero))),
                 drive));
     driver
         .a(buttonLoop)

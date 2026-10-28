@@ -1,12 +1,10 @@
 package frc.robot;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.servohub.ServoChannel;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -74,18 +72,9 @@ public final class Constants {
 
       public static final CANcoder leftAzimuthEncoder = new CANcoder(48, CANivore);
       public static final CANcoder rightAzimuthEncoder = new CANcoder(47, CANivore);
-      public static final CANcoderConfiguration leftConfig = new CANcoderConfiguration();
-      public static final CANcoderConfiguration rightConfig = new CANcoderConfiguration();
+      // CANcoder magnet offsets (rotations), applied to each encoder when its turret is created.
       public static final double leftEncoderOffset = -0.49853515625;
       public static final double rightEncoderOffset = 0.097412109375;
-
-      public static final double leftTurretAzimuthOffset = 0;
-      public static final double rightTurretAzimuthOffset = 0;
-
-      public static final SensorDirectionValue leftEncoderDirection =
-          SensorDirectionValue.CounterClockwise_Positive;
-      public static final SensorDirectionValue rightEncoderDirection =
-          SensorDirectionValue.CounterClockwise_Positive;
 
       public static final double azimuthGearRatio = 10;
       // Mark these poses from the established zero along the negative-angle wire route.
@@ -143,20 +132,12 @@ public final class Constants {
             leftAzimuthConfig,
             leftMinAzimuthControlAngle,
             leftMaxAzimuthControlAngle,
-            leftAzimuthEncoder,
-            leftConfig,
-            leftEncoderOffset,
-            leftEncoderDirection,
-            leftTurretAzimuthOffset);
+            leftAzimuthEncoder);
         applyAzimuthConfig(
             rightAzimuthConfig,
             rightMinAzimuthControlAngle,
             rightMaxAzimuthControlAngle,
-            rightAzimuthEncoder,
-            rightConfig,
-            rightEncoderOffset,
-            rightEncoderDirection,
-            rightTurretAzimuthOffset);
+            rightAzimuthEncoder);
 
         // Flywheel Motor Config
         flywheelConfig.Slot0.kP = flywheelKP;
@@ -172,11 +153,7 @@ public final class Constants {
           TalonFXConfiguration config,
           double minControlAngleDeg,
           double maxControlAngleDeg,
-          CANcoder encoder,
-          CANcoderConfiguration encoderConfig,
-          double encoderMagnetOffset,
-          SensorDirectionValue encoderDirection,
-          double azimuthOffset) {
+          CANcoder encoder) {
         config.Slot0.kP = azimuthKP;
         config.Slot0.kV = azimuthKV;
         config.Slot0.kD = azimuthKD;
@@ -193,14 +170,10 @@ public final class Constants {
             Units.degreesToRotations(
                     minControlAngleDeg - azimuthSoftLimitMarginDeg - TURRET_LIMIT_SWITCH_ANGLE_DEG)
                 * azimuthGearRatio;
-        config.Feedback.FeedbackRotorOffset = azimuthOffset;
         config.CurrentLimits.StatorCurrentLimit = 60;
         config.CurrentLimits.SupplyCurrentLimit = 25;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-
-        encoderConfig.MagnetSensor.SensorDirection = encoderDirection;
-        encoderConfig.MagnetSensor.MagnetOffset = encoderMagnetOffset;
       }
     }
 
@@ -234,10 +207,11 @@ public final class Constants {
         pivotConfig.MotionMagic.MotionMagicAcceleration = pivotMMAcceleration;
         pivotConfig.MotionMagic.MotionMagicCruiseVelocity = pivotMMVelocity;
         pivotConfig.CurrentLimits.StatorCurrentLimit = 40;
-        pivotConfig.CurrentLimits.SupplyCurrentLimit = 20;
+        // Lower limit must be below SupplyCurrentLimit: the limit drops to it after LowerTime.
+        pivotConfig.CurrentLimits.SupplyCurrentLimit = 60;
         pivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         pivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        pivotConfig.CurrentLimits.SupplyCurrentLowerLimit = 60;
+        pivotConfig.CurrentLimits.SupplyCurrentLowerLimit = 20;
         pivotConfig.CurrentLimits.SupplyCurrentLowerTime = 1;
 
         // Intake Motor Config
@@ -246,9 +220,9 @@ public final class Constants {
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         intakeConfig.CurrentLimits.StatorCurrentLimit = 60;
         intakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        intakeConfig.CurrentLimits.SupplyCurrentLimit = 30;
+        intakeConfig.CurrentLimits.SupplyCurrentLimit = 37.5;
         intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        intakeConfig.CurrentLimits.SupplyCurrentLowerLimit = 37.5;
+        intakeConfig.CurrentLimits.SupplyCurrentLowerLimit = 30;
         intakeConfig.CurrentLimits.SupplyCurrentLowerTime = 0.2;
       }
     }
@@ -284,9 +258,9 @@ public final class Constants {
         hotdogConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         hotdogConfig.CurrentLimits.StatorCurrentLimit = 50;
         hotdogConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 30;
+        hotdogConfig.CurrentLimits.SupplyCurrentLimit = 40;
         hotdogConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        hotdogConfig.CurrentLimits.SupplyCurrentLowerLimit = 40;
+        hotdogConfig.CurrentLimits.SupplyCurrentLowerLimit = 30;
         hotdogConfig.CurrentLimits.SupplyCurrentLowerTime = 0.5;
       }
     }
