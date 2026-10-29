@@ -75,8 +75,8 @@ public final class Constants {
       public static final CANcoder rightAzimuthEncoder = new CANcoder(47, CANivore);
       public static final CANcoderConfiguration leftConfig = new CANcoderConfiguration();
       public static final CANcoderConfiguration rightConfig = new CANcoderConfiguration();
-      public static final double leftEncoderOffset = -0.479248046875;
-      public static final double rightEncoderOffset = 0.105712890625;
+      public static final double leftEncoderOffset = 0.470458984375;
+      public static final double rightEncoderOffset = -0.109375;
 
       public static final double azimuthGearRatio = 10;
       // Mark these poses from the established zero along the negative-angle wire route.
