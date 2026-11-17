@@ -320,6 +320,10 @@ public final class Constants {
     public static final int DEMO_TAG_ID = 6;
     // Default aim point above the tag center (m). Live-adjustable at "Demo/Height Above Tag M".
     public static final double DEFAULT_HEIGHT_ABOVE_TAG_METERS = 0.5;
+    // Extra horizontal range for the demo shot, adjustable at "Demo/Range Offset Ft".
+    public static final double DEFAULT_RANGE_OFFSET_FEET = 0.0;
+    // Trial correction for the short 93-inch shot, adjustable at "Demo/Speed Trim".
+    public static final double DEFAULT_SPEED_TRIM = 1.08;
 
     // Height the ball leaves the turret (m). Same value the shot table was calibrated against
     // (sim TURRET_LAUNCH_HEIGHT_METERS). TODO: measure on the real robot.

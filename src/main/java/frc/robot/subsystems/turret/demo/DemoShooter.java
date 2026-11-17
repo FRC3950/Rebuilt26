@@ -1,8 +1,12 @@
 package frc.robot.subsystems.turret.demo;
 
 import static frc.robot.Constants.DemoConstants.*;
+import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret1;
+import static frc.robot.Constants.SubsystemConstants.Turret.robotToTurret2;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -10,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.util.Distancer;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -20,8 +25,8 @@ import java.util.function.BooleanSupplier;
  * <p>This subsystem tracks the tag every loop and hands out the turret targeting command via {@link
  * #targetingCommand}; RobotContainer picks it as each turret's default command in demo mode.
  *
- * <p>Dashboard (under "Demo/"): Tag ID, Height Above Tag M, Speed Trim, Hood Override Deg, Clear
- * Target, plus per-turret status/telemetry.
+ * <p>Dashboard controls include Tag ID, Height Above Tag M, Range Offset Ft, Speed Trim, Hood
+ * Override Deg, and Clear Target.
  */
 public class DemoShooter extends SubsystemBase {
   private final Drive drive;
@@ -43,8 +48,8 @@ public class DemoShooter extends SubsystemBase {
             HUB_IMPACT_BEYOND_CENTER_METERS);
 
     SmartDashboard.putBoolean("Demo/Shot Model Calibrated", model.isCalibrated());
-    // Multiplies the solved flywheel speed; raise above 1.0 if long shots fall short (drag).
-    SmartDashboard.setDefaultNumber(DemoTargeting.SPEED_TRIM_KEY, 1.0);
+    SmartDashboard.setDefaultNumber(DemoTargeting.RANGE_OFFSET_KEY, DEFAULT_RANGE_OFFSET_FEET);
+    SmartDashboard.setDefaultNumber(DemoTargeting.SPEED_TRIM_KEY, DEFAULT_SPEED_TRIM);
     // Outside the hood range (e.g. 0) = auto.
     SmartDashboard.setDefaultNumber(DemoTargeting.HOOD_OVERRIDE_KEY, 0.0);
     SmartDashboard.putData(
@@ -60,5 +65,15 @@ public class DemoShooter extends SubsystemBase {
   public void periodic() {
     tracker.update();
     SmartDashboard.putBoolean("Demo/Active", demoSelected.getAsBoolean());
+    var hub = tracker.getAimPointRobotRelative().map(Translation3d::toTranslation2d);
+    publishHubDistance("Demo/Hub Distance/Robot Ft", hub, Translation2d.kZero);
+    publishHubDistance("Demo/Hub Distance/Left Turret Ft", hub, robotToTurret1);
+    publishHubDistance("Demo/Hub Distance/Right Turret Ft", hub, robotToTurret2);
+  }
+
+  private static void publishHubDistance(
+      String key, Optional<Translation2d> hub, Translation2d origin) {
+    SmartDashboard.putNumber(
+        key, hub.map(target -> Units.metersToFeet(target.getDistance(origin))).orElse(-1.0));
   }
 }

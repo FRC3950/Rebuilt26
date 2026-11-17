@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
@@ -26,6 +27,7 @@ import org.littletonrobotics.junction.Logger;
 class DemoTargeting extends Command {
   private static final int LOOKAHEAD_ITERATIONS = 10;
   private static final Pose2d ROBOT_ORIGIN = Pose2d.kZero;
+  static final String RANGE_OFFSET_KEY = "Demo/Range Offset Ft";
   static final String SPEED_TRIM_KEY = "Demo/Speed Trim";
   static final String HOOD_OVERRIDE_KEY = "Demo/Hood Override Deg";
 
@@ -66,21 +68,24 @@ class DemoTargeting extends Command {
         GetAdjustedShot.getTurretFieldVelocity(
             ROBOT_ORIGIN, drive.getRobotRelativeSpeeds(), robotToTurret);
     double hoodOverride = SmartDashboard.getNumber(HOOD_OVERRIDE_KEY, 0.0);
+    // Compensate for short shots along the line to the hub while keeping the same target height.
+    double rangeOffsetMeters =
+        Units.feetToMeters(SmartDashboard.getNumber(RANGE_OFFSET_KEY, DEFAULT_RANGE_OFFSET_FEET));
 
     // Iterate: where will the turret be when the ball arrives, and what shot does that need?
     Translation2d lookahead = robotToTurret;
     BallisticShotModel.Solution solution = null;
     for (int i = 0; i < LOOKAHEAD_ITERATIONS; i++) {
-      double d = aimXY.getDistance(lookahead);
+      double hubDistanceMeters = aimXY.getDistance(lookahead);
       solution =
           model.solve(
-              d,
+              hubDistanceMeters + rangeOffsetMeters,
               dz,
               minHoodAngle,
               maxHoodAngle,
               maxFlywheelRps,
               hoodOverride,
-              preferredHoodDeg(d),
+              preferredHoodDeg(hubDistanceMeters),
               HOOD_SEARCH_STEP_DEG);
       if (!solution.valid()) {
         break;
@@ -99,7 +104,7 @@ class DemoTargeting extends Command {
       return;
     }
 
-    double trim = SmartDashboard.getNumber(SPEED_TRIM_KEY, 1.0);
+    double trim = SmartDashboard.getNumber(SPEED_TRIM_KEY, DEFAULT_SPEED_TRIM);
     double rps = Math.min(solution.flywheelRps() * trim, maxFlywheelRps);
     Rotation2d turretAngleRobot = aimXY.minus(lookahead).getAngle();
 
