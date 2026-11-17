@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.turret.Turret;
-import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.Distancer;
 import java.util.function.BooleanSupplier;
 
@@ -33,8 +32,7 @@ public class DemoShooter extends SubsystemBase {
   public DemoShooter(Drive drive, BooleanSupplier demoSelected) {
     this.drive = drive;
     this.demoSelected = demoSelected;
-    tracker =
-        new DemoTargetTracker(drive, VisionConstants.camera0Name, VisionConstants.camera1Name);
+    tracker = new DemoTargetTracker(drive);
 
     // Calibrated from the hub table, whose shots land at the back of the HUB funnel.
     model =
@@ -60,8 +58,7 @@ public class DemoShooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    boolean active = demoSelected.getAsBoolean();
-    tracker.update(active);
-    SmartDashboard.putBoolean("Demo/Active", active);
+    tracker.update();
+    SmartDashboard.putBoolean("Demo/Active", demoSelected.getAsBoolean());
   }
 }

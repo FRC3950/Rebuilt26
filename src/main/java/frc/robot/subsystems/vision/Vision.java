@@ -24,16 +24,19 @@ import frc.robot.Constants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
+  private final BooleanSupplier localizationEnabled;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  public Vision(VisionConsumer consumer, VisionIO... io) {
+  public Vision(VisionConsumer consumer, BooleanSupplier localizationEnabled, VisionIO... io) {
     this.consumer = consumer;
+    this.localizationEnabled = localizationEnabled;
     this.io = io;
 
     // Initialize inputs
@@ -62,6 +65,8 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    boolean useFieldLocalization = localizationEnabled.getAsBoolean();
+    Logger.recordOutput("Vision/LocalizationEnabled", useFieldLocalization);
     boolean shouldFlushNetworkTables = false;
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
@@ -102,7 +107,8 @@ public class Vision extends SubsystemBase {
       for (var observation : inputs[cameraIndex].poseObservations) {
         // Check whether to reject pose
         boolean rejectPose =
-            observation.tagCount() == 0 // Must have at least one tag
+            !useFieldLocalization
+                || observation.tagCount() == 0 // Must have at least one tag
                 || (observation.tagCount() == 1
                     && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
                 || Math.abs(observation.pose().getZ())

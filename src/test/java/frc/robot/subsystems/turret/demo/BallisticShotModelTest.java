@@ -5,9 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.Constants.DemoConstants.LimelightRobotSpaceAxes;
 import frc.robot.util.Distancer;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,16 +119,23 @@ class BallisticShotModelTest {
   }
 
   @Test
-  void limelightAxesConvertToWpilibRobotFrame() {
-    var flu =
-        DemoTargetTracker.toRobotFrame(
-            new double[] {2.0, 0.5, 1.5, 0, 0, 0}, LimelightRobotSpaceAxes.FORWARD_LEFT_UP);
-    assertEquals(new Translation3d(2.0, 0.5, 1.5), flu);
-    // Camera-style: x right, y down, z forward -> 2 m ahead, 0.5 m left, 1.5 m up.
-    var rdf =
-        DemoTargetTracker.toRobotFrame(
-            new double[] {-0.5, -1.5, 2.0, 0, 0, 0}, LimelightRobotSpaceAxes.RIGHT_DOWN_FORWARD);
-    assertEquals(new Translation3d(2.0, 0.5, 1.5), rdf);
+  void configuredTagCanBeTheSecondFiducial() {
+    var frame = new double[] {8, 0, 0, 1, 1, 1, 0, 42, 10, 15, 2, 3, 4, 0};
+    assertEquals(7, DemoTargetTracker.findTag(frame, 42));
+    assertEquals(-1, DemoTargetTracker.findTag(frame, 51));
+    assertEquals(-1, DemoTargetTracker.findTag(new double[] {42, 10}, 42));
+  }
+
+  @Test
+  void limelightAnglesAndDistanceUseCameraMountPose() {
+    var mount = new Transform3d(0.4, -0.1, 0.2, new Rotation3d(0, 0, -Math.PI / 2));
+    // +tx is camera-right, which points backward on a right-facing camera. +ty is up.
+    var target = DemoTargetTracker.toRobotFrame(45.0, 45.0, Math.sqrt(3.0), mount).orElseThrow();
+    assertEquals(-0.6, target.getX(), 1e-9);
+    assertEquals(-1.1, target.getY(), 1e-9);
+    assertEquals(1.2, target.getZ(), 1e-9);
+    assertTrue(DemoTargetTracker.toRobotFrame(0.0, 0.0, 0.0, mount).isEmpty());
+    assertTrue(DemoTargetTracker.toRobotFrame(Double.NaN, 0.0, 1.0, mount).isEmpty());
   }
 
   @Test

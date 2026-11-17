@@ -56,15 +56,13 @@ public class DriveCommands {
         .getTranslation();
   }
 
-  /**
-   * Field relative drive command using two joysticks (controlling linear and angular velocities).
-   */
+  /** Field-relative drive using the supplied heading relative to the driver's forward direction. */
   public static Command joystickDrive(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
-
+      DoubleSupplier omegaSupplier,
+      Supplier<Rotation2d> driverRelativeHeading) {
     return Commands.run(
         () -> {
 
@@ -85,8 +83,7 @@ public class DriveCommands {
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
           drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds, AllianceFlipUtil.apply(drive.getRotation())));
+              ChassisSpeeds.fromFieldRelativeSpeeds(speeds, driverRelativeHeading.get()));
         },
         drive);
   }
