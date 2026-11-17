@@ -75,8 +75,8 @@ public final class Constants {
       public static final CANcoder rightAzimuthEncoder = new CANcoder(47, CANivore);
       public static final CANcoderConfiguration leftConfig = new CANcoderConfiguration();
       public static final CANcoderConfiguration rightConfig = new CANcoderConfiguration();
-      public static final double leftEncoderOffset = 0.43798828125;
-      public static final double rightEncoderOffset = 0.242431640625;
+      public static final double leftEncoderOffset = 0.487548828125;
+      public static final double rightEncoderOffset = -0.450439453125;
 
       public static final double azimuthGearRatio = 10;
       // Mark these poses from the established zero along the negative-angle wire route.
@@ -317,7 +317,7 @@ public final class Constants {
   /** Demo mode: shoot at a point a set height above a single AprilTag seen by the Limelights. */
   public static final class DemoConstants {
     // TODO: set to the demo goal's AprilTag ID. Also editable live at "Demo/Tag ID".
-    public static final int DEMO_TAG_ID = -1;
+    public static final int DEMO_TAG_ID = 6;
     // Default aim point above the tag center (m). Live-adjustable at "Demo/Height Above Tag M".
     public static final double DEFAULT_HEIGHT_ABOVE_TAG_METERS = 0.5;
 
