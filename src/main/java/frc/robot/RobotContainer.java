@@ -52,6 +52,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.Field2dPublisher;
 import frc.robot.util.MatchTiming;
 import org.littletonrobotics.junction.Logger;
@@ -60,7 +61,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   public enum BindingMode {
     DEFAULT,
-    /** Turrets shoot at a point above the demo AprilTag; no ferrying, no field odometry. */
+    /** Turrets track the demo AprilTag. Driving uses wheel and gyro odometry. */
     DEMO
   }
 
@@ -105,6 +106,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
+                () -> !isDemoMode(),
                 new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
                 new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
         break;
@@ -123,6 +125,7 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
+                () -> !isDemoMode(),
                 new VisionIOPhotonVisionSim(
                     VisionConstants.camera0Name, VisionConstants.robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(
@@ -140,7 +143,12 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
 
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                () -> !isDemoMode(),
+                new VisionIO() {},
+                new VisionIO() {});
         break;
     }
 
@@ -347,6 +355,11 @@ public class RobotContainer {
             this::isDemoMode));
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
-            drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
+            drive,
+            () -> -driver.getLeftY(),
+            () -> -driver.getLeftX(),
+            () -> -driver.getRightX(),
+            () ->
+                isDemoMode() ? drive.getRotation() : AllianceFlipUtil.apply(drive.getRotation())));
   }
 }

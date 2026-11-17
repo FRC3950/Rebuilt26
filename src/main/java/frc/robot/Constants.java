@@ -341,26 +341,12 @@ public final class Constants {
     public static final double MIN_TAG_HEIGHT_METERS = 0.0;
     public static final double MAX_TAG_HEIGHT_METERS = 4.0;
     public static final double MAX_TAG_RANGE_METERS = 12.0;
+    // Discard cached NetworkTables frames after a camera stops sending data.
+    public static final double MAX_LIMELIGHT_SAMPLE_AGE_SECS = 0.5;
     // A new measurement this far from the stored target replaces it instead of being averaged.
     public static final double TARGET_RESET_JUMP_METERS = 1.0;
     // Low-pass weight given to each new tag measurement (0-1).
     public static final double TARGET_FILTER_ALPHA = 0.2;
-
-    /**
-     * Axis convention of Limelight "targetpose_robotspace". The Limelight NT docs do not state it;
-     * the LimelightLib docs describe robot space as "x forward, y left, z up", so that is the
-     * default. VERIFY ON ROBOT: put the tag ~2 m straight ahead of robot center and check that
-     * "Demo/Raw Tag Robot X" is about +2 and "Demo/Raw Tag Robot Z" equals the tag height.
-     */
-    public enum LimelightRobotSpaceAxes {
-      /** [x forward, y left, z up] (WPILib convention). */
-      FORWARD_LEFT_UP,
-      /** [x right, y down, z forward] (camera/OpenCV-style). */
-      RIGHT_DOWN_FORWARD
-    }
-
-    public static final LimelightRobotSpaceAxes LIMELIGHT_ROBOT_SPACE_AXES =
-        LimelightRobotSpaceAxes.FORWARD_LEFT_UP;
   }
 
   public static final class SimConstants {

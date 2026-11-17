@@ -13,7 +13,7 @@ import frc.robot.subsystems.intake.Intake;
 
 /**
  * Driver bindings for the Demo code mode. Turret aiming is handled by DemoShooter, so there is no
- * ferrying, no face-the-hub, and nothing that depends on field odometry here.
+ * ferrying or face-the-hub. Heading for field-relative driving comes from wheel/gyro odometry.
  */
 public final class DemoModeBindings {
   private DemoModeBindings() {}
