@@ -314,6 +314,55 @@ public final class Constants {
     }
   }
 
+  /** Demo mode: shoot at a point a set height above a single AprilTag seen by the Limelights. */
+  public static final class DemoConstants {
+    // TODO: set to the demo goal's AprilTag ID. Also editable live at "Demo/Tag ID".
+    public static final int DEMO_TAG_ID = -1;
+    // Default aim point above the tag center (m). Live-adjustable at "Demo/Height Above Tag M".
+    public static final double DEFAULT_HEIGHT_ABOVE_TAG_METERS = 0.5;
+
+    // Height the ball leaves the turret (m). Same value the shot table was calibrated against
+    // (sim TURRET_LAUNCH_HEIGHT_METERS). TODO: measure on the real robot.
+    public static final double LAUNCH_HEIGHT_METERS = SimConstants.Fuel.TURRET_LAUNCH_HEIGHT_METERS;
+
+    // Where the hub shot table actually lands: the back of the HUB funnel, not hub center.
+    // 2026 manual 5.4: opening front edge 72 in off the carpet, 41.7 in hexagonal opening, so the
+    // back rim is ~half the opening past hub center. Hub AprilTags are at 44.25 in (1.124 m),
+    // which puts the table's impact point ~0.71 m above the hub tags.
+    public static final double HUB_IMPACT_HEIGHT_METERS = Units.inchesToMeters(72.0);
+    public static final double HUB_IMPACT_BEYOND_CENTER_METERS = Units.inchesToMeters(41.7) / 2.0;
+
+    // Hood search resolution when solving a shot.
+    public static final double HOOD_SEARCH_STEP_DEG = 0.25;
+    // Extra delay (s) between command and ball exit, same as hub targeting.
+    public static final double SHOT_EXTRA_LATENCY_SECS = 0.05;
+
+    // Tag measurement gating / smoothing.
+    public static final double MIN_TAG_HEIGHT_METERS = 0.0;
+    public static final double MAX_TAG_HEIGHT_METERS = 4.0;
+    public static final double MAX_TAG_RANGE_METERS = 12.0;
+    // A new measurement this far from the stored target replaces it instead of being averaged.
+    public static final double TARGET_RESET_JUMP_METERS = 1.0;
+    // Low-pass weight given to each new tag measurement (0-1).
+    public static final double TARGET_FILTER_ALPHA = 0.2;
+
+    /**
+     * Axis convention of Limelight "targetpose_robotspace". The Limelight NT docs do not state it;
+     * the LimelightLib docs describe robot space as "x forward, y left, z up", so that is the
+     * default. VERIFY ON ROBOT: put the tag ~2 m straight ahead of robot center and check that
+     * "Demo/Raw Tag Robot X" is about +2 and "Demo/Raw Tag Robot Z" equals the tag height.
+     */
+    public enum LimelightRobotSpaceAxes {
+      /** [x forward, y left, z up] (WPILib convention). */
+      FORWARD_LEFT_UP,
+      /** [x right, y down, z forward] (camera/OpenCV-style). */
+      RIGHT_DOWN_FORWARD
+    }
+
+    public static final LimelightRobotSpaceAxes LIMELIGHT_ROBOT_SPACE_AXES =
+        LimelightRobotSpaceAxes.FORWARD_LEFT_UP;
+  }
+
   public static final class SimConstants {
     public static final class Fuel {
       public static final int MAX_FUEL_CAPACITY = 40;

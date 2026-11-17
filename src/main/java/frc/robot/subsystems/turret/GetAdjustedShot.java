@@ -180,7 +180,7 @@ public class GetAdjustedShot {
         "");
   }
 
-  private Translation2d getTurretFieldVelocity(
+  public static Translation2d getTurretFieldVelocity(
       Pose2d robotPose, ChassisSpeeds fieldVelocity, Translation2d robotToTurret) {
     Translation2d turretOffsetField = robotToTurret.rotateBy(robotPose.getRotation());
     double rotationalVelocityX = -fieldVelocity.omegaRadiansPerSecond * turretOffsetField.getY();

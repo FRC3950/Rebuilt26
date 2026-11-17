@@ -376,6 +376,11 @@ public class Drive extends SubsystemBase {
     return getPose().getRotation();
   }
 
+  /** Returns the raw gyro heading, unaffected by vision corrections or pose resets. */
+  public Rotation2d getRawGyroRotation() {
+    return rawGyroRotation;
+  }
+
   /** Returns the measured chassis speeds of the robot (robot-relative). */
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return getChassisSpeeds();

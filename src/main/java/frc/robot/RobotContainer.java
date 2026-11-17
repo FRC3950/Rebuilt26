@@ -29,8 +29,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.IntakeCommand;
 import frc.robot.controls.DefaultModeBindings;
+import frc.robot.controls.DemoModeBindings;
 import frc.robot.generated.TunerConstants;
 import frc.robot.sim.FuelSimCommand;
 import frc.robot.sim.FuelSimulationController;
@@ -46,6 +46,7 @@ import frc.robot.subsystems.turret.Tune;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.turret.TurretTargeting;
 import frc.robot.subsystems.turret.TurretVisualization;
+import frc.robot.subsystems.turret.demo.DemoShooter;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -58,7 +59,9 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
   public enum BindingMode {
-    DEFAULT
+    DEFAULT,
+    /** Turrets shoot at a point above the demo AprilTag; no ferrying, no field odometry. */
+    DEMO
   }
 
   private final Drive drive;
@@ -72,11 +75,12 @@ public class RobotContainer {
   private final Indexer indexer;
   private final Command simulationCommand;
   private final CommandXboxController driver = new CommandXboxController(0);
-  private final CommandXboxController operator = new CommandXboxController(1);
 
   private final EventLoop defaultButtonLoop = new EventLoop();
+  private final EventLoop demoButtonLoop = new EventLoop();
 
   private final Tune tune;
+  private final DemoShooter demoShooter;
 
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<BindingMode> bindingModeChooser;
@@ -249,12 +253,15 @@ public class RobotContainer {
 
     bindingModeChooser = new LoggedDashboardChooser<>("Code Mode");
     bindingModeChooser.addDefaultOption("Default", BindingMode.DEFAULT);
+    bindingModeChooser.addOption("Demo Mode", BindingMode.DEMO);
+    demoShooter = new DemoShooter(drive, this::isDemoMode);
 
     DefaultModeBindings.configure(
         defaultButtonLoop, driver, drive, intake, indexer, turret1, turret2);
-    configureEmergencyBindings();
+    DemoModeBindings.configure(demoButtonLoop, driver, drive, intake, indexer);
     tune = new Tune(drive::getPose, turret1, turret2);
     defaultButtonLoop.bind(this::checkMode);
+    demoButtonLoop.bind(this::checkMode);
     configureDefaults();
     applyBindingMode(BindingMode.DEFAULT);
   }
@@ -297,64 +304,21 @@ public class RobotContainer {
     return isDisabled && selectedBindingMode != currentBindingMode;
   }
 
-  private void configureEmergencyBindings() {
-    operator
-        .leftTrigger(0.5, defaultButtonLoop)
-        .whileTrue(
-            new IntakeCommand(
-                intake,
-                () -> {
-                  var speeds = drive.getRobotRelativeSpeeds();
-                  return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
-                }));
-    operator.rightBumper(defaultButtonLoop).onTrue(intake.retractCommand());
-
-    operator
-        .rightTrigger(0.5, defaultButtonLoop)
-        .whileTrue(
-            Commands.startEnd(
-                () -> {
-                  indexer.startIndexer();
-                  indexer.startHotdog();
-                },
-                () -> {
-                  indexer.stopIndexer();
-                  indexer.stopHotdog();
-                },
-                indexer));
-
-    operator
-        .b(defaultButtonLoop)
-        .and(operator.start(defaultButtonLoop).negate())
-        .whileTrue(
-            Commands.startEnd(
-                () -> {
-                  indexer.setIndexerSpeed(-Constants.SubsystemConstants.Indexer.indexerSpeed);
-                  indexer.setHotdogSpeed(-Constants.SubsystemConstants.Indexer.hotdogSpeed);
-                },
-                () -> {
-                  indexer.stopIndexer();
-                  indexer.stopHotdog();
-                },
-                indexer));
-    operator
-        .start(defaultButtonLoop)
-        .and(operator.b(defaultButtonLoop))
-        .whileTrue(Commands.startEnd(intake::reverseIntake, intake::stopIntake, intake));
-
-    operator.a(defaultButtonLoop).onTrue(Commands.runOnce(Turret::toggleTurretMode)).debounce(0.25);
-  }
-
   private void applyBindingMode(BindingMode bindingMode) {
     CommandScheduler.getInstance()
         .setActiveButtonLoop(
             switch (bindingMode) {
               case DEFAULT -> defaultButtonLoop;
+              case DEMO -> demoButtonLoop;
             });
 
     appliedBindingMode = bindingMode;
     SmartDashboard.putString("Code Mode/Applied", appliedBindingMode.name());
     Logger.recordOutput("Controls/BindingModeApplied", appliedBindingMode.name());
+  }
+
+  private boolean isDemoMode() {
+    return appliedBindingMode == BindingMode.DEMO;
   }
 
   private BindingMode getSelectedBindingMode() {
@@ -370,8 +334,17 @@ public class RobotContainer {
     //     new TurretTargeting(turret2, drive, robotToTurret2, Turret.getTargetingMode()));
     // Re-enable hub tracking by commenting out the two lock lines above and uncommenting the two
     // lines below.
-    turret1.setDefaultCommand(new TurretTargeting(turret1, drive, robotToTurret1));
-    turret2.setDefaultCommand(new TurretTargeting(turret2, drive, robotToTurret2));
+    // Picked each time the default starts (every enable). Code mode only changes while disabled.
+    turret1.setDefaultCommand(
+        Commands.either(
+            demoShooter.targetingCommand(turret1, robotToTurret1),
+            new TurretTargeting(turret1, drive, robotToTurret1),
+            this::isDemoMode));
+    turret2.setDefaultCommand(
+        Commands.either(
+            demoShooter.targetingCommand(turret2, robotToTurret2),
+            new TurretTargeting(turret2, drive, robotToTurret2),
+            this::isDemoMode));
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive, () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
