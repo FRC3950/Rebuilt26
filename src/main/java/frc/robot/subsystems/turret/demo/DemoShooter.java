@@ -18,15 +18,14 @@ import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 /**
- * Demo mode: turrets shoot at a point a set height above one AprilTag, solving hood and flywheel
- * for that distance AND height. Field odometry is not used, only the Limelights plus the robot's
- * own motion.
+ * Demo mode: turrets solve hood and flywheel setpoints for a funnel opening behind and above one
+ * AprilTag. The target tracker uses the Limelights and the robot's own motion.
  *
  * <p>This subsystem tracks the tag every loop and hands out the turret targeting command via {@link
  * #targetingCommand}; RobotContainer picks it as each turret's default command in demo mode.
  *
- * <p>Dashboard controls include Tag ID, Height Above Tag M, Range Offset Ft, Speed Trim, Hood
- * Override Deg, and Clear Target.
+ * <p>Dashboard controls include Tag ID, Hub Depth Behind Tag In, Height Above Tag M, Range Offset
+ * Ft, Speed Trim, Hood Override Deg, and Clear Target.
  */
 public class DemoShooter extends SubsystemBase {
   private final Drive drive;

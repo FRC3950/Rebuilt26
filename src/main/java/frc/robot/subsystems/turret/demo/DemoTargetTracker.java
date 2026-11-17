@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
@@ -31,6 +32,7 @@ import org.littletonrobotics.junction.Logger;
 class DemoTargetTracker {
   private static final String TAG_ID_KEY = "Demo/Tag ID";
   private static final String HEIGHT_ABOVE_TAG_KEY = "Demo/Height Above Tag M";
+  private static final String HUB_DEPTH_BEHIND_TAG_KEY = "Demo/Hub Depth Behind Tag In";
   private static final String SIM_TAG_X_KEY = "Demo/Sim Tag X";
   private static final String SIM_TAG_Y_KEY = "Demo/Sim Tag Y";
   private static final String SIM_TAG_Z_KEY = "Demo/Sim Tag Z";
@@ -74,6 +76,7 @@ class DemoTargetTracker {
         };
     SmartDashboard.setDefaultNumber(TAG_ID_KEY, DEMO_TAG_ID);
     SmartDashboard.setDefaultNumber(HEIGHT_ABOVE_TAG_KEY, DEFAULT_HEIGHT_ABOVE_TAG_METERS);
+    SmartDashboard.setDefaultNumber(HUB_DEPTH_BEHIND_TAG_KEY, DEFAULT_HUB_DEPTH_BEHIND_TAG_INCHES);
     if (Constants.currentMode == Constants.Mode.SIM) {
       SmartDashboard.setDefaultNumber(SIM_TAG_X_KEY, 8.0);
       SmartDashboard.setDefaultNumber(SIM_TAG_Y_KEY, 4.0);
@@ -100,7 +103,23 @@ class DemoTargetTracker {
       return Optional.empty();
     }
     double above = SmartDashboard.getNumber(HEIGHT_ABOVE_TAG_KEY, DEFAULT_HEIGHT_ABOVE_TAG_METERS);
-    return Optional.of(tagRobotRelative.plus(new Translation3d(0.0, 0.0, above)));
+    double depthInches =
+        SmartDashboard.getNumber(HUB_DEPTH_BEHIND_TAG_KEY, DEFAULT_HUB_DEPTH_BEHIND_TAG_INCHES);
+    if (!Double.isFinite(depthInches) || depthInches < 0.0) {
+      depthInches = DEFAULT_HUB_DEPTH_BEHIND_TAG_INCHES;
+    }
+    return Optional.of(aimPointFromTag(tagRobotRelative, Units.inchesToMeters(depthInches), above));
+  }
+
+  /** The bearing-only measurement approximates the face normal for a head-on shot. */
+  static Translation3d aimPointFromTag(
+      Translation3d tag, double depthBehindTagMeters, double heightAboveTagMeters) {
+    Translation2d hub = tag.toTranslation2d();
+    double tagRange = hub.getNorm();
+    if (tagRange > 0.0) {
+      hub = hub.times(1.0 + depthBehindTagMeters / tagRange);
+    }
+    return new Translation3d(hub.getX(), hub.getY(), tag.getZ() + heightAboveTagMeters);
   }
 
   /** Call once per loop. */
